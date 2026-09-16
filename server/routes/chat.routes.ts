@@ -1,7 +1,8 @@
 import { Router } from 'express'
 import { rbacMiddleware } from '../middleware'
 import { chatService } from '../services'
-import { HttpStatus } from '../shared/utils'
+import { decodeFileName, uploader, uploadsPathOf } from '../shared/uploads'
+import { HttpError, HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
 import {
   parseCompanionId,
@@ -14,6 +15,8 @@ import {
 import { idOf, respond } from './respond'
 
 const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
+const FILE_FIELD = 'file'
+const FILE_REQUIRED = 'Файл не передан'
 const actorOf = (req: { user?: IAuthUser }) => (req.user as IAuthUser).id
 
 export const chatRouter = Router()
@@ -57,3 +60,25 @@ chatRouter.post('/remove-member/:id', anyRole, respond(
 ))
 chatRouter.patch('/leave/:id', anyRole, respond((req) => chatService.leave(actorOf(req), idOf(req))))
 chatRouter.patch('/read/:id', anyRole, respond((req) => chatService.markRead(actorOf(req), idOf(req))))
+
+chatRouter.post('/upload/:id', anyRole, uploader.single(FILE_FIELD), respond((req) => {
+  const file = req.file
+  if (!file) throw new HttpError(HttpStatus.BAD_REQUEST, FILE_REQUIRED)
+  const attachment = {
+    fileName: decodeFileName(file.originalname),
+    filePath: file.filename,
+    fileSize: file.size,
+    fileMime: file.mimetype,
+  }
+  const caption = typeof req.body?.body === 'string' ? req.body.body.trim() : ''
+  return chatService.send(actorOf(req), idOf(req), caption, attachment)
+}, HttpStatus.CREATED))
+
+chatRouter.get('/file/:id', anyRole, async (req, res, next) => {
+  try {
+    const stored = await chatService.fileOf(actorOf(req), idOf(req))
+    res.download(uploadsPathOf(stored.path), stored.name)
+  } catch (error) {
+    next(error)
+  }
+})

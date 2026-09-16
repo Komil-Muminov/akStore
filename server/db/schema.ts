@@ -79,6 +79,10 @@ export const SCHEMA = `
   ALTER TABLE chat_conversations ALTER COLUMN direct_key DROP NOT NULL;
   ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS edited_at TIMESTAMPTZ;
   ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+  ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_name TEXT NOT NULL DEFAULT '';
+  ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_path TEXT NOT NULL DEFAULT '';
+  ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_size BIGINT NOT NULL DEFAULT 0;
+  ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_mime TEXT NOT NULL DEFAULT '';
 `
 
 export const SEED_LEADERSHIP = { name: 'Руководство' }

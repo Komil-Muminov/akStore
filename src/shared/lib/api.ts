@@ -62,3 +62,26 @@ export const request = async <T>(url: string, options: IRequestOptions = {}) => 
   return (payload as IApiResponse<T>).data
 }
 
+
+export const uploadFile = async <T>(url: string, filePath: string, caption: string) => {
+  const token = session.get()?.token
+  const path = await import('node:path')
+  const form = new FormData()
+  form.append('file', Bun.file(filePath), path.basename(filePath))
+  form.append('body', caption)
+
+  let response: Response
+  try {
+    response = await fetch(`${env.apiUrl}${url}`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    })
+  } catch {
+    throw new Error('Не удалось подключиться к серверу')
+  }
+
+  const payload: unknown = await response.json().catch(() => null)
+  if (!response.ok) throw new Error(getErrorMessage(response.status, response.statusText, payload))
+  return (payload as IApiResponse<T>).data
+}

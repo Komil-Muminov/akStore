@@ -2,7 +2,8 @@ import { chatDb, chatMembersDb, chatMessagesDb, usersDb } from '../db'
 import { hub } from '../realtime/hub'
 import { ChatEventType } from '../realtime/model'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { ConversationKind } from '../types'
+import { removeUpload } from '../shared/uploads'
+import { ConversationKind, type IAttachment } from '../types'
 
 const HISTORY_LIMIT = 50
 const SEARCH_LIMIT = 40
@@ -122,9 +123,9 @@ export const chatService = {
     return chatMessagesDb.search(userId, `%${needle}%`, SEARCH_LIMIT)
   },
 
-  send: async (userId: string, conversationId: string, body: string) => {
+  send: async (userId: string, conversationId: string, body: string, file: IAttachment | null = null) => {
     const members = await requireMembership(conversationId, userId)
-    const message = await chatMessagesDb.create(conversationId, userId, body)
+    const message = await chatMessagesDb.create(conversationId, userId, body, file)
     await chatDb.markRead(conversationId, userId)
     hub.publish(members, ChatEventType.MESSAGE, message)
     return message
@@ -141,13 +142,26 @@ export const chatService = {
     return updated
   },
 
+  fileOf: async (userId: string, messageId: string) => {
+    const existing = await chatMessagesDb.find(messageId)
+    if (!existing || existing.isDeleted || existing.fileName.length === 0) {
+      throw new HttpError(HttpStatus.NOT_FOUND, MESSAGE_MISSING)
+    }
+    await requireMembership(existing.conversationId, userId)
+    const stored = await chatMessagesDb.filePathOf(messageId)
+    if (!stored) throw new HttpError(HttpStatus.NOT_FOUND, MESSAGE_MISSING)
+    return stored
+  },
+
   removeMessage: async (userId: string, messageId: string) => {
     const existing = await chatMessagesDb.find(messageId)
     if (!existing || existing.isDeleted) throw new HttpError(HttpStatus.NOT_FOUND, MESSAGE_MISSING)
     if (existing.authorId !== userId) throw new HttpError(HttpStatus.FORBIDDEN, NOT_AUTHOR)
     const members = await requireMembership(existing.conversationId, userId)
+    const stored = await chatMessagesDb.filePathOf(messageId)
     const removed = await chatMessagesDb.softDelete(messageId)
     if (!removed) throw new HttpError(HttpStatus.NOT_FOUND, MESSAGE_MISSING)
+    if (stored?.path) removeUpload(stored.path)
     hub.publish(members, ChatEventType.MESSAGE_REMOVED, removed)
     return removed
   },

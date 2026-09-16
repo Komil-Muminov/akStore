@@ -13,6 +13,9 @@ export interface IProps {
   onManage: () => void
   onEditMessage: (message: IMessage) => void
   onRemoveMessage: (message: IMessage) => void
+  onDownload: (message: IMessage) => void
+  onDropFiles: (paths: string[]) => void
+  dropHint: boolean
 }
 
 export const ESTIMATED_MESSAGE_HEIGHT = 64

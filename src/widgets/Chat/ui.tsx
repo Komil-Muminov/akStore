@@ -18,6 +18,7 @@ import { useChatRealtime } from './realtime'
 import { useMessageActions } from './actions'
 import { useChatControls } from './controls'
 import { useGroupPanel } from './group'
+import { useAttachments } from './files'
 import { ChatDialogs } from './ui/ChatDialogs'
 import { filterCompanions } from './lib'
 import { pane, root } from './style'
@@ -33,6 +34,7 @@ export const Chat = () => {
   const controls = useChatControls({ open, createGroup, leave, setDraft, cancelEdit: actions.cancelEdit })
   const { activeId, query } = controls
   const panel = useGroupPanel(activeId)
+  const files = useAttachments(activeId)
   const onlineQuery = useOnlineQuery()
   const { online, setOnline, typingName } = useChatRealtime(activeId)
 
@@ -109,6 +111,9 @@ export const Chat = () => {
                   onManage={panel.show}
                   onEditMessage={actions.startEdit}
                   onRemoveMessage={actions.askRemove}
+                  onDownload={files.handleDownload}
+                  onDropFiles={files.sendFiles}
+                  dropHint={files.pending}
                 />
                 <If condition={active !== null}>
                   <ChatComposer
@@ -116,7 +121,7 @@ export const Chat = () => {
                     disabled={activeId === null}
                     pending={send.isPending || actions.pending}
                     editing={isEditing}
-                    error={send.error?.message ?? actions.error}
+                    error={send.error?.message ?? actions.error ?? files.error}
                     onChange={controls.changeDraft}
                     onSend={handleSend}
                     onCancelEdit={actions.cancelEdit}

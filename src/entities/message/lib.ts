@@ -1,4 +1,12 @@
-import { ConversationKind, MEMBERS_FORMS, UNREAD_LIMIT, UNREAD_OVERFLOW, type IConversation, type IMessage } from './model'
+import {
+  ConversationKind,
+  MEMBERS_FORMS,
+  SIZE_UNITS,
+  UNREAD_LIMIT,
+  UNREAD_OVERFLOW,
+  type IConversation,
+  type IMessage,
+} from './model'
 
 const TIME_OPTIONS: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
 const DAY_OPTIONS: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long' }
@@ -56,3 +64,19 @@ export const previewOf = (conversation: IConversation) =>
 export const isReadByCompanion = (message: IMessage, conversation: IConversation) =>
   conversation.companionReadAt !== null &&
   new Date(message.createdAt).getTime() <= new Date(conversation.companionReadAt).getTime()
+
+const SIZE_STEP = 1024
+const SIZE_PRECISION = 1
+
+export const fileSizeOf = (bytes: number) => {
+  let value = bytes
+  let unit = 0
+  while (value >= SIZE_STEP && unit < SIZE_UNITS.length - 1) {
+    value /= SIZE_STEP
+    unit += 1
+  }
+  const rounded = unit === 0 ? String(value) : value.toFixed(SIZE_PRECISION)
+  return `${rounded} ${SIZE_UNITS[unit] ?? ''}`
+}
+
+export const hasFile = (message: IMessage) => message.fileName.length > 0 && !message.isDeleted

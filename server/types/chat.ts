@@ -44,6 +44,9 @@ export interface IMessage {
   createdAt: string
   editedAt: string | null
   isDeleted: boolean
+  fileName: string
+  fileSize: number
+  fileMime: string
 }
 
 export interface IMessageRow {
@@ -55,6 +58,10 @@ export interface IMessageRow {
   created_at: Date
   edited_at: Date | null
   deleted_at: Date | null
+  file_name: string
+  file_path: string
+  file_size: string
+  file_mime: string
 }
 
 export interface IMember {
@@ -67,6 +74,13 @@ export interface IMemberRow {
   user_id: string
   full_name: string
   login: string
+}
+
+export interface IAttachment {
+  fileName: string
+  filePath: string
+  fileSize: number
+  fileMime: string
 }
 
 export interface IGroupInput {

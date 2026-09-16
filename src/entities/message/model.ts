@@ -28,6 +28,9 @@ export interface IMessage {
   createdAt: string
   editedAt: string | null
   isDeleted: boolean
+  fileName: string
+  fileSize: number
+  fileMime: string
 }
 
 export interface IMember {
@@ -44,4 +47,6 @@ export const OFFLINE_HINT = 'Не в сети'
 export const TYPING_HINT = 'печатает…'
 export const EDITED_MARK = 'изменено'
 export const DELETED_BODY = 'Сообщение удалено'
+export const SIZE_UNITS = ['Б', 'КБ', 'МБ', 'ГБ']
+export const UPLOAD_HINT = 'Отправляю файл…'
 export const MEMBERS_FORMS = ['участник', 'участника', 'участников']
