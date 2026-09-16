@@ -47,6 +47,10 @@ export const tabCount = (active: boolean): StyleDesc => ({
   color: active ? theme.colors.accent : theme.colors.tertiary,
 })
 
+export const tabLabel = (active: boolean): StyleDesc => ({
+  color: active ? theme.colors.text : theme.colors.secondary,
+})
+
 export const main: StyleDesc = {
   flexGrow: 1,
   minWidth: 0,

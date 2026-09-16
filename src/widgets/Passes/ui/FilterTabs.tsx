@@ -2,7 +2,7 @@ import { memo, useCallback } from 'react'
 import { PassFilter } from '@/entities/pass'
 import { theme } from '@/shared/config'
 import { Icon, Text, type TIconName } from '@/shared/ui'
-import { tab, tabCount, tabs } from '../style'
+import { tab, tabCount, tabLabel, tabs } from '../style'
 
 interface ITab {
   id: PassFilter
@@ -28,7 +28,7 @@ const Tab = memo(({ entry, active, total, onSelect }: ITabProps) => {
   return (
     <div testId={`passes__tab-${entry.id}`} onClick={handleClick} style={tab(active)}>
       <Icon name={entry.icon} size={theme.size.iconSm + 2} color={active ? theme.colors.accent : theme.colors.secondary} />
-      <Text variant={active ? 'bodyStrong' : 'body'}>{entry.label}</Text>
+      <Text variant="bodyStrong" style={tabLabel(active)}>{entry.label}</Text>
       <text style={tabCount(active)}>{String(total)}</text>
     </div>
   )
