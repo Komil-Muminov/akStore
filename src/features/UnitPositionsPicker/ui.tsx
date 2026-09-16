@@ -11,12 +11,13 @@ import {
   ESTIMATED_ITEM_HEIGHT,
   NEW_POSITION_PLACEHOLDER,
   NO_EMPLOYEE,
+  SEARCH_EMPTY,
   SEARCH_POSITION_PLACEHOLDER,
   SUBMIT_LABEL,
   TITLE,
   type IProps,
 } from './model'
-import { footer, formRow, inputWrap, itemCard, itemWrapper, list, selectRow, selectStyle, spacer } from './style'
+import { emptyWrap, footer, formRow, inputWrap, itemCard, itemWrapper, list, selectRow, selectStyle, spacer } from './style'
 
 export const UnitPositionsPicker = ({
   unit,
@@ -115,20 +116,25 @@ export const UnitPositionsPicker = ({
           testId="unit-positions__new-add"
         />
       </div>
-      <If condition={positions.length > 5}>
-        <div style={formRow}>
-          <div style={inputWrap}>
-            <TextInput
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder={SEARCH_POSITION_PLACEHOLDER}
-              icon="search"
-              testId="unit-positions__search"
-            />
-          </div>
+      <div style={formRow}>
+        <div style={inputWrap}>
+          <TextInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder={SEARCH_POSITION_PLACEHOLDER}
+            icon="search"
+            testId="unit-positions__search"
+          />
         </div>
-      </If>
-      <If condition={filteredPositions.length > 0} fallback={<Text variant="secondary">{EMPTY}</Text>}>
+      </div>
+      <If
+        condition={filteredPositions.length > 0}
+        fallback={
+          <div style={emptyWrap}>
+            <Text variant="secondary">{searchQuery.trim() ? SEARCH_EMPTY : EMPTY}</Text>
+          </div>
+        }
+      >
         <virtual-list estimatedItemHeight={ESTIMATED_ITEM_HEIGHT} style={list} testId="unit-positions__list">
           {filteredPositions.map((position) => {
             const isChecked = position.id in assignments

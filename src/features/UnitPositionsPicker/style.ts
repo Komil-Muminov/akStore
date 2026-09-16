@@ -28,6 +28,18 @@ export const itemWrapper: StyleDesc = {
   paddingBottom: theme.spacing.sm,
 }
 
+export const emptyWrap: StyleDesc = {
+  height: LIST_MAX_HEIGHT,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: theme.radius.md,
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+  padding: theme.spacing.lg,
+}
+
 export const itemCard: StyleDesc = {
   display: 'flex',
   flexDirection: 'column',
