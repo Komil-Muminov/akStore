@@ -1,5 +1,5 @@
 import { pool } from './pool'
-import type { IUser, IUserRow, UserRole } from '../types'
+import type { IPagedResult, IUser, IUserRow, IUserSearchParams, UserRole } from '../types'
 
 const toUser = (row: IUserRow): IUser => ({
   id: row.id,
@@ -19,8 +19,46 @@ const UPDATE_SQL = 'UPDATE users SET full_name = $2, is_active = $3 WHERE id = $
 const PASSWORD_SQL = 'UPDATE users SET password_hash = $2 WHERE id = $1'
 const DELETE_SQL = 'DELETE FROM users WHERE id = $1 RETURNING id'
 
+const LIST_SQL = 'SELECT * FROM users WHERE is_active = true ORDER BY role, full_name'
+
 export const usersDb = {
-  search: async (): Promise<IUser[]> => (await pool.query<IUserRow>(SEARCH_SQL)).rows.map(toUser),
+  list: async (): Promise<IUser[]> => (await pool.query<IUserRow>(LIST_SQL)).rows.map(toUser),
+  searchPaged: async (params: IUserSearchParams = {}, allowedRoles?: UserRole[]): Promise<IPagedResult<IUser>> => {
+    const conditions: string[] = []
+    const values: (string | number | string[])[] = []
+
+    if (params.query?.trim()) {
+      values.push(`%${params.query.trim()}%`)
+      const idx = values.length
+      conditions.push(`(full_name ILIKE $${idx} OR login ILIKE $${idx})`)
+    }
+
+    if (allowedRoles && allowedRoles.length > 0) {
+      values.push(allowedRoles)
+      conditions.push(`role = ANY($${values.length})`)
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    const countSql = `SELECT count(*)::text AS total FROM users ${whereClause}`
+    const countResult = await pool.query<{ total: string }>(countSql, values)
+    const total = Number(countResult.rows[0]?.total ?? 0)
+
+    const page = Math.max(Number(params.page) || 1, 1)
+    const limit = Math.max(Number(params.limit) || 10, 1)
+    const offset = (page - 1) * limit
+    const totalPages = Math.ceil(total / limit)
+
+    const listSql = `SELECT * FROM users ${whereClause} ORDER BY role, created_at LIMIT $${values.length + 1} OFFSET $${values.length + 2}`
+    const result = await pool.query<IUserRow>(listSql, [...values, limit, offset])
+
+    return {
+      items: result.rows.map(toUser),
+      total,
+      page,
+      limit,
+      totalPages,
+    }
+  },
   findRowByLogin: async (login: string): Promise<IUserRow | null> =>
     (await pool.query<IUserRow>(FIND_BY_LOGIN_SQL, [login])).rows[0] ?? null,
   findRow: async (id: string): Promise<IUserRow | null> => (await pool.query<IUserRow>(FIND_SQL, [id])).rows[0] ?? null,

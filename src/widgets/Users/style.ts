@@ -21,6 +21,17 @@ export const header: StyleDesc = {
 
 export const headerText: StyleDesc = { display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }
 
+export const headerActions: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.md,
+}
+
+export const searchWrap: StyleDesc = {
+  width: 260,
+}
+
 export const sectionHead: StyleDesc = {
   paddingLeft: theme.spacing.xl,
   paddingRight: theme.spacing.xl,

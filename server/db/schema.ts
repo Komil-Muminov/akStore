@@ -44,9 +44,11 @@ export const SCHEMA = `
   CREATE TABLE IF NOT EXISTS unit_positions (
     unit_id UUID NOT NULL REFERENCES units(id) ON DELETE CASCADE,
     position_id UUID NOT NULL REFERENCES positions(id) ON DELETE RESTRICT,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     sort_order INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (unit_id, position_id)
   );
+  ALTER TABLE unit_positions ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id) ON DELETE SET NULL;
 `
 
 export const SEED_POSITIONS: { name: string; rank: number }[] = [

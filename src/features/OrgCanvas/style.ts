@@ -126,9 +126,9 @@ export const edge = (x: number, y: number, width: number, height: number): Style
 
 export const MINI_MAP = { width: 200, height: 140 } as const
 
-export const miniMap: StyleDesc = {
+export const miniMap = (hasDetails: boolean): StyleDesc => ({
   position: 'absolute',
-  right: theme.spacing.lg,
+  right: hasDetails ? 364 : theme.spacing.lg,
   bottom: theme.spacing.md,
   width: MINI_MAP.width,
   height: MINI_MAP.height,
@@ -140,7 +140,7 @@ export const miniMap: StyleDesc = {
   cursor: 'pointer',
   userSelect: 'none',
   active: { cursor: 'pointer' },
-}
+})
 
 export const miniMapNode = (rect: { x: number; y: number; width: number; height: number }, color: string): StyleDesc => ({
   position: 'absolute',
@@ -168,11 +168,11 @@ export const miniMapView = (rect: { x: number; y: number; width: number; height:
   active: { cursor: 'pointer' },
 })
 
-export const miniMapToggle: StyleDesc = {
+export const miniMapToggle = (hasDetails: boolean): StyleDesc => ({
   position: 'absolute',
-  right: theme.spacing.lg,
+  right: hasDetails ? 364 : theme.spacing.lg,
   bottom: theme.spacing.md,
-}
+})
 
 export const miniMapClose: StyleDesc = {
   position: 'absolute',

@@ -17,6 +17,7 @@ interface IProps {
   units: IUnit[]
   viewport: IViewport
   canvas: ElementBounds
+  hasDetails?: boolean
   onCenter: (world: IPoint) => void
   onStartDrag: () => void
   onStopDrag: () => void
@@ -24,7 +25,7 @@ interface IProps {
   onRegisterListeners?: (listeners: IMiniMapListeners) => void
 }
 
-export const MiniMap = memo(({ units, viewport, canvas, onCenter, onStartDrag, onStopDrag, onToggle, onRegisterListeners }: IProps) => {
+export const MiniMap = memo(({ units, viewport, canvas, hasDetails, onCenter, onStartDrag, onStopDrag, onToggle, onRegisterListeners }: IProps) => {
   const [ref, , measure] = useElementBounds()
   const dragOffsetRef = useRef<IPoint | null>(null)
   const activeBoundsRef = useRef<ElementBounds | null>(null)
@@ -108,7 +109,7 @@ export const MiniMap = memo(({ units, viewport, canvas, onCenter, onStartDrag, o
     <div
       ref={ref}
       testId="canvas__minimap"
-      style={miniMap}
+      style={miniMap(Boolean(hasDetails))}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

@@ -1,12 +1,12 @@
 export interface IPosition {
   id: string
   name: string
-  rank: number
+  rank?: number
 }
 
 export interface IPositionInput {
   name: string
-  rank: number
+  rank?: number
 }
 
 export const POSITION_DEFAULT_RANK = 100

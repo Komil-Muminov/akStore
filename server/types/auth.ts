@@ -45,3 +45,9 @@ export interface ITokenPayload {
   sub: string
   role: UserRole
 }
+
+export interface IUserSearchParams {
+  query?: string
+  page?: number
+  limit?: number
+}

@@ -1,18 +1,25 @@
-import type { IUnit } from '@/entities/unit'
-import type { IPosition } from '@/entities/position'
+import type { IUnit, IUnitAssignment } from '@/entities/unit'
+import type { IPosition, IPositionInput } from '@/entities/position'
+import type { IUser } from '@/entities/user'
 
 export interface IProps {
   unit: IUnit | null
   positions: IPosition[]
+  users: IUser[]
   pending: boolean
   error?: string
-  onSubmit: (positionIds: string[]) => void
+  onCreatePosition: (input: IPositionInput) => Promise<IPosition | void> | void
+  onSubmit: (assignments: IUnitAssignment[]) => void
   onClose: () => void
 }
 
-export const TITLE = 'Должности подразделения'
-export const DESCRIPTION = 'Отметьте должности, которые есть в этом подразделении.'
-export const EMPTY = 'Справочник должностей пуст — добавьте должности через «Должности» в панели инструментов.'
+export const TITLE = 'Должности и сотрудники'
+export const DESCRIPTION = 'Отметьте должности, прикрепите сотрудников или создайте новую должность.'
+export const EMPTY = 'Список должностей пуст — создайте первую должность выше.'
+export const NEW_POSITION_PLACEHOLDER = 'Название новой должности...'
+export const SEARCH_POSITION_PLACEHOLDER = 'Поиск по должностям...'
+export const ADD_POSITION_LABEL = 'Создать'
+export const NO_EMPLOYEE = '— Не назначен (вакансия) —'
+export const EMPLOYEE_LABEL = 'Сотрудник:'
 export const SUBMIT_LABEL = 'Сохранить'
 export const CANCEL_LABEL = 'Отмена'
-export const RANK_PREFIX = 'ранг '

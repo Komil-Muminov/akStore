@@ -43,8 +43,19 @@ export const parseLayout = (body: unknown): { id: string; x: number; y: number }
   return items.map((item) => ({ id: requireUuid(item.id, 'id'), x: numberOf(item.x, 0), y: numberOf(item.y, 0) }))
 }
 
-export const parsePositionIds = (body: unknown): string[] => {
+export interface IAssignmentInput {
+  positionId: string
+  userId: string | null
+}
+
+export const parseUnitAssignments = (body: unknown): IAssignmentInput[] => {
   const raw = (body ?? {}) as Record<string, unknown>
+  if (Array.isArray(raw.assignments)) {
+    return (raw.assignments as Record<string, unknown>[]).map((item) => ({
+      positionId: requireUuid(item.positionId, 'positionId'),
+      userId: item.userId ? requireUuid(item.userId, 'userId') : null,
+    }))
+  }
   const ids = Array.isArray(raw.positionIds) ? raw.positionIds : []
-  return ids.map((id) => requireUuid(id, 'positionIds'))
+  return ids.map((id) => ({ positionId: requireUuid(id, 'positionIds'), userId: null }))
 }

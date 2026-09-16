@@ -5,6 +5,11 @@ export enum UnitType {
   SECTION = 'section',
 }
 
+export interface IUnitAssignment {
+  positionId: string
+  userId: string | null
+}
+
 export interface IUnit {
   id: string
   name: string
@@ -13,6 +18,7 @@ export interface IUnit {
   x: number
   y: number
   positionIds: string[]
+  assignments: IUnitAssignment[]
 }
 
 export interface IUnitInput {

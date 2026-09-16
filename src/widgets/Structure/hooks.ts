@@ -1,4 +1,5 @@
-import type { IPoint, IUnit, IUnitInput } from '@/entities/unit'
+import type { IUser } from '@/entities/user'
+import type { IPoint, IUnit, IUnitAssignment, IUnitInput } from '@/entities/unit'
 import type { IPosition, IPositionInput } from '@/entities/position'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
@@ -14,9 +15,9 @@ interface IUpdateVariables {
   point: IPoint
 }
 
-interface IPositionsVariables {
+export interface IPositionsVariables {
   id: string
-  positionIds: string[]
+  assignments: IUnitAssignment[]
 }
 
 interface ILayoutVariables {
@@ -27,7 +28,8 @@ const UNITS = [QueryKeys.UNITS]
 const POSITIONS = [QueryKeys.POSITIONS]
 
 export const useUnitsQuery = () => useGetQuery<IUnit[]>(QueryKeys.UNITS, ApiRoutes.UNITS_SEARCH)
-export const usePositionsQuery = () => useGetQuery<IPosition[]>(QueryKeys.POSITIONS, ApiRoutes.POSITIONS_SEARCH)
+export const usePositionsQuery = (query?: string) => useGetQuery<IPosition[]>(QueryKeys.POSITIONS, ApiRoutes.POSITIONS_SEARCH(query))
+export const useUsersListQuery = () => useGetQuery<IUser[]>(QueryKeys.USERS, ApiRoutes.USERS_LIST)
 
 export const useUnitMutations = () => {
   const create = useMutationQuery<IUnit, IUnitInput>(ApiRoutes.UNITS_CREATE, { invalidate: UNITS })
@@ -48,7 +50,7 @@ export const useUnitMutations = () => {
   const setPositions = useMutationQuery<IUnit, IPositionsVariables>((v) => ApiRoutes.UNITS_SET_POSITIONS(v.id), {
     method: 'PATCH',
     invalidate: UNITS,
-    body: (v) => ({ positionIds: v.positionIds }),
+    body: (v) => ({ assignments: v.assignments }),
   })
   const remove = useMutationQuery<{ id: string }, string>(ApiRoutes.UNITS_DELETE, { method: 'DELETE', invalidate: UNITS })
   const pending = create.isPending || update.isPending || move.isPending || setLayout.isPending || remove.isPending

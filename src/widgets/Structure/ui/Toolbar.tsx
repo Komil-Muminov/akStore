@@ -6,10 +6,9 @@ interface IProps {
   canAddManagement: boolean
   onAddManagement: () => void
   onAutoLayout: () => void
-  onPositions: () => void
 }
 
-export const Toolbar = ({ canAddManagement, onAddManagement, onAutoLayout, onPositions }: IProps) => (
+export const Toolbar = ({ canAddManagement, onAddManagement, onAutoLayout }: IProps) => (
   <div style={header}>
     <div style={headerText}>
       <Text variant="heading">{TITLE}</Text>
@@ -17,7 +16,6 @@ export const Toolbar = ({ canAddManagement, onAddManagement, onAutoLayout, onPos
     </div>
     <div style={actions}>
       <Button label={ADD_MANAGEMENT_LABEL} icon="plus" onClick={onAddManagement} disabled={!canAddManagement} testId="structure__add" />
-      <Button label={POSITIONS_LABEL} icon="briefcase" variant="secondary" onClick={onPositions} testId="structure__positions" />
       <Button label={AUTO_LAYOUT_LABEL} icon="rotate" variant="secondary" onClick={onAutoLayout} testId="structure__auto-layout" />
     </div>
   </div>

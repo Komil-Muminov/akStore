@@ -3,23 +3,27 @@ import type { IPosition, IPositionInput, IPositionRow } from '../types'
 
 const toPosition = (row: IPositionRow): IPosition => ({ id: row.id, name: row.name, rank: row.rank })
 
-const SEARCH_SQL = 'SELECT * FROM positions ORDER BY rank, name'
+const SEARCH_SQL = 'SELECT * FROM positions ORDER BY name'
 const CREATE_SQL = 'INSERT INTO positions (name, rank) VALUES ($1, $2) RETURNING *'
 const UPDATE_SQL = 'UPDATE positions SET name = $2, rank = $3 WHERE id = $1 RETURNING *'
 const DELETE_SQL = 'DELETE FROM positions WHERE id = $1 RETURNING id'
 const USAGE_SQL = 'SELECT count(*)::text AS total FROM unit_positions WHERE position_id = $1'
 
 export const positionsDb = {
-  search: async (): Promise<IPosition[]> => {
+  search: async (query?: string): Promise<IPosition[]> => {
+    if (query?.trim()) {
+      const result = await pool.query<IPositionRow>('SELECT * FROM positions WHERE name ILIKE $1 ORDER BY name', [`%${query.trim()}%`])
+      return result.rows.map(toPosition)
+    }
     const result = await pool.query<IPositionRow>(SEARCH_SQL)
     return result.rows.map(toPosition)
   },
   create: async (input: IPositionInput): Promise<IPosition> => {
-    const result = await pool.query<IPositionRow>(CREATE_SQL, [input.name, input.rank])
+    const result = await pool.query<IPositionRow>(CREATE_SQL, [input.name, input.rank ?? 100])
     return toPosition(result.rows[0]!)
   },
   update: async (id: string, input: IPositionInput): Promise<IPosition | null> => {
-    const result = await pool.query<IPositionRow>(UPDATE_SQL, [id, input.name, input.rank])
+    const result = await pool.query<IPositionRow>(UPDATE_SQL, [id, input.name, input.rank ?? 100])
     return result.rows[0] ? toPosition(result.rows[0]) : null
   },
   usageCount: async (id: string): Promise<number> => {

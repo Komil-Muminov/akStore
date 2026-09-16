@@ -1,6 +1,7 @@
 import type { IPass, IPassInput } from '@/entities/pass'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
+import type { IPagedResponse } from '@/shared/model'
 
 interface IUpdateVariables {
   id: string
@@ -9,7 +10,8 @@ interface IUpdateVariables {
 
 const INVALIDATE = [QueryKeys.PASSES]
 
-export const usePassesQuery = () => useGetQuery<IPass[]>(QueryKeys.PASSES, ApiRoutes.PASSES_SEARCH)
+export const usePassesQuery = (query?: string, status?: string, page = 1) =>
+  useGetQuery<IPagedResponse<IPass>>(QueryKeys.PASSES, ApiRoutes.PASSES_SEARCH(query, status, page))
 
 export const usePassMutations = () => {
   const create = useMutationQuery<IPass, IPassInput>(ApiRoutes.PASSES_CREATE, { invalidate: INVALIDATE })

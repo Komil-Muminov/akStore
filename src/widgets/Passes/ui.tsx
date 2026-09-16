@@ -3,9 +3,9 @@ import { PassDetails } from '@/features/PassDetails'
 import { PassForm } from '@/features/PassForm'
 import { PassList } from '@/features/PassList'
 import type { IPass, IPassInput, PassFilter } from '@/entities/pass'
-import { ConfirmDialog, If, Spinner, Text } from '@/shared/ui'
+import { ConfirmDialog, If, Pagination, Spinner, Text } from '@/shared/ui'
 import { usePassMutations, usePassesQuery } from './hooks'
-import { countByFilter, selectVisible } from './lib'
+import { countByFilter } from './lib'
 import { CLOSED_FORM, COUNT_SUFFIX, DELETE_DIALOG, HEADERS, INITIAL_FILTER, type IFormState } from './model'
 import { layout, main, sectionHead } from './style'
 import { ErrorState } from './ui/ErrorState'
@@ -15,15 +15,17 @@ import { Header } from './ui/Header'
 export const Passes = () => {
   const [filter, setFilter] = useState<PassFilter>(INITIAL_FILTER)
   const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [form, setForm] = useState<IFormState>(CLOSED_FORM)
   const [deleting, setDeleting] = useState<IPass | null>(null)
-  const passes = usePassesQuery()
+  const passes = usePassesQuery(query, filter, page)
   const { create, update, revoke, restore, remove, pending } = usePassMutations()
 
-  const items = passes.data ?? []
+  const items = useMemo(() => passes.data?.items ?? [], [passes.data?.items])
+  const total = passes.data?.total ?? 0
+  const totalPages = passes.data?.totalPages ?? 1
   const counts = useMemo(() => countByFilter(items), [items])
-  const visible = useMemo(() => selectVisible(items, filter, query), [items, filter, query])
   const selected = useMemo(() => items.find((pass) => pass.id === selectedId) ?? null, [items, selectedId])
   const heading = HEADERS[filter]
   const formError = form.mode === 'edit' ? update.error?.message : create.error?.message
@@ -36,6 +38,16 @@ export const Passes = () => {
   const closeForm = useCallback(() => setForm(CLOSED_FORM), [])
   const closeDetails = useCallback(() => setSelectedId(null), [])
   const cancelDelete = useCallback(() => setDeleting(null), [])
+
+  const handleFilterChange = useCallback((nextFilter: PassFilter) => {
+    setFilter(nextFilter)
+    setPage(1)
+  }, [])
+
+  const handleQueryChange = useCallback((nextQuery: string) => {
+    setQuery(nextQuery)
+    setPage(1)
+  }, [])
 
   const handleSubmit = useCallback(
     (input: IPassInput) => {
@@ -65,27 +77,32 @@ export const Passes = () => {
           title={heading.title}
           description={heading.description}
           query={query}
-          onQueryChange={setQuery}
+          onQueryChange={handleQueryChange}
           onCreate={openCreate}
         />
-        <FilterTabs active={filter} counts={counts} onSelect={setFilter} />
+        <FilterTabs active={filter} counts={counts} onSelect={handleFilterChange} />
         <div style={sectionHead}>
-          <Text variant="label">{`${heading.title.toUpperCase()} · ${visible.length}${COUNT_SUFFIX}`}</Text>
+          <Text variant="label">{`${heading.title.toUpperCase()} · ${String(total)}${COUNT_SUFFIX}`}</Text>
         </div>
         <If condition={passes.isPending} fallback={
           <If
             condition={passes.isError}
             fallback={
-              <PassList
-                passes={visible}
-                filter={filter}
-                searching={query.trim().length > 0}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-                onRevoke={handleRevoke}
-                onRestore={handleRestore}
-                onDelete={setDeleting}
-              />
+              <>
+                <PassList
+                  passes={items}
+                  filter={filter}
+                  searching={query.trim().length > 0}
+                  selectedId={selectedId}
+                  onSelect={setSelectedId}
+                  onRevoke={handleRevoke}
+                  onRestore={handleRestore}
+                  onDelete={setDeleting}
+                />
+                <If condition={totalPages > 1}>
+                  <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />
+                </If>
+              </>
             }
           >
             <ErrorState details={passes.error?.message ?? ''} onRetry={handleRetry} />

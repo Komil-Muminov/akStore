@@ -9,13 +9,17 @@ const toUnit = (row: IUnitRow): IUnit => ({
   x: row.layout_x,
   y: row.layout_y,
   positionIds: row.position_ids ?? [],
+  assignments: row.assignments ?? [],
 })
 
 const SELECT_SQL = `
   SELECT u.*, (
     SELECT array_agg(up.position_id ORDER BY up.sort_order)
     FROM unit_positions up WHERE up.unit_id = u.id
-  ) AS position_ids
+  ) AS position_ids, (
+    SELECT json_agg(json_build_object('positionId', up.position_id, 'userId', up.user_id) ORDER BY up.sort_order)
+    FROM unit_positions up WHERE up.unit_id = u.id
+  ) AS assignments
   FROM units u`
 const SEARCH_SQL = `${SELECT_SQL} ORDER BY u.sort_order, u.created_at`
 const FIND_SQL = `${SELECT_SQL} WHERE u.id = $1`
@@ -28,7 +32,7 @@ const LAYOUT_SQL = 'UPDATE units SET layout_x = $2, layout_y = $3 WHERE id = $1'
 const DELETE_SQL = 'DELETE FROM units WHERE id = $1 RETURNING id'
 const CHILDREN_SQL = 'SELECT count(*)::text AS total FROM units WHERE parent_id = $1'
 const CLEAR_POSITIONS_SQL = 'DELETE FROM unit_positions WHERE unit_id = $1'
-const ADD_POSITION_SQL = 'INSERT INTO unit_positions (unit_id, position_id, sort_order) VALUES ($1, $2, $3)'
+const ADD_POSITION_SQL = 'INSERT INTO unit_positions (unit_id, position_id, user_id, sort_order) VALUES ($1, $2, $3, $4)'
 
 export const unitsDb = {
   search: async (): Promise<IUnit[]> => {
@@ -64,9 +68,11 @@ export const unitsDb = {
     const result = await pool.query<{ total: string }>(CHILDREN_SQL, [id])
     return Number(result.rows[0]?.total ?? 0)
   },
-  setPositions: async (id: string, positionIds: string[]): Promise<void> => {
+  setPositions: async (id: string, assignments: { positionId: string; userId: string | null }[]): Promise<void> => {
     await pool.query(CLEAR_POSITIONS_SQL, [id])
-    await Promise.all(positionIds.map((positionId, index) => pool.query(ADD_POSITION_SQL, [id, positionId, index])))
+    await Promise.all(
+      assignments.map((item, index) => pool.query(ADD_POSITION_SQL, [id, item.positionId, item.userId, index])),
+    )
   },
   remove: async (id: string): Promise<boolean> => {
     const result = await pool.query(DELETE_SQL, [id])

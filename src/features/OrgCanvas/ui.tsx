@@ -95,6 +95,7 @@ export const OrgCanvas = ({ units, positions, selectedId, onSelect, onMoveNode, 
           units={units}
           viewport={viewport}
           canvas={canvasBounds}
+          hasDetails={selectedId !== null}
           onCenter={handleCenter}
           onStartDrag={startMiniMapDrag}
           onStopDrag={stopMiniMapDrag}
@@ -103,7 +104,7 @@ export const OrgCanvas = ({ units, positions, selectedId, onSelect, onMoveNode, 
         />
       </If>
       <If condition={!showMiniMap}>
-        <div style={miniMapToggle}>
+        <div style={miniMapToggle(selectedId !== null)}>
           <Tooltip title="Показать мини-карту">
             <IconButton icon="map" onClick={toggleMiniMap} testId="canvas__minimap-show" />
           </Tooltip>

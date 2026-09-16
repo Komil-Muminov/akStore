@@ -7,11 +7,17 @@ import { parsePassword, parseUserInput, parseUserUpdate } from './auth.validatio
 import { idOf, respond } from './respond'
 
 const admin = rbacMiddleware(UserRole.ADMIN)
+const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
 const actorOf = (req: { user?: IAuthUser }) => req.user as IAuthUser
 
 export const usersRouter = Router()
 
-usersRouter.get('/search', admin, respond((req) => usersService.search(actorOf(req))))
+usersRouter.get('/list', anyRole, respond(() => usersService.list()))
+usersRouter.get('/search', admin, respond((req) => usersService.search(actorOf(req), {
+  query: typeof req.query.q === 'string' ? req.query.q : undefined,
+  page: typeof req.query.page === 'string' ? Number(req.query.page) : undefined,
+  limit: typeof req.query.limit === 'string' ? Number(req.query.limit) : undefined,
+})))
 usersRouter.post('/create', admin, respond((req) => usersService.create(actorOf(req), parseUserInput(req.body)), HttpStatus.CREATED))
 usersRouter.patch('/update/:id', admin, respond((req) => {
   const { fullName, isActive } = parseUserUpdate(req.body)

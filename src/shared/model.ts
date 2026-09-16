@@ -2,6 +2,14 @@ export interface IApiResponse<T> {
   data: T
 }
 
+export interface IPagedResponse<T> {
+  items: T[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
 export interface IApiError {
   message: string
 }

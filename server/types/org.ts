@@ -8,18 +8,23 @@ export enum UnitType {
 export interface IPosition {
   id: string
   name: string
-  rank: number
+  rank?: number
 }
 
 export interface IPositionRow {
   id: string
   name: string
-  rank: number
+  rank?: number
 }
 
 export interface IPositionInput {
   name: string
-  rank: number
+  rank?: number
+}
+
+export interface IUnitAssignment {
+  positionId: string
+  userId: string | null
 }
 
 export interface IUnit {
@@ -30,6 +35,7 @@ export interface IUnit {
   x: number
   y: number
   positionIds: string[]
+  assignments: IUnitAssignment[]
 }
 
 export interface IUnitRow {
@@ -40,6 +46,7 @@ export interface IUnitRow {
   layout_x: number
   layout_y: number
   position_ids: string[] | null
+  assignments: IUnitAssignment[] | null
 }
 
 export interface IUnitInput {

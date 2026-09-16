@@ -1,6 +1,6 @@
 import { usersDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { ROLE_RANK, UserRole, type IAuthUser, type IUser, type IUserInput } from '../types'
+import { ROLE_RANK, UserRole, type IAuthUser, type IPagedResult, type IUser, type IUserInput, type IUserSearchParams } from '../types'
 
 const NOT_FOUND = 'Пользователь не найден'
 const FORBIDDEN_ROLE = 'Недостаточно прав для этой роли'
@@ -19,8 +19,11 @@ const assertManageable = async (actor: IAuthUser, id: string): Promise<IUser> =>
 }
 
 export const usersService = {
-  search: async (actor: IAuthUser): Promise<IUser[]> =>
-    (await usersDb.search()).filter((user) => canManage(actor, user.role)),
+  list: (): Promise<IUser[]> => usersDb.list(),
+  search: (actor: IAuthUser, params?: IUserSearchParams): Promise<IPagedResult<IUser>> => {
+    const allowedRoles = (Object.values(UserRole) as UserRole[]).filter((role) => canManage(actor, role))
+    return usersDb.searchPaged(params, allowedRoles)
+  },
   create: async (actor: IAuthUser, input: IUserInput): Promise<IUser> => {
     if (!canManage(actor, input.role)) throw new HttpError(HttpStatus.FORBIDDEN, FORBIDDEN_ROLE)
     if (await usersDb.findRowByLogin(input.login)) throw new HttpError(HttpStatus.BAD_REQUEST, LOGIN_TAKEN)

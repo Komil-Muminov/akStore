@@ -2,6 +2,8 @@ import type { IUser, IUserInput } from '@/entities/user'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
 
+import type { IPagedResponse } from '@/shared/model'
+
 interface IUpdateVariables {
   id: string
   fullName: string
@@ -15,7 +17,8 @@ interface IResetVariables {
 
 const USERS = [QueryKeys.USERS]
 
-export const useUsersQuery = () => useGetQuery<IUser[]>(QueryKeys.USERS, ApiRoutes.USERS_SEARCH)
+export const useUsersQuery = (query?: string, page = 1) =>
+  useGetQuery<IPagedResponse<IUser>>(QueryKeys.USERS, ApiRoutes.USERS_SEARCH(query, page))
 
 export const useUserMutations = () => {
   const create = useMutationQuery<IUser, IUserInput>(ApiRoutes.USERS_CREATE, { invalidate: USERS })

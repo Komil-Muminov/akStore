@@ -3,7 +3,7 @@ import { rbacMiddleware } from '../middleware'
 import { unitsService } from '../services'
 import { HttpStatus } from '../shared/utils'
 import { UserRole } from '../types'
-import { parseLayout, parseParentId, parsePositionIds, parseUnitInput, parseUnitUpdate } from './org.validation'
+import { parseLayout, parseParentId, parseUnitAssignments, parseUnitInput, parseUnitUpdate } from './org.validation'
 import { idOf, respond } from './respond'
 
 const admin = rbacMiddleware(UserRole.ADMIN)
@@ -19,5 +19,5 @@ unitsRouter.patch('/update/:id', admin, respond((req) => {
 }))
 unitsRouter.patch('/move/:id', admin, respond((req) => unitsService.move(idOf(req), parseParentId(req.body))))
 unitsRouter.patch('/set-layout', admin, respond((req) => unitsService.setLayout(parseLayout(req.body))))
-unitsRouter.patch('/set-positions/:id', admin, respond((req) => unitsService.setPositions(idOf(req), parsePositionIds(req.body))))
+unitsRouter.patch('/set-positions/:id', admin, respond((req) => unitsService.setPositions(idOf(req), parseUnitAssignments(req.body))))
 unitsRouter.delete('/delete/:id', admin, respond((req) => unitsService.remove(idOf(req))))

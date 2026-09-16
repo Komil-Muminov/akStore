@@ -4,9 +4,12 @@ import { theme } from '@/shared/config'
 const PANEL_WIDTH = 340
 
 export const root: StyleDesc = {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  bottom: 0,
   width: PANEL_WIDTH,
-  height: '100%',
-  flexShrink: 0,
+  zIndex: 10,
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.lg,
@@ -14,6 +17,7 @@ export const root: StyleDesc = {
   backgroundColor: theme.colors.sidebar,
   borderLeftWidth: 1,
   borderColor: theme.colors.border,
+  boxShadow: { offsetX: -8, offsetY: 0, blurRadius: 24, spreadRadius: 0, color: '#00000040' },
 }
 
 export const head: StyleDesc = { display: 'flex', flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm }

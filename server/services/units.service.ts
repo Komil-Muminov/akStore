@@ -52,9 +52,9 @@ export const unitsService = {
     await unitsDb.setLayout(items)
     return { updated: items.length }
   },
-  setPositions: async (id: string, positionIds: string[]): Promise<IUnit> => {
+  setPositions: async (id: string, assignments: { positionId: string; userId: string | null }[]): Promise<IUnit> => {
     await findOrThrow(id)
-    await unitsDb.setPositions(id, positionIds)
+    await unitsDb.setPositions(id, assignments)
     return findOrThrow(id)
   },
   remove: async (id: string): Promise<{ id: string }> => {

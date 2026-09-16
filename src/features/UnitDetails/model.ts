@@ -1,10 +1,12 @@
 import type { IUnit } from '@/entities/unit'
 import type { IPosition } from '@/entities/position'
+import type { IUser } from '@/entities/user'
 
 export interface IProps {
   unit: IUnit
   units: IUnit[]
   positions: IPosition[]
+  users: IUser[]
   pending: boolean
   onAddChild: (parent: IUnit) => void
   onRename: (unit: IUnit) => void

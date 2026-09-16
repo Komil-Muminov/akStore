@@ -11,7 +11,12 @@ const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
 
 export const passesRouter = Router()
 
-passesRouter.get('/search', anyRole, respond(() => passesService.search()))
+passesRouter.get('/search', anyRole, respond((req) => passesService.search({
+  query: typeof req.query.q === 'string' ? req.query.q : undefined,
+  status: typeof req.query.status === 'string' ? req.query.status : undefined,
+  page: typeof req.query.page === 'string' ? Number(req.query.page) : undefined,
+  limit: typeof req.query.limit === 'string' ? Number(req.query.limit) : undefined,
+})))
 passesRouter.post('/create', admin, respond((req) => passesService.create(parsePassInput(req.body)), HttpStatus.CREATED))
 passesRouter.patch('/update/:id', admin, respond((req) => passesService.update(idOf(req), parsePassInput(req.body))))
 passesRouter.patch('/deactivate/:id', admin, respond((req) => passesService.deactivate(idOf(req))))

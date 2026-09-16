@@ -11,7 +11,7 @@ const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
 
 export const positionsRouter = Router()
 
-positionsRouter.get('/search', anyRole, respond(() => positionsService.search()))
+positionsRouter.get('/search', anyRole, respond((req) => positionsService.search(typeof req.query.q === 'string' ? req.query.q : undefined)))
 positionsRouter.post('/create', admin, respond((req) => positionsService.create(parsePositionInput(req.body)), HttpStatus.CREATED))
 positionsRouter.patch('/update/:id', admin, respond((req) => positionsService.update(idOf(req), parsePositionInput(req.body))))
 positionsRouter.delete('/delete/:id', admin, respond((req) => positionsService.remove(idOf(req))))

@@ -24,15 +24,32 @@ const TYPE_COLORS: Record<UnitType, string> = {
   [UnitType.SECTION]: '#FBBF24',
 }
 
-export const UnitDetails = ({ unit, units, positions, pending, onAddChild, onRename, onEditPositions, onDelete, onClose }: IProps) => {
+export const UnitDetails = ({ unit, units, positions, users, pending, onAddChild, onRename, onEditPositions, onDelete, onClose }: IProps) => {
   const childType = CHILD_TYPE[unit.type]
   const locked = unit.type === UnitType.LEADERSHIP
   const path = useMemo(() => unitPath(units, unit.parentId).join(PATH_SEPARATOR), [units, unit.parentId])
   const childrenCount = useMemo(() => childrenOf(units, unit.id).length, [units, unit.id])
-  const names = useMemo(
-    () => unit.positionIds.map((id) => positions.find((position) => position.id === id)?.name ?? '').filter(Boolean),
-    [unit.positionIds, positions],
-  )
+  const assignedItems = useMemo(() => {
+    if (!unit.assignments || unit.assignments.length === 0) {
+      return unit.positionIds
+        .map((id) => {
+          const pos = positions.find((p) => p.id === id)
+          return { id, posName: pos?.name ?? '', userName: null }
+        })
+        .filter((item) => item.posName)
+    }
+    return unit.assignments
+      .map((item) => {
+        const pos = positions.find((p) => p.id === item.positionId)
+        const usr = users.find((u) => u.id === item.userId)
+        return {
+          id: item.positionId,
+          posName: pos?.name ?? '',
+          userName: usr ? usr.fullName || usr.login : null,
+        }
+      })
+      .filter((item) => item.posName)
+  }, [unit.assignments, unit.positionIds, positions, users])
   const handleAddChild = useCallback(() => onAddChild(unit), [onAddChild, unit])
   const handleRename = useCallback(() => onRename(unit), [onRename, unit])
   const handlePositions = useCallback(() => onEditPositions(unit), [onEditPositions, unit])
@@ -62,9 +79,11 @@ export const UnitDetails = ({ unit, units, positions, pending, onAddChild, onRen
           <Icon name="briefcase" size={theme.size.iconMd} color={theme.colors.tertiary} />
           <Text variant="label">{POSITIONS_LABEL}</Text>
         </div>
-        <If condition={names.length > 0} fallback={<Text variant="ghost">{NO_POSITIONS}</Text>}>
-          {names.map((name) => (
-            <Text key={name} variant="body">{`• ${name}`}</Text>
+        <If condition={assignedItems.length > 0} fallback={<Text variant="ghost">{NO_POSITIONS}</Text>}>
+          {assignedItems.map((item) => (
+            <Text key={item.id} variant="body">
+              {`• ${item.posName}${item.userName ? ` — ${item.userName}` : ' (вакансия)'}`}
+            </Text>
           ))}
         </If>
         <Button label={EDIT_POSITIONS_LABEL} icon="briefcase" variant="secondary" fullWidth onClick={handlePositions} testId="unit-details__positions" />

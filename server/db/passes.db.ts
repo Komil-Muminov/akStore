@@ -1,5 +1,5 @@
 import { pool } from './pool'
-import { PassStatus, type IPass, type IPassInput, type IPassRow } from '../types'
+import { PassStatus, type IPass, type IPassInput, type IPassRow, type IPagedResult, type IPassSearchParams } from '../types'
 
 const toPass = (row: IPassRow): IPass => ({
   id: row.id,
@@ -23,7 +23,6 @@ const toParams = (input: IPassInput) => [
   input.carPlate,
 ]
 
-const SEARCH_SQL = 'SELECT * FROM passes ORDER BY created_at DESC'
 const CREATE_SQL = `
   INSERT INTO passes (holder_name, host_name, organization, purpose, phone, car_plate)
   VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`
@@ -37,9 +36,41 @@ const DELETE_SQL = 'DELETE FROM passes WHERE id = $1 RETURNING id'
 const first = (rows: IPassRow[]): IPass | null => (rows[0] ? toPass(rows[0]) : null)
 
 export const passesDb = {
-  search: async (): Promise<IPass[]> => {
-    const result = await pool.query<IPassRow>(SEARCH_SQL)
-    return result.rows.map(toPass)
+  search: async (params: IPassSearchParams = {}): Promise<IPagedResult<IPass>> => {
+    const conditions: string[] = []
+    const values: (string | number)[] = []
+
+    if (params.query?.trim()) {
+      values.push(`%${params.query.trim()}%`)
+      const idx = values.length
+      conditions.push(`(holder_name ILIKE $${idx} OR host_name ILIKE $${idx} OR organization ILIKE $${idx} OR phone ILIKE $${idx} OR car_plate ILIKE $${idx})`)
+    }
+
+    if (params.status && params.status !== 'all') {
+      values.push(params.status)
+      conditions.push(`status = $${values.length}`)
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    const countSql = `SELECT count(*)::text AS total FROM passes ${whereClause}`
+    const countResult = await pool.query<{ total: string }>(countSql, values)
+    const total = Number(countResult.rows[0]?.total ?? 0)
+
+    const page = Math.max(Number(params.page) || 1, 1)
+    const limit = Math.max(Number(params.limit) || 10, 1)
+    const offset = (page - 1) * limit
+    const totalPages = Math.ceil(total / limit)
+
+    const listSql = `SELECT * FROM passes ${whereClause} ORDER BY created_at DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`
+    const result = await pool.query<IPassRow>(listSql, [...values, limit, offset])
+
+    return {
+      items: result.rows.map(toPass),
+      total,
+      page,
+      limit,
+      totalPages,
+    }
   },
   create: async (input: IPassInput): Promise<IPass> => {
     const result = await pool.query<IPassRow>(CREATE_SQL, toParams(input))

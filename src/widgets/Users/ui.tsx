@@ -4,27 +4,35 @@ import { UserForm } from '@/features/UserForm'
 import { UserList } from '@/features/UserList'
 import { UserRole, assignableRoles, toRole, type IUser, type IUserInput } from '@/entities/user'
 import { useSession } from '@/shared/lib'
-import { Button, ConfirmDialog, If, Spinner, Text } from '@/shared/ui'
+import { Button, ConfirmDialog, If, Pagination, Spinner, Text, TextInput } from '@/shared/ui'
 import { useUserMutations, useUsersQuery } from './hooks'
-import { ADD_LABEL, COUNT_SUFFIX, DELETE_DIALOG, DESCRIPTION_ADMIN, DESCRIPTION_SUPERADMIN, TITLE } from './model'
-import { header, headerText, layout, sectionHead } from './style'
+import { ADD_LABEL, COUNT_SUFFIX, DELETE_DIALOG, DESCRIPTION_ADMIN, DESCRIPTION_SUPERADMIN, SEARCH_PLACEHOLDER, TITLE } from './model'
+import { header, headerActions, headerText, layout, searchWrap, sectionHead } from './style'
 import { ErrorState } from './ui/ErrorState'
 
 export const Users = () => {
   const current = useSession()
+  const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
   const [formOpen, setFormOpen] = useState(false)
   const [resetting, setResetting] = useState<IUser | null>(null)
   const [deleting, setDeleting] = useState<IUser | null>(null)
-  const usersQuery = useUsersQuery()
+  const usersQuery = useUsersQuery(query, page)
   const { create, update, resetPassword, remove, pending } = useUserMutations()
 
   const actorRole = toRole(current?.user.role ?? '')
   const roles = useMemo(() => assignableRoles(actorRole), [actorRole])
-  const users = useMemo(() => usersQuery.data ?? [], [usersQuery.data])
+  const users = useMemo(() => usersQuery.data?.items ?? [], [usersQuery.data?.items])
+  const total = usersQuery.data?.total ?? 0
+  const totalPages = usersQuery.data?.totalPages ?? 1
   const description = actorRole === UserRole.SUPERADMIN ? DESCRIPTION_SUPERADMIN : DESCRIPTION_ADMIN
   const refetch = usersQuery.refetch
 
   const handleRetry = useCallback(() => void refetch(), [refetch])
+  const handleQueryChange = useCallback((next: string) => {
+    setQuery(next)
+    setPage(1)
+  }, [])
   const openForm = useCallback(() => setFormOpen(true), [])
   const closeForm = useCallback(() => setFormOpen(false), [])
   const closeReset = useCallback(() => setResetting(null), [])
@@ -56,14 +64,30 @@ export const Users = () => {
           <Text variant="heading">{TITLE}</Text>
           <Text variant="secondary">{description}</Text>
         </div>
-        <Button label={ADD_LABEL} icon="plus" onClick={openForm} disabled={roles.length === 0} testId="users__add" />
+        <div style={headerActions}>
+          <div style={searchWrap}>
+            <TextInput
+              value={query}
+              onChange={handleQueryChange}
+              placeholder={SEARCH_PLACEHOLDER}
+              icon="search"
+              testId="users__search"
+            />
+          </div>
+          <Button label={ADD_LABEL} icon="plus" onClick={openForm} disabled={roles.length === 0} testId="users__add" />
+        </div>
       </div>
       <div style={sectionHead}>
-        <Text variant="label">{`${TITLE.toUpperCase()} · ${users.length}${COUNT_SUFFIX}`}</Text>
+        <Text variant="label">{`${TITLE.toUpperCase()} · ${String(total)}${COUNT_SUFFIX}`}</Text>
       </div>
       <If condition={usersQuery.isPending} fallback={
         <If condition={usersQuery.isError} fallback={
-          <UserList users={users} onResetPassword={setResetting} onToggleActive={handleToggle} onDelete={setDeleting} />
+          <>
+            <UserList users={users} onResetPassword={setResetting} onToggleActive={handleToggle} onDelete={setDeleting} />
+            <If condition={totalPages > 1}>
+              <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />
+            </If>
+          </>
         }>
           <ErrorState details={usersQuery.error?.message ?? ''} onRetry={handleRetry} />
         </If>

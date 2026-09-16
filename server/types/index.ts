@@ -32,8 +32,23 @@ export interface IPassRow {
   updated_at: Date
 }
 
+export interface IPagedResult<T> {
+  items: T[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface IPassSearchParams {
+  query?: string
+  status?: string
+  page?: number
+  limit?: number
+}
+
 export { UserRole, ROLE_RANK } from './auth'
-export type { IAuthUser, IUser, IUserRow, IUserInput, ITokenPayload } from './auth'
+export type { IAuthUser, IUser, IUserRow, IUserInput, ITokenPayload, IUserSearchParams } from './auth'
 export { UnitType } from './org'
 export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'
 

@@ -6,7 +6,7 @@ const NOT_FOUND = 'Должность не найдена'
 const IN_USE = 'Должность используется в структуре — сначала уберите её из подразделений'
 
 export const positionsService = {
-  search: (): Promise<IPosition[]> => positionsDb.search(),
+  search: (query?: string): Promise<IPosition[]> => positionsDb.search(query),
   create: (input: IPositionInput): Promise<IPosition> => positionsDb.create(input),
   update: async (id: string, input: IPositionInput): Promise<IPosition> => {
     const position = await positionsDb.update(id, input)

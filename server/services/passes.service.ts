@@ -1,6 +1,6 @@
 import { passesDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { PassStatus, type IPass, type IPassInput } from '../types'
+import { PassStatus, type IPass, type IPassInput, type IPagedResult, type IPassSearchParams } from '../types'
 
 const NOT_FOUND = 'Пропуск не найден'
 
@@ -10,7 +10,7 @@ const orNotFound = (pass: IPass | null): IPass => {
 }
 
 export const passesService = {
-  search: (): Promise<IPass[]> => passesDb.search(),
+  search: (params?: IPassSearchParams): Promise<IPagedResult<IPass>> => passesDb.search(params),
   create: (input: IPassInput): Promise<IPass> => passesDb.create(input),
   update: async (id: string, input: IPassInput): Promise<IPass> => orNotFound(await passesDb.update(id, input)),
   deactivate: async (id: string): Promise<IPass> => orNotFound(await passesDb.setStatus(id, PassStatus.REVOKED)),

@@ -1,39 +1,164 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Button, Checkbox, If, Modal, Text } from '@/shared/ui'
-import { CANCEL_LABEL, DESCRIPTION, EMPTY, RANK_PREFIX, SUBMIT_LABEL, TITLE, type IProps } from './model'
-import { footer, list, spacer } from './style'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { IUnitAssignment } from '@/entities/unit'
+import { POSITION_NAME_MIN_LENGTH } from '@/entities/position'
+import { Button, Checkbox, If, Modal, Text, TextInput } from '@/shared/ui'
+import {
+  ADD_POSITION_LABEL,
+  CANCEL_LABEL,
+  DESCRIPTION,
+  EMPLOYEE_LABEL,
+  EMPTY,
+  NEW_POSITION_PLACEHOLDER,
+  NO_EMPLOYEE,
+  SEARCH_POSITION_PLACEHOLDER,
+  SUBMIT_LABEL,
+  TITLE,
+  type IProps,
+} from './model'
+import { footer, formRow, inputWrap, itemCard, list, selectRow, selectStyle, spacer } from './style'
 
-export const UnitPositionsPicker = ({ unit, positions, pending, error, onSubmit, onClose }: IProps) => {
-  const [selected, setSelected] = useState<string[]>([])
+export const UnitPositionsPicker = ({
+  unit,
+  positions,
+  users,
+  pending,
+  error,
+  onCreatePosition,
+  onSubmit,
+  onClose,
+}: IProps) => {
+  const [assignments, setAssignments] = useState<Record<string, string | null>>({})
+  const [newPositionName, setNewPositionName] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const open = unit !== null
 
   useEffect(() => {
-    if (open) setSelected(unit?.positionIds ?? [])
+    if (!open || !unit) return
+    const map: Record<string, string | null> = {}
+    if (unit.assignments && unit.assignments.length > 0) {
+      unit.assignments.forEach((item) => {
+        map[item.positionId] = item.userId
+      })
+    } else {
+      unit.positionIds.forEach((id) => {
+        map[id] = null
+      })
+    }
+    setAssignments(map)
   }, [open, unit])
 
-  const toggle = useCallback(
-    (id: string) => setSelected((current) => (current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id])),
-    [],
-  )
+  const filteredPositions = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    return q ? positions.filter((p) => p.name.toLowerCase().includes(q)) : positions
+  }, [positions, searchQuery])
+
+  const toggle = useCallback((positionId: string) => {
+    setAssignments((current) => {
+      const next = { ...current }
+      if (positionId in next) {
+        delete next[positionId]
+      } else {
+        next[positionId] = null
+      }
+      return next
+    })
+  }, [])
+
+  const handleSelectUser = useCallback((positionId: string, userId: string | null) => {
+    setAssignments((current) => ({ ...current, [positionId]: userId }))
+  }, [])
+
+  const handleCreatePosition = useCallback(async () => {
+    const trimmed = newPositionName.trim()
+    if (trimmed.length < POSITION_NAME_MIN_LENGTH) return
+    setNewPositionName('')
+    const created = await onCreatePosition({ name: trimmed })
+    if (created && 'id' in created) {
+      setAssignments((current) => ({ ...current, [created.id]: null }))
+    }
+  }, [newPositionName, onCreatePosition])
+
   const handleSubmit = useCallback(() => {
     if (pending) return
-    onSubmit(positions.filter((position) => selected.includes(position.id)).map((position) => position.id))
-  }, [pending, onSubmit, positions, selected])
+    const result: IUnitAssignment[] = positions
+      .filter((position) => position.id in assignments)
+      .map((position) => ({ positionId: position.id, userId: assignments[position.id] ?? null }))
+    onSubmit(result)
+  }, [pending, onSubmit, positions, assignments])
 
   return (
-    <Modal open={open} title={TITLE} description={unit ? `${unit.name}. ${DESCRIPTION}` : DESCRIPTION} icon="briefcase" onClose={onClose} testId="unit-positions">
-      <If condition={positions.length > 0} fallback={<Text variant="secondary">{EMPTY}</Text>}>
-        <div style={list}>
-          {positions.map((position) => (
-            <Checkbox
-              key={position.id}
-              label={position.name}
-              hint={`${RANK_PREFIX}${String(position.rank)}`}
-              checked={selected.includes(position.id)}
-              onToggle={() => toggle(position.id)}
-              testId={`unit-positions__item-${position.id}`}
+    <Modal
+      open={open}
+      title={TITLE}
+      description={unit ? `${unit.name}. ${DESCRIPTION}` : DESCRIPTION}
+      icon="briefcase"
+      onClose={onClose}
+      testId="unit-positions"
+    >
+      <div style={formRow}>
+        <div style={inputWrap}>
+          <TextInput
+            value={newPositionName}
+            onChange={setNewPositionName}
+            onSubmit={handleCreatePosition}
+            placeholder={NEW_POSITION_PLACEHOLDER}
+            icon="briefcase"
+            testId="unit-positions__new-name"
+          />
+        </div>
+        <Button
+          label={ADD_POSITION_LABEL}
+          icon="plus"
+          onClick={handleCreatePosition}
+          disabled={newPositionName.trim().length < POSITION_NAME_MIN_LENGTH}
+          testId="unit-positions__new-add"
+        />
+      </div>
+      <If condition={positions.length > 5}>
+        <div style={formRow}>
+          <div style={inputWrap}>
+            <TextInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder={SEARCH_POSITION_PLACEHOLDER}
+              icon="search"
+              testId="unit-positions__search"
             />
-          ))}
+          </div>
+        </div>
+      </If>
+      <If condition={filteredPositions.length > 0} fallback={<Text variant="secondary">{EMPTY}</Text>}>
+        <div style={list}>
+          {filteredPositions.map((position) => {
+            const isChecked = position.id in assignments
+            return (
+              <div key={position.id} style={itemCard}>
+                <Checkbox
+                  label={position.name}
+                  checked={isChecked}
+                  onToggle={() => toggle(position.id)}
+                  testId={`unit-positions__item-${position.id}`}
+                />
+                <If condition={isChecked}>
+                  <div style={selectRow}>
+                    <Text variant="caption">{EMPLOYEE_LABEL}</Text>
+                    <select
+                      value={assignments[position.id] ?? ''}
+                      onChange={(e) => handleSelectUser(position.id, e.target.value || null)}
+                      style={selectStyle}
+                    >
+                      <option value="">{NO_EMPLOYEE}</option>
+                      {users.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.fullName || user.login}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </If>
+              </div>
+            )
+          })}
         </div>
       </If>
       <div style={footer}>
