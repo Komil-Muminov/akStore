@@ -1,6 +1,19 @@
 const SERVER_PORT = Number(process.env.PORT ?? 3000)
 const READY_TIMEOUT_MS = 30_000
 const POLL_INTERVAL_MS = 250
+const DEFAULT_MODE = 'app'
+
+const CLIENTS = {
+  app: ['--hot', 'app.tsx'],
+  web: ['web.ts'],
+} as const
+
+type TClientMode = keyof typeof CLIENTS
+
+const resolveMode = (): TClientMode => {
+  const requested = process.argv[2] ?? DEFAULT_MODE
+  return requested in CLIENTS ? (requested as TClientMode) : DEFAULT_MODE
+}
 
 const spawn = (name: string, args: string[]) => {
   console.log(`[${name}] bun ${args.join(' ')}`)
@@ -23,11 +36,12 @@ const waitForServer = async () => {
   return false
 }
 
+const mode = resolveMode()
 const server = spawn('server', ['--watch', 'server/index.ts'])
 const ready = await waitForServer()
-if (!ready) console.log('[dev] сервер не ответил вовремя, запускаю окно всё равно')
-const app = spawn('app', ['--hot', 'app.tsx'])
-const children = [server, app]
+if (!ready) console.log('[dev] сервер не ответил вовремя, запускаю клиент всё равно')
+const client = spawn(mode, [...CLIENTS[mode]])
+const children = [server, client]
 
 const stopAll = () => {
   children.forEach((child) => child.kill())

@@ -20,9 +20,10 @@ npm run dev
 |---|---|
 | `npm run app:dev` | Только клиент, hot remount на том же окне |
 | `npm run server:dev` | Только сервер, перезапуск при изменениях |
-| `npm run dev` | Сервер + клиент |
+| `npm run dev` | Сервер + десктоп-клиент |
+| `npm run web` | Сервер + веб-клиент на `:4173` |
 | `npm run build` | Бинарник `dist/gatePass` |
-| `npm run web:dev` | Сборка под браузер и сервер на `:4173` |
+| `npm run web:dev` | Только веб-клиент, сборка под браузер на `:4173` |
 | `npm run screenshot` | PNG окна через automation-клиент |
 | `npm test` | Vitest через GPU test-renderer |
 | `npm run typecheck` | `tsc --noEmit` |

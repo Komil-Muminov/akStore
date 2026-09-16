@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun dev.ts",
+    "web": "bun dev.ts web",
     "app:dev": "bun --hot app.tsx",
     "server:dev": "bun --watch server/index.ts",
     "build": "bun build --compile app.tsx --outfile dist/gatePass",
