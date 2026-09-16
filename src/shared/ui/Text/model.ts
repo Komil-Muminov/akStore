@@ -1,1 +1,11 @@
-export type TTextVariant = 'title' | 'body' | 'secondary' | 'ghost' | 'onAccent' | 'danger'
+export type TTextVariant =
+  | 'heading'
+  | 'title'
+  | 'body'
+  | 'bodyStrong'
+  | 'secondary'
+  | 'caption'
+  | 'label'
+  | 'ghost'
+  | 'onAccent'
+  | 'danger'

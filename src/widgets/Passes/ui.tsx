@@ -1,14 +1,19 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { PassComposer } from '@/features/PassComposer'
 import { PassList } from '@/features/PassList'
-import type { ICreatePassDto, IPass } from '@/entities/pass'
-import { ApiRoutes, QueryKeys, theme } from '@/shared/config'
+import { Sidebar } from '@/features/Sidebar'
+import type { ICreatePassDto, IPass, PassFilter } from '@/entities/pass'
+import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
-import { Icon, If, Spinner, Text } from '@/shared/ui'
-import { ERROR_PREFIX, TITLE } from './model'
-import { header, layout, message, spacer } from './style'
+import { If, Spinner, Text, TextInput } from '@/shared/ui'
+import { countByFilter, selectVisible } from './lib'
+import { COUNT_SUFFIX, HEADERS, INITIAL_FILTER, SEARCH_PLACEHOLDER } from './model'
+import { composer, header, headerText, layout, main, search, sectionHead } from './style'
+import { ErrorState } from './ui/ErrorState'
 
 export const Passes = () => {
+  const [filter, setFilter] = useState<PassFilter>(INITIAL_FILTER)
+  const [query, setQuery] = useState('')
   const passes = useGetQuery<IPass[]>(QueryKeys.PASSES, ApiRoutes.PASSES_SEARCH)
   const create = useMutationQuery<IPass, ICreatePassDto>(ApiRoutes.PASSES_CREATE, {
     invalidate: [QueryKeys.PASSES],
@@ -20,31 +25,47 @@ export const Passes = () => {
 
   const createPass = create.mutate
   const deactivatePass = deactivate.mutate
+  const refetch = passes.refetch
   const handleCreate = useCallback((holderName: string) => createPass({ holderName }), [createPass])
   const handleDeactivate = useCallback((id: string) => deactivatePass(id), [deactivatePass])
+  const handleRetry = useCallback(() => void refetch(), [refetch])
+
   const items = passes.data ?? []
-  const errorText = `${ERROR_PREFIX}${passes.error?.message ?? ''}`
+  const counts = useMemo(() => countByFilter(items), [items])
+  const visible = useMemo(() => selectVisible(items, filter, query), [items, filter, query])
+  const searching = query.trim().length > 0
+  const heading = HEADERS[filter]
 
   return (
     <div style={layout} testId="passes__layout">
-      <div style={header}>
-        <Icon name="sparkle" color={theme.colors.accent} />
-        <Text variant="title" testId="passes__title">
-          {TITLE}
-        </Text>
-        <Text variant="ghost">{String(items.length)}</Text>
-        <div style={spacer} />
-      </div>
-      <If condition={passes.isPending} fallback={
-        <If condition={passes.isError} fallback={<PassList passes={items} onDeactivate={handleDeactivate} />}>
-          <div style={message} testId="passes__error">
-            <Text variant="danger">{errorText}</Text>
+      <Sidebar active={filter} counts={counts} onSelect={setFilter} />
+      <div style={main}>
+        <div style={header}>
+          <div style={headerText}>
+            <Text variant="heading">{heading.title}</Text>
+            <Text variant="secondary">{heading.description}</Text>
           </div>
+          <div style={search}>
+            <TextInput value={query} onChange={setQuery} placeholder={SEARCH_PLACEHOLDER} icon="search" testId="passes__search" />
+          </div>
+        </div>
+        <div style={composer}>
+          <PassComposer onCreate={handleCreate} pending={create.isPending} error={create.error?.message} />
+        </div>
+        <div style={sectionHead}>
+          <Text variant="label">{`${heading.title.toUpperCase()} · ${visible.length}${COUNT_SUFFIX}`}</Text>
+        </div>
+        <If condition={passes.isPending} fallback={
+          <If
+            condition={passes.isError}
+            fallback={<PassList passes={visible} filter={filter} searching={searching} onDeactivate={handleDeactivate} />}
+          >
+            <ErrorState details={passes.error?.message ?? ''} onRetry={handleRetry} />
+          </If>
+        }>
+          <Spinner />
         </If>
-      }>
-        <Spinner />
-      </If>
-      <PassComposer onCreate={handleCreate} pending={create.isPending} />
+      </div>
     </div>
   )
 }

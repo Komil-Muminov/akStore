@@ -2,35 +2,66 @@ import type { StyleDesc } from '@gpuix/react'
 import { theme } from '@/shared/config'
 
 const isMac = typeof process !== 'undefined' && process.platform === 'darwin'
-const MAC_TITLEBAR_CLEARANCE = 86
+const MAC_TITLEBAR_CLEARANCE = 52
 const TITLEBAR_CLEARANCE = 20
 
 export const layout: StyleDesc = {
   display: 'flex',
-  flexDirection: 'column',
+  flexDirection: 'row',
   width: '100%',
   height: '100%',
   backgroundColor: theme.colors.canvas,
+}
+
+export const main: StyleDesc = {
+  flexGrow: 1,
+  minWidth: 0,
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
 }
 
 export const header: StyleDesc = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: theme.spacing.sm + theme.spacing.xxs,
-  height: theme.size.header,
-  paddingTop: isMac ? MAC_TITLEBAR_CLEARANCE - theme.size.header : TITLEBAR_CLEARANCE - theme.spacing.md,
-  paddingLeft: theme.spacing.md + theme.spacing.xxs,
-  paddingRight: theme.spacing.md + theme.spacing.xxs,
+  gap: theme.spacing.lg,
+  paddingTop: isMac ? MAC_TITLEBAR_CLEARANCE : TITLEBAR_CLEARANCE,
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
+  paddingBottom: theme.spacing.lg,
   flexShrink: 0,
 }
 
-export const spacer: StyleDesc = { flexGrow: 1 }
+export const headerText: StyleDesc = { display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }
+
+export const search: StyleDesc = { width: theme.size.sidebar, flexShrink: 0 }
+
+export const composer: StyleDesc = {
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
+  paddingBottom: theme.spacing.lg,
+  maxWidth: theme.size.contentMaxWidth + theme.spacing.xl * 2,
+  flexShrink: 0,
+}
+
+export const sectionHead: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
+  paddingBottom: theme.spacing.sm,
+  flexShrink: 0,
+}
 
 export const message: StyleDesc = {
   flexGrow: 1,
   minHeight: 0,
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  gap: theme.spacing.sm,
 }

@@ -18,3 +18,5 @@ process.on('SIGTERM', stopAll)
 
 await Promise.race(children.map((child) => child.exited))
 stopAll()
+
+export {}

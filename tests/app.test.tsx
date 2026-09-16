@@ -4,7 +4,7 @@ import { createTestRoot, hasNativeTestRenderer } from '@gpuix/react/testing'
 import { App } from '@/app'
 
 const describeNative = hasNativeTestRenderer ? describe : describe.skip
-const TITLE = 'Пропуска'
+const TITLE = 'Все пропуска'
 
 describeNative('gatePass', () => {
   it('рисует заголовок и композер', async () => {

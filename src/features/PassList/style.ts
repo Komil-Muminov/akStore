@@ -4,8 +4,12 @@ import { theme } from '@/shared/config'
 export const list: StyleDesc = {
   flexGrow: 1,
   minHeight: 0,
-  paddingLeft: theme.spacing.md + theme.spacing.xxs,
-  paddingRight: theme.spacing.md + theme.spacing.xxs,
+}
+
+export const rowWrapper: StyleDesc = {
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
+  paddingBottom: theme.spacing.sm,
 }
 
 export const empty: StyleDesc = {
@@ -16,32 +20,60 @@ export const empty: StyleDesc = {
   alignItems: 'center',
   justifyContent: 'center',
   gap: theme.spacing.sm,
+  paddingBottom: theme.spacing.xxl,
 }
 
-export const row: StyleDesc = {
+export const emptyMark: StyleDesc = {
+  width: theme.size.row,
+  height: theme.size.row,
+  borderRadius: theme.radius.full,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: theme.colors.overlay,
+  marginBottom: theme.spacing.sm,
+}
+
+export const row = (active: boolean): StyleDesc => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.md,
-  minHeight: theme.size.row,
-  maxWidth: theme.size.contentMaxWidth,
-  paddingLeft: theme.spacing.sm + theme.spacing.xxs,
-  paddingRight: theme.spacing.xs + theme.spacing.xxs,
-  borderRadius: theme.radius.md,
-  hover: { backgroundColor: theme.colors.overlay },
-}
+  height: theme.size.row,
+  paddingLeft: theme.spacing.md,
+  paddingRight: theme.spacing.md,
+  borderRadius: theme.radius.lg,
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+  backgroundColor: theme.colors.raised,
+  opacity: active ? 1 : 0.7,
+  hover: { backgroundColor: theme.colors.raisedHover, borderColor: theme.colors.borderStrong },
+})
 
-export const status = (active: boolean): StyleDesc => ({
-  width: theme.spacing.sm,
-  height: theme.spacing.sm,
+export const avatar = (active: boolean): StyleDesc => ({
+  width: theme.size.avatar,
+  height: theme.size.avatar,
   flexShrink: 0,
   borderRadius: theme.radius.full,
-  backgroundColor: active ? theme.colors.success : theme.colors.ghost,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: active ? theme.colors.accentSoft : theme.colors.mutedSoft,
 })
+
+export const avatarText = (active: boolean): StyleDesc => ({
+  fontFamily: theme.font.family,
+  fontSize: theme.font.size.sm,
+  fontWeight: theme.font.weight.semibold,
+  color: active ? theme.colors.accent : theme.colors.secondary,
+})
+
+export const info: StyleDesc = { display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }
 
 export const actions: StyleDesc = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: theme.spacing.xxs,
+  gap: theme.spacing.sm,
+  flexShrink: 0,
 }
