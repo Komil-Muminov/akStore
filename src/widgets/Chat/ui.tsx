@@ -17,6 +17,7 @@ import { useHistoryPages } from './history'
 import { useChatRealtime } from './realtime'
 import { useMessageActions } from './actions'
 import { useChatControls } from './controls'
+import { useGroupPanel } from './group'
 import { ChatDialogs } from './ui/ChatDialogs'
 import { filterCompanions } from './lib'
 import { pane, root } from './style'
@@ -31,6 +32,7 @@ export const Chat = () => {
   const actions = useMessageActions(setDraft)
   const controls = useChatControls({ open, createGroup, leave, setDraft, cancelEdit: actions.cancelEdit })
   const { activeId, query } = controls
+  const panel = useGroupPanel(activeId)
   const onlineQuery = useOnlineQuery()
   const { online, setOnline, typingName } = useChatRealtime(activeId)
 
@@ -104,6 +106,7 @@ export const Chat = () => {
                   onLoadOlder={history.loadOlder}
                   typingName={typingName}
                   onLeave={controls.leaveGroup}
+                  onManage={panel.show}
                   onEditMessage={actions.startEdit}
                   onRemoveMessage={actions.askRemove}
                 />
@@ -139,6 +142,16 @@ export const Chat = () => {
         onCloseGroup={controls.closeGroupForm}
         onConfirmRemove={actions.confirmRemove}
         onCancelRemove={actions.cancelRemove}
+        panelOpen={panel.open}
+        panelTitle={active?.title ?? ''}
+        members={members.data ?? []}
+        isOwner={active?.createdBy === currentUserId}
+        panelPending={panel.pending}
+        panelError={panel.error}
+        onRename={panel.handleRename}
+        onAddMembers={panel.handleAdd}
+        onRemoveMember={panel.handleRemove}
+        onClosePanel={panel.hide}
       />
     </div>
   )

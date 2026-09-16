@@ -32,3 +32,7 @@ export const parseGroupInput = (body: unknown): IGroupInput => {
 }
 
 export const parseMemberList = (body: unknown) => parseMemberIds(asRecord(body).memberIds)
+
+export const parseTitle = (body: unknown) => requireString(asRecord(body).title, 'title', TITLE_MIN, TITLE_MAX)
+
+export const parseMemberId = (body: unknown) => requireUuid(asRecord(body).memberId, 'memberId')

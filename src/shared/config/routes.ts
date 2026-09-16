@@ -35,6 +35,8 @@ export const ApiRoutes = {
   CHAT_LEAVE: (id: string) => `/chat/leave/${id}`,
   CHAT_UNREAD: '/chat/unread-count',
   CHAT_ONLINE: '/chat/online',
+  CHAT_RENAME: (id: string) => `/chat/rename/${id}`,
+  CHAT_REMOVE_MEMBER: (id: string) => `/chat/remove-member/${id}`,
   CHAT_EDIT_MESSAGE: (id: string) => `/chat/edit-message/${id}`,
   CHAT_DELETE_MESSAGE: (id: string) => `/chat/delete-message/${id}`,
   CHAT_SEARCH_MESSAGES: (query: string) => `/chat/search-messages?q=${encodeURIComponent(query)}`,

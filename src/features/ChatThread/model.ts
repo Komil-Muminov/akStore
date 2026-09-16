@@ -10,6 +10,7 @@ export interface IProps {
   hasMore: boolean
   onLoadOlder: () => void
   onLeave: () => void
+  onManage: () => void
   onEditMessage: (message: IMessage) => void
   onRemoveMessage: (message: IMessage) => void
 }
@@ -22,4 +23,5 @@ export const THREAD_EMPTY_HINT = 'Напишите первым — сообще
 export const LOAD_OLDER_LABEL = 'Показать более ранние'
 export const COMPANION_HINT = 'Личная переписка'
 export const LEAVE_TOOLTIP = 'Покинуть группу'
+export const MANAGE_TOOLTIP = 'Управление группой'
 export const MEMBERS_SEPARATOR = ', '

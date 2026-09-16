@@ -2,16 +2,17 @@ import { initialsOf } from '@/entities/pass'
 import { isGroup, membersLabelOf, titleOf, type IConversation, type IMember } from '@/entities/message'
 import { theme } from '@/shared/config'
 import { Icon, IconButton, If, Text, Tooltip } from '@/shared/ui'
-import { COMPANION_HINT, LEAVE_TOOLTIP, MEMBERS_SEPARATOR } from '../model'
+import { COMPANION_HINT, LEAVE_TOOLTIP, MANAGE_TOOLTIP, MEMBERS_SEPARATOR } from '../model'
 import { head, headAvatar, headAvatarText, headText } from '../style'
 
 interface IProps {
   conversation: IConversation
   members: IMember[]
   onLeave: () => void
+  onManage: () => void
 }
 
-export const ThreadHead = ({ conversation, members, onLeave }: IProps) => {
+export const ThreadHead = ({ conversation, members, onLeave, onManage }: IProps) => {
   const group = isGroup(conversation)
   const names = members.map((member) => member.fullName || member.login).join(MEMBERS_SEPARATOR)
 
@@ -33,6 +34,11 @@ export const ThreadHead = ({ conversation, members, onLeave }: IProps) => {
           </Tooltip>
         </If>
       </div>
+      <If condition={group}>
+        <Tooltip title={MANAGE_TOOLTIP}>
+          <IconButton icon="userCog" onClick={onManage} testId="chat__manage" />
+        </Tooltip>
+      </If>
       <If condition={group}>
         <Tooltip title={LEAVE_TOOLTIP}>
           <IconButton icon="logOut" onClick={onLeave} hoverColor={theme.colors.dangerSoft} testId="chat__leave" />

@@ -7,6 +7,7 @@ export interface IConversation {
   id: string
   kind: ConversationKind
   title: string
+  createdBy: string
   companionId: string
   companionName: string
   companionLogin: string
@@ -22,6 +23,7 @@ export interface IConversationRow {
   id: string
   kind: ConversationKind
   title: string
+  created_by: string | null
   companion_id: string | null
   companion_name: string | null
   companion_login: string | null

@@ -5,6 +5,7 @@ const toConversation = (row: IConversationRow): IConversation => ({
   id: row.id,
   kind: row.kind,
   title: row.title,
+  createdBy: row.created_by ?? '',
   companionId: row.companion_id ?? '',
   companionReadAt: row.companion_read_at ? row.companion_read_at.toISOString() : null,
   companionName: row.companion_name ?? '',
@@ -17,7 +18,7 @@ const toConversation = (row: IConversationRow): IConversation => ({
 })
 
 const BASE_SQL = `
-  SELECT c.id, c.kind, c.title,
+  SELECT c.id, c.kind, c.title, c.created_by,
          peer.user_id AS companion_id, peer.full_name AS companion_name, peer.login AS companion_login,
          peer.last_read_at AS companion_read_at,
          (SELECT COUNT(*) FROM chat_participants total WHERE total.conversation_id = c.id) AS members_count,
@@ -62,6 +63,8 @@ const UNREAD_TOTAL_SQL = `
   JOIN chat_participants me ON me.conversation_id = m.conversation_id AND me.user_id = $1
   WHERE m.author_id <> $1 AND m.created_at > me.last_read_at`
 
+const RENAME_SQL = 'UPDATE chat_conversations SET title = $2 WHERE id = $1'
+
 const MARK_READ_SQL = `
   UPDATE chat_participants SET last_read_at = now()
   WHERE conversation_id = $1 AND user_id = $2`
@@ -78,6 +81,9 @@ export const chatDb = {
     (await pool.query<{ id: string }>(CREATE_DIRECT_SQL, [directKey, ConversationKind.DIRECT])).rows[0]?.id ?? '',
   createGroup: async (title: string, authorId: string) =>
     (await pool.query<{ id: string }>(CREATE_GROUP_SQL, [ConversationKind.GROUP, title, authorId])).rows[0]?.id ?? '',
+  rename: async (conversationId: string, title: string) => {
+    await pool.query(RENAME_SQL, [conversationId, title])
+  },
   unreadTotal: async (userId: string) =>
     Number((await pool.query<{ total: string }>(UNREAD_TOTAL_SQL, [userId])).rows[0]?.total ?? 0),
   markRead: async (conversationId: string, userId: string) => {

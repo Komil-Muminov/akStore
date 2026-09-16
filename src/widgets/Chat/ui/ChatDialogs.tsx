@@ -1,5 +1,6 @@
 import type { IHost } from '@/entities/host'
-import type { IMessage } from '@/entities/message'
+import type { IMember, IMessage } from '@/entities/message'
+import { ChatGroupPanel } from '@/features/ChatGroupPanel'
 import { ChatGroupForm, type IGroupSubmit } from '@/features/ChatGroupForm'
 import { ConfirmDialog } from '@/shared/ui'
 import { REMOVE_DIALOG } from '../model'
@@ -15,6 +16,16 @@ interface IProps {
   onCloseGroup: () => void
   onConfirmRemove: () => void
   onCancelRemove: () => void
+  panelOpen: boolean
+  panelTitle: string
+  members: IMember[]
+  isOwner: boolean
+  panelPending: boolean
+  panelError?: string
+  onRename: (title: string) => void
+  onAddMembers: (memberIds: string[]) => void
+  onRemoveMember: (memberId: string) => void
+  onClosePanel: () => void
 }
 
 export const ChatDialogs = ({
@@ -28,6 +39,16 @@ export const ChatDialogs = ({
   onCloseGroup,
   onConfirmRemove,
   onCancelRemove,
+  panelOpen,
+  panelTitle,
+  members,
+  isOwner,
+  panelPending,
+  panelError,
+  onRename,
+  onAddMembers,
+  onRemoveMember,
+  onClosePanel,
 }: IProps) => (
   <>
     <ChatGroupForm
@@ -37,6 +58,19 @@ export const ChatDialogs = ({
       error={groupError}
       onSubmit={onCreateGroup}
       onClose={onCloseGroup}
+    />
+    <ChatGroupPanel
+      open={panelOpen}
+      title={panelTitle}
+      members={members}
+      companions={colleagues}
+      isOwner={isOwner}
+      pending={panelPending}
+      error={panelError}
+      onRename={onRename}
+      onAddMembers={onAddMembers}
+      onRemoveMember={onRemoveMember}
+      onClose={onClosePanel}
     />
     <ConfirmDialog
       open={removing !== null}

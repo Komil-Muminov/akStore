@@ -3,7 +3,14 @@ import { rbacMiddleware } from '../middleware'
 import { chatService } from '../services'
 import { HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
-import { parseCompanionId, parseGroupInput, parseMemberList, parseMessageBody } from './chat.validation'
+import {
+  parseCompanionId,
+  parseGroupInput,
+  parseMemberId,
+  parseMemberList,
+  parseMessageBody,
+  parseTitle,
+} from './chat.validation'
 import { idOf, respond } from './respond'
 
 const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
@@ -41,6 +48,12 @@ chatRouter.patch('/edit-message/:id', anyRole, respond(
 ))
 chatRouter.delete('/delete-message/:id', anyRole, respond((req) =>
   chatService.removeMessage(actorOf(req), idOf(req)),
+))
+chatRouter.patch('/rename/:id', anyRole, respond(
+  (req) => chatService.rename(actorOf(req), idOf(req), parseTitle(req.body)),
+))
+chatRouter.post('/remove-member/:id', anyRole, respond(
+  (req) => chatService.removeMember(actorOf(req), idOf(req), parseMemberId(req.body)),
 ))
 chatRouter.patch('/leave/:id', anyRole, respond((req) => chatService.leave(actorOf(req), idOf(req))))
 chatRouter.patch('/read/:id', anyRole, respond((req) => chatService.markRead(actorOf(req), idOf(req))))

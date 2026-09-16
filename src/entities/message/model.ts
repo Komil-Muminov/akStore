@@ -7,6 +7,7 @@ export interface IConversation {
   id: string
   kind: ConversationKind
   title: string
+  createdBy: string
   companionId: string
   companionName: string
   companionLogin: string

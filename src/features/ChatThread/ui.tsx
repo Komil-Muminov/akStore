@@ -26,6 +26,7 @@ export const ChatThread = ({
   hasMore,
   onLoadOlder,
   onLeave,
+  onManage,
   onEditMessage,
   onRemoveMessage,
 }: IProps) => (
@@ -36,7 +37,7 @@ export const ChatThread = ({
     >
       {() => (
         <>
-          <ThreadHead conversation={conversation as IConversation} members={members} onLeave={onLeave} />
+          <ThreadHead conversation={conversation as IConversation} members={members} onLeave={onLeave} onManage={onManage} />
           <If
             condition={loading}
             fallback={

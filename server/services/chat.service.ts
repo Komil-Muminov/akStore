@@ -17,6 +17,8 @@ const GROUP_TOO_SMALL = 'В группе нужно минимум два уча
 const GROUP_ONLY = 'Действие доступно только в группах'
 const MESSAGE_MISSING = 'Сообщение не найдено'
 const NOT_AUTHOR = 'Можно менять только свои сообщения'
+const NOT_OWNER = 'Управлять группой может только её создатель'
+const SELF_REMOVE = 'Себя исключить нельзя, выйдите из группы'
 
 const directKeyOf = (first: string, second: string) => [first, second].sort().join(KEY_SEPARATOR)
 
@@ -65,6 +67,23 @@ export const chatService = {
     const conversationId = await chatDb.createGroup(title, userId)
     await chatMembersDb.add(conversationId, [userId, ...others])
     return loaded(userId, conversationId)
+  },
+
+  rename: async (userId: string, conversationId: string, title: string) => {
+    await requireMembership(conversationId, userId)
+    const conversation = await requireGroup(conversationId, userId)
+    if (conversation.createdBy !== userId) throw new HttpError(HttpStatus.FORBIDDEN, NOT_OWNER)
+    await chatDb.rename(conversationId, title)
+    return loaded(userId, conversationId)
+  },
+
+  removeMember: async (userId: string, conversationId: string, memberId: string) => {
+    if (userId === memberId) throw new HttpError(HttpStatus.BAD_REQUEST, SELF_REMOVE)
+    await requireMembership(conversationId, userId)
+    const conversation = await requireGroup(conversationId, userId)
+    if (conversation.createdBy !== userId) throw new HttpError(HttpStatus.FORBIDDEN, NOT_OWNER)
+    await chatMembersDb.remove(conversationId, memberId)
+    return chatMembersDb.list(conversationId)
   },
 
   members: async (userId: string, conversationId: string) => {
