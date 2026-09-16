@@ -12,6 +12,7 @@ interface IProps {
   icon?: TIconName
   disabled?: boolean
   fullWidth?: boolean
+  tabIndex?: number
   testId?: string
 }
 
@@ -23,9 +24,10 @@ export const Button = ({
   icon,
   disabled = false,
   fullWidth = false,
+  tabIndex,
   testId,
 }: IProps) => (
-  <div testId={testId} onClick={disabled ? undefined : onClick} style={root(variant, disabled, fullWidth, size)}>
+  <div testId={testId} tabIndex={tabIndex} onClick={disabled ? undefined : onClick} style={root(variant, disabled, fullWidth, size)}>
     <If condition={icon !== undefined}>
       <Icon name={icon ?? 'plus'} size={size === 'lg' ? theme.size.iconLg : theme.size.iconMd} color={iconColor(variant)} />
     </If>

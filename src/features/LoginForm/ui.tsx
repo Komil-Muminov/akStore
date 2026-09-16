@@ -1,3 +1,4 @@
+import type { EventPayload } from '@gpuix/react'
 import { useCallback, useState } from 'react'
 import { LOGIN_MIN_LENGTH, PASSWORD_MIN_LENGTH } from '@/entities/user'
 import { theme } from '@/shared/config'
@@ -18,6 +19,7 @@ import { brand, brandMark, card, field, formBody, message, root } from './style'
 export const LoginForm = ({ pending, error, onSubmit }: IProps) => {
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
+  const [focusedField, setFocusedField] = useState<'login' | 'password'>('login')
   const [touched, setTouched] = useState(false)
   const invalid = login.trim().length < LOGIN_MIN_LENGTH || password.length < PASSWORD_MIN_LENGTH
 
@@ -26,6 +28,24 @@ export const LoginForm = ({ pending, error, onSubmit }: IProps) => {
     if (invalid || pending) return
     onSubmit({ login: login.trim(), password })
   }, [invalid, pending, login, password, onSubmit])
+
+  const handleLoginKeyDown = useCallback((event: EventPayload) => {
+    if (event.key?.toLowerCase() === 'tab' && !event.modifiers?.shift) {
+      setFocusedField('password')
+    }
+  }, [])
+
+  const handlePasswordKeyDown = useCallback((event: EventPayload) => {
+    if (event.key?.toLowerCase() === 'tab' && event.modifiers?.shift) {
+      setFocusedField('login')
+    }
+  }, [])
+
+  const handleLoginSubmit = useCallback(() => {
+    if (login.trim().length >= LOGIN_MIN_LENGTH) {
+      setFocusedField('password')
+    }
+  }, [login])
 
   return (
     <div style={root} testId="login">
@@ -43,10 +63,12 @@ export const LoginForm = ({ pending, error, onSubmit }: IProps) => {
             <TextInput
               value={login}
               onChange={setLogin}
-              onSubmit={submit}
+              onSubmit={handleLoginSubmit}
+              onKeyDown={handleLoginKeyDown}
               placeholder={LOGIN_PLACEHOLDER}
               icon="user"
-              autoFocus
+              autoFocus={focusedField === 'login'}
+              tabIndex={1}
               testId="login__login"
             />
           </div>
@@ -56,7 +78,10 @@ export const LoginForm = ({ pending, error, onSubmit }: IProps) => {
               value={password}
               onChange={setPassword}
               onSubmit={submit}
+              onKeyDown={handlePasswordKeyDown}
               placeholder={PASSWORD_PLACEHOLDER}
+              autoFocus={focusedField === 'password'}
+              tabIndex={2}
               testId="login__password"
             />
           </div>
@@ -77,6 +102,7 @@ export const LoginForm = ({ pending, error, onSubmit }: IProps) => {
             icon="key"
             size="lg"
             fullWidth
+            tabIndex={3}
             onClick={submit}
             disabled={pending}
             testId="login__submit"
@@ -86,4 +112,5 @@ export const LoginForm = ({ pending, error, onSubmit }: IProps) => {
     </div>
   )
 }
+
 

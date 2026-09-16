@@ -10,13 +10,25 @@ interface IProps {
   value: string
   onChange: (value: string) => void
   onSubmit?: () => void
+  onKeyDown?: (event: EventPayload) => void
   placeholder?: string
   autoFocus?: boolean
+  tabIndex?: number
   testId?: string
   style?: StyleDesc
 }
 
-export const PasswordInput = ({ value, onChange, onSubmit, placeholder, autoFocus, testId, style: customStyle }: IProps) => {
+export const PasswordInput = ({
+  value,
+  onChange,
+  onSubmit,
+  onKeyDown,
+  placeholder,
+  autoFocus,
+  tabIndex = 0,
+  testId,
+  style: customStyle,
+}: IProps) => {
   const [visible, setVisible] = useState(false)
   const displayed = visible ? value : MASK_CHAR.repeat(value.length)
 
@@ -42,8 +54,10 @@ export const PasswordInput = ({ value, onChange, onSubmit, placeholder, autoFocu
         value={displayed}
         placeholder={placeholder}
         autoFocus={autoFocus}
+        tabIndex={tabIndex}
         onChange={(event) => handleChange(event.value ?? '')}
         onSubmit={onSubmit}
+        onKeyDown={onKeyDown}
         theme={inputTheme}
         style={input}
       />

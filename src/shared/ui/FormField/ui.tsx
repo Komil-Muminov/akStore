@@ -1,3 +1,4 @@
+import type { EventPayload } from '@gpuix/react'
 import type { TIconName } from '../Icon'
 import { If } from '../If'
 import { Text } from '../Text'
@@ -11,11 +12,13 @@ interface IProps {
   value: string
   onChange: (value: string) => void
   onSubmit?: () => void
+  onKeyDown?: (event: EventPayload) => void
   placeholder?: string
   icon?: TIconName
   error?: string
   isRequired?: boolean
   autoFocus?: boolean
+  tabIndex?: number
   testId?: string
 }
 
@@ -24,11 +27,13 @@ export const FormField = ({
   value,
   onChange,
   onSubmit,
+  onKeyDown,
   placeholder,
   icon,
   error,
   isRequired = false,
   autoFocus,
+  tabIndex,
   testId,
 }: IProps) => (
   <div style={root}>
@@ -42,9 +47,11 @@ export const FormField = ({
       value={value}
       onChange={onChange}
       onSubmit={onSubmit}
+      onKeyDown={onKeyDown}
       placeholder={placeholder}
       icon={icon}
       autoFocus={autoFocus}
+      tabIndex={tabIndex}
       testId={testId}
     />
     <div style={message}>
