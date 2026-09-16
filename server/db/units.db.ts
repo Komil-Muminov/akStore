@@ -35,15 +35,15 @@ const CLEAR_POSITIONS_SQL = 'DELETE FROM unit_positions WHERE unit_id = $1'
 const ADD_POSITION_SQL = 'INSERT INTO unit_positions (unit_id, position_id, user_id, sort_order) VALUES ($1, $2, $3, $4)'
 
 export const unitsDb = {
-  search: async (): Promise<IUnit[]> => {
+  search: async () => {
     const result = await pool.query<IUnitRow>(SEARCH_SQL)
     return result.rows.map(toUnit)
   },
-  find: async (id: string): Promise<IUnit | null> => {
+  find: async (id: string) => {
     const result = await pool.query<IUnitRow>(FIND_SQL, [id])
     return result.rows[0] ? toUnit(result.rows[0]) : null
   },
-  create: async (input: IUnitInput): Promise<string> => {
+  create: async (input: IUnitInput) => {
     const result = await pool.query<{ id: string }>(CREATE_SQL, [
       input.name,
       input.type,
@@ -53,28 +53,31 @@ export const unitsDb = {
     ])
     return result.rows[0]!.id
   },
-  update: async (id: string, name: string, x: number, y: number): Promise<boolean> => {
+  update: async (id: string, name: string, x: number, y: number) => {
     const result = await pool.query(UPDATE_SQL, [id, name, x, y])
     return (result.rowCount ?? 0) > 0
   },
-  move: async (id: string, parentId: string | null): Promise<boolean> => {
+  move: async (id: string, parentId: string | null) => {
     const result = await pool.query(MOVE_SQL, [id, parentId])
     return (result.rowCount ?? 0) > 0
   },
-  setLayout: async (items: { id: string; x: number; y: number }[]): Promise<void> => {
-    await Promise.all(items.map((item) => pool.query(LAYOUT_SQL, [item.id, item.x, item.y])))
+  setLayout: async (items: { id: string; x: number; y: number }[]) => {
+    for (const item of items) {
+      await pool.query(LAYOUT_SQL, [item.id, item.x, item.y])
+    }
   },
-  childrenCount: async (id: string): Promise<number> => {
+  childrenCount: async (id: string) => {
     const result = await pool.query<{ total: string }>(CHILDREN_SQL, [id])
     return Number(result.rows[0]?.total ?? 0)
   },
-  setPositions: async (id: string, assignments: { positionId: string; userId: string | null }[]): Promise<void> => {
+  setPositions: async (id: string, assignments: { positionId: string; userId: string | null }[]) => {
     await pool.query(CLEAR_POSITIONS_SQL, [id])
-    await Promise.all(
-      assignments.map((item, index) => pool.query(ADD_POSITION_SQL, [id, item.positionId, item.userId, index])),
-    )
+    for (let index = 0; index < assignments.length; index++) {
+      const item = assignments[index]!
+      await pool.query(ADD_POSITION_SQL, [id, item.positionId, item.userId, index])
+    }
   },
-  remove: async (id: string): Promise<boolean> => {
+  remove: async (id: string) => {
     const result = await pool.query(DELETE_SQL, [id])
     return (result.rowCount ?? 0) > 0
   },

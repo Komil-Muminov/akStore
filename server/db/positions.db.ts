@@ -10,7 +10,7 @@ const DELETE_SQL = 'DELETE FROM positions WHERE id = $1 RETURNING id'
 const USAGE_SQL = 'SELECT count(*)::text AS total FROM unit_positions WHERE position_id = $1'
 
 export const positionsDb = {
-  search: async (query?: string): Promise<IPosition[]> => {
+  search: async (query?: string) => {
     if (query?.trim()) {
       const result = await pool.query<IPositionRow>('SELECT * FROM positions WHERE name ILIKE $1 ORDER BY name', [`%${query.trim()}%`])
       return result.rows.map(toPosition)
@@ -18,19 +18,19 @@ export const positionsDb = {
     const result = await pool.query<IPositionRow>(SEARCH_SQL)
     return result.rows.map(toPosition)
   },
-  create: async (input: IPositionInput): Promise<IPosition> => {
+  create: async (input: IPositionInput) => {
     const result = await pool.query<IPositionRow>(CREATE_SQL, [input.name, input.rank ?? 100])
     return toPosition(result.rows[0]!)
   },
-  update: async (id: string, input: IPositionInput): Promise<IPosition | null> => {
+  update: async (id: string, input: IPositionInput) => {
     const result = await pool.query<IPositionRow>(UPDATE_SQL, [id, input.name, input.rank ?? 100])
     return result.rows[0] ? toPosition(result.rows[0]) : null
   },
-  usageCount: async (id: string): Promise<number> => {
+  usageCount: async (id: string) => {
     const result = await pool.query<{ total: string }>(USAGE_SQL, [id])
     return Number(result.rows[0]?.total ?? 0)
   },
-  remove: async (id: string): Promise<boolean> => {
+  remove: async (id: string) => {
     const result = await pool.query(DELETE_SQL, [id])
     return (result.rowCount ?? 0) > 0
   },

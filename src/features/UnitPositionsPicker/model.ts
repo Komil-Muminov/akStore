@@ -8,7 +8,7 @@ export interface IProps {
   users: IUser[]
   pending: boolean
   error?: string
-  onCreatePosition: (input: IPositionInput) => Promise<IPosition | void> | void
+  onCreatePosition: (input: IPositionInput) => unknown
   onSubmit: (assignments: IUnitAssignment[]) => void
   onClose: () => void
 }

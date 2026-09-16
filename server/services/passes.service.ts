@@ -10,12 +10,12 @@ const orNotFound = (pass: IPass | null): IPass => {
 }
 
 export const passesService = {
-  search: (params?: IPassSearchParams): Promise<IPagedResult<IPass>> => passesDb.search(params),
-  create: (input: IPassInput): Promise<IPass> => passesDb.create(input),
-  update: async (id: string, input: IPassInput): Promise<IPass> => orNotFound(await passesDb.update(id, input)),
-  deactivate: async (id: string): Promise<IPass> => orNotFound(await passesDb.setStatus(id, PassStatus.REVOKED)),
-  activate: async (id: string): Promise<IPass> => orNotFound(await passesDb.setStatus(id, PassStatus.ACTIVE)),
-  remove: async (id: string): Promise<{ id: string }> => {
+  search: async (params?: IPassSearchParams) => passesDb.search(params),
+  create: async (input: IPassInput) => passesDb.create(input),
+  update: async (id: string, input: IPassInput) => orNotFound(await passesDb.update(id, input)),
+  deactivate: async (id: string) => orNotFound(await passesDb.setStatus(id, PassStatus.REVOKED)),
+  activate: async (id: string) => orNotFound(await passesDb.setStatus(id, PassStatus.ACTIVE)),
+  remove: async (id: string) => {
     const removed = await passesDb.remove(id)
     if (!removed) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
     return { id }

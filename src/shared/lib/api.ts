@@ -10,7 +10,7 @@ interface IRequestOptions {
 const FALLBACK_ERROR = 'Ошибка сети'
 const UNAUTHORIZED = 401
 
-export const request = async <T>(url: string, options: IRequestOptions = {}): Promise<T> => {
+export const request = async <T>(url: string, options: IRequestOptions = {}) => {
   const token = session.get()?.token
   const response = await fetch(`${env.apiUrl}${url}`, {
     method: options.method ?? 'GET',
@@ -20,7 +20,12 @@ export const request = async <T>(url: string, options: IRequestOptions = {}): Pr
     },
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   })
-  const payload = (await response.json().catch(() => null)) as IApiResponse<T> | IApiError | null
+  let payload: IApiResponse<T> | IApiError | null = null
+  try {
+    payload = (await response.json()) as IApiResponse<T> | IApiError
+  } catch {
+    payload = null
+  }
   if (response.status === UNAUTHORIZED && token) session.set(null)
   const failed = !response.ok || payload === null
   const message = (payload as IApiError | null)?.message ?? FALLBACK_ERROR

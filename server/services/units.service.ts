@@ -9,13 +9,13 @@ const HAS_CHILDREN = 'Сначала удалите или перенесите 
 const ROOT_LOCKED = 'Корневой узел «Руководство» нельзя удалить или перенести'
 const CYCLE = 'Нельзя привязать подразделение к собственному потомку'
 
-const findOrThrow = async (id: string): Promise<IUnit> => {
+const findOrThrow = async (id: string) => {
   const unit = await unitsDb.find(id)
   if (!unit) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
   return unit
 }
 
-const parentTypeOf = async (parentId: string | null): Promise<UnitType | null> =>
+const parentTypeOf = async (parentId: string | null) =>
   parentId === null ? null : (await findOrThrow(parentId)).type
 
 const isDescendant = (all: IUnit[], candidateId: string, ancestorId: string): boolean => {
@@ -28,19 +28,19 @@ const isDescendant = (all: IUnit[], candidateId: string, ancestorId: string): bo
 }
 
 export const unitsService = {
-  search: (): Promise<IUnit[]> => unitsDb.search(),
-  create: async (input: IUnitInput): Promise<IUnit> => {
+  search: async () => unitsDb.search(),
+  create: async (input: IUnitInput) => {
     if (!canAttach(input.type, await parentTypeOf(input.parentId))) {
       throw new HttpError(HttpStatus.BAD_REQUEST, BAD_PARENT)
     }
     return findOrThrow(await unitsDb.create(input))
   },
-  update: async (id: string, name: string, x: number, y: number): Promise<IUnit> => {
+  update: async (id: string, name: string, x: number, y: number) => {
     await findOrThrow(id)
     await unitsDb.update(id, name, x, y)
     return findOrThrow(id)
   },
-  move: async (id: string, parentId: string | null): Promise<IUnit> => {
+  move: async (id: string, parentId: string | null) => {
     const unit = await findOrThrow(id)
     if (unit.type === UnitType.LEADERSHIP) throw new HttpError(HttpStatus.BAD_REQUEST, ROOT_LOCKED)
     if (!canAttach(unit.type, await parentTypeOf(parentId))) throw new HttpError(HttpStatus.BAD_REQUEST, BAD_PARENT)
@@ -48,16 +48,16 @@ export const unitsService = {
     await unitsDb.move(id, parentId)
     return findOrThrow(id)
   },
-  setLayout: async (items: { id: string; x: number; y: number }[]): Promise<{ updated: number }> => {
+  setLayout: async (items: { id: string; x: number; y: number }[]) => {
     await unitsDb.setLayout(items)
     return { updated: items.length }
   },
-  setPositions: async (id: string, assignments: { positionId: string; userId: string | null }[]): Promise<IUnit> => {
+  setPositions: async (id: string, assignments: { positionId: string; userId: string | null }[]) => {
     await findOrThrow(id)
     await unitsDb.setPositions(id, assignments)
     return findOrThrow(id)
   },
-  remove: async (id: string): Promise<{ id: string }> => {
+  remove: async (id: string) => {
     const unit = await findOrThrow(id)
     if (unit.type === UnitType.LEADERSHIP) throw new HttpError(HttpStatus.BAD_REQUEST, ROOT_LOCKED)
     if ((await unitsDb.childrenCount(id)) > 0) throw new HttpError(HttpStatus.BAD_REQUEST, HAS_CHILDREN)

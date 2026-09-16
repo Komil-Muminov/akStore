@@ -36,7 +36,7 @@ const DELETE_SQL = 'DELETE FROM passes WHERE id = $1 RETURNING id'
 const first = (rows: IPassRow[]): IPass | null => (rows[0] ? toPass(rows[0]) : null)
 
 export const passesDb = {
-  search: async (params: IPassSearchParams = {}): Promise<IPagedResult<IPass>> => {
+  search: async (params: IPassSearchParams = {}) => {
     const conditions: string[] = []
     const values: (string | number)[] = []
 
@@ -72,19 +72,19 @@ export const passesDb = {
       totalPages,
     }
   },
-  create: async (input: IPassInput): Promise<IPass> => {
+  create: async (input: IPassInput) => {
     const result = await pool.query<IPassRow>(CREATE_SQL, toParams(input))
     return toPass(result.rows[0]!)
   },
-  update: async (id: string, input: IPassInput): Promise<IPass | null> => {
+  update: async (id: string, input: IPassInput) => {
     const result = await pool.query<IPassRow>(UPDATE_SQL, [id, ...toParams(input)])
     return first(result.rows)
   },
-  setStatus: async (id: string, status: PassStatus): Promise<IPass | null> => {
+  setStatus: async (id: string, status: PassStatus) => {
     const result = await pool.query<IPassRow>(SET_STATUS_SQL, [id, status])
     return first(result.rows)
   },
-  remove: async (id: string): Promise<boolean> => {
+  remove: async (id: string) => {
     const result = await pool.query(DELETE_SQL, [id])
     return (result.rowCount ?? 0) > 0
   },

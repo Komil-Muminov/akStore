@@ -28,14 +28,12 @@ const ensureDatabase = async () => {
 const seedPositions = async () => {
   const count = await pool.query<{ total: string }>('SELECT count(*)::text AS total FROM positions')
   if (Number(count.rows[0]?.total ?? 0) > 0) return
-  await Promise.all(
-    SEED_POSITIONS.map((position) =>
-      pool.query('INSERT INTO positions (name, rank) VALUES ($1, $2) ON CONFLICT (name) DO NOTHING', [
-        position.name,
-        position.rank,
-      ]),
-    ),
-  )
+  for (const position of SEED_POSITIONS) {
+    await pool.query('INSERT INTO positions (name, rank) VALUES ($1, $2) ON CONFLICT (name) DO NOTHING', [
+      position.name,
+      position.rank,
+    ])
+  }
 }
 
 const seedLeadership = async () => {

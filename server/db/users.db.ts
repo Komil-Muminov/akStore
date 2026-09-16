@@ -22,8 +22,8 @@ const DELETE_SQL = 'DELETE FROM users WHERE id = $1 RETURNING id'
 const LIST_SQL = 'SELECT * FROM users WHERE is_active = true ORDER BY role, full_name'
 
 export const usersDb = {
-  list: async (): Promise<IUser[]> => (await pool.query<IUserRow>(LIST_SQL)).rows.map(toUser),
-  searchPaged: async (params: IUserSearchParams = {}, allowedRoles?: UserRole[]): Promise<IPagedResult<IUser>> => {
+  list: async () => (await pool.query<IUserRow>(LIST_SQL)).rows.map(toUser),
+  searchPaged: async (params: IUserSearchParams = {}, allowedRoles?: UserRole[]) => {
     const conditions: string[] = []
     const values: (string | number | string[])[] = []
 
@@ -59,23 +59,23 @@ export const usersDb = {
       totalPages,
     }
   },
-  findRowByLogin: async (login: string): Promise<IUserRow | null> =>
+  findRowByLogin: async (login: string) =>
     (await pool.query<IUserRow>(FIND_BY_LOGIN_SQL, [login])).rows[0] ?? null,
-  findRow: async (id: string): Promise<IUserRow | null> => (await pool.query<IUserRow>(FIND_SQL, [id])).rows[0] ?? null,
-  find: async (id: string): Promise<IUser | null> => {
+  findRow: async (id: string) => (await pool.query<IUserRow>(FIND_SQL, [id])).rows[0] ?? null,
+  find: async (id: string) => {
     const row = (await pool.query<IUserRow>(FIND_SQL, [id])).rows[0]
     return row ? toUser(row) : null
   },
-  countActiveByRole: async (role: UserRole): Promise<number> =>
+  countActiveByRole: async (role: UserRole) =>
     Number((await pool.query<{ total: string }>(COUNT_ROLE_SQL, [role])).rows[0]?.total ?? 0),
-  create: async (login: string, passwordHash: string, role: UserRole, fullName: string): Promise<IUser> =>
+  create: async (login: string, passwordHash: string, role: UserRole, fullName: string) =>
     toUser((await pool.query<IUserRow>(CREATE_SQL, [login, passwordHash, role, fullName])).rows[0]!),
-  update: async (id: string, fullName: string, isActive: boolean): Promise<IUser | null> => {
+  update: async (id: string, fullName: string, isActive: boolean) => {
     const row = (await pool.query<IUserRow>(UPDATE_SQL, [id, fullName, isActive])).rows[0]
     return row ? toUser(row) : null
   },
-  setPassword: async (id: string, passwordHash: string): Promise<void> => {
+  setPassword: async (id: string, passwordHash: string) => {
     await pool.query(PASSWORD_SQL, [id, passwordHash])
   },
-  remove: async (id: string): Promise<boolean> => ((await pool.query(DELETE_SQL, [id])).rowCount ?? 0) > 0,
+  remove: async (id: string) => ((await pool.query(DELETE_SQL, [id])).rowCount ?? 0) > 0,
 }

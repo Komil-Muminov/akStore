@@ -10,7 +10,7 @@ const SELF_ACTION = 'Нельзя выполнить это действие н�
 
 const canManage = (actor: IAuthUser, role: UserRole): boolean => ROLE_RANK[actor.role] < ROLE_RANK[role]
 
-const assertManageable = async (actor: IAuthUser, id: string): Promise<IUser> => {
+const assertManageable = async (actor: IAuthUser, id: string) => {
   const user = await usersDb.find(id)
   if (!user) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
   if (user.id === actor.id) throw new HttpError(HttpStatus.BAD_REQUEST, SELF_ACTION)
@@ -19,12 +19,12 @@ const assertManageable = async (actor: IAuthUser, id: string): Promise<IUser> =>
 }
 
 export const usersService = {
-  list: (): Promise<IUser[]> => usersDb.list(),
-  search: (actor: IAuthUser, params?: IUserSearchParams): Promise<IPagedResult<IUser>> => {
+  list: async () => usersDb.list(),
+  search: async (actor: IAuthUser, params?: IUserSearchParams) => {
     const allowedRoles = (Object.values(UserRole) as UserRole[]).filter((role) => canManage(actor, role))
     return usersDb.searchPaged(params, allowedRoles)
   },
-  create: async (actor: IAuthUser, input: IUserInput): Promise<IUser> => {
+  create: async (actor: IAuthUser, input: IUserInput) => {
     if (!canManage(actor, input.role)) throw new HttpError(HttpStatus.FORBIDDEN, FORBIDDEN_ROLE)
     if (await usersDb.findRowByLogin(input.login)) throw new HttpError(HttpStatus.BAD_REQUEST, LOGIN_TAKEN)
     if (input.role === UserRole.ADMIN && (await usersDb.countActiveByRole(UserRole.ADMIN)) > 0) {
@@ -33,19 +33,19 @@ export const usersService = {
     const hash = await Bun.password.hash(input.password)
     return usersDb.create(input.login, hash, input.role, input.fullName)
   },
-  update: async (actor: IAuthUser, id: string, fullName: string, isActive: boolean): Promise<IUser> => {
+  update: async (actor: IAuthUser, id: string, fullName: string, isActive: boolean) => {
     const user = await assertManageable(actor, id)
     if (isActive && !user.isActive && user.role === UserRole.ADMIN && (await usersDb.countActiveByRole(UserRole.ADMIN)) > 0) {
       throw new HttpError(HttpStatus.BAD_REQUEST, ADMIN_EXISTS)
     }
     return (await usersDb.update(id, fullName, isActive)) ?? user
   },
-  resetPassword: async (actor: IAuthUser, id: string, password: string): Promise<{ id: string }> => {
+  resetPassword: async (actor: IAuthUser, id: string, password: string) => {
     await assertManageable(actor, id)
     await usersDb.setPassword(id, await Bun.password.hash(password))
     return { id }
   },
-  remove: async (actor: IAuthUser, id: string): Promise<{ id: string }> => {
+  remove: async (actor: IAuthUser, id: string) => {
     await assertManageable(actor, id)
     await usersDb.remove(id)
     return { id }

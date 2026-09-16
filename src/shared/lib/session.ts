@@ -24,7 +24,7 @@ export const session = {
     emit()
     void (next ? storage.write(STORAGE_KEY, JSON.stringify(next)) : storage.remove(STORAGE_KEY))
   },
-  restore: async (): Promise<ISession | null> => {
+  restore: async () => {
     if (restored) return current
     restored = true
     const raw = await storage.read(STORAGE_KEY)

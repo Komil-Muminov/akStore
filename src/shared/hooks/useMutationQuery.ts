@@ -20,7 +20,10 @@ export const useMutationQuery = <TResult, TBody = void>(
         method: options.method ?? 'POST',
         body: options.body ? options.body(variables) : typeof url === 'function' ? undefined : variables,
       }),
-    onSuccess: () =>
-      Promise.all(options.invalidate.map((key) => queryClient.invalidateQueries({ queryKey: [key] }))),
+    onSuccess: async () => {
+      for (const key of options.invalidate) {
+        await queryClient.invalidateQueries({ queryKey: [key] })
+      }
+    },
   })
 }

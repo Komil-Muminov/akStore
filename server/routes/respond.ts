@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { HttpStatus, requireUuid } from '../shared/utils'
 
-type THandler = (req: Request) => Promise<unknown>
+type THandler = (req: Request) => unknown
 
 export const respond =
   (handler: THandler, status: number = HttpStatus.OK) =>

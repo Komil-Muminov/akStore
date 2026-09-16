@@ -17,14 +17,14 @@ const sign = (row: IUserRow): string => {
 }
 
 export const authService = {
-  login: async (login: string, password: string): Promise<{ token: string; user: IAuthUser }> => {
+  login: async (login: string, password: string) => {
     const row = await usersDb.findRowByLogin(login)
     const valid = row ? await Bun.password.verify(password, row.password_hash) : false
     if (!row || !valid) throw new HttpError(HttpStatus.UNAUTHORIZED, BAD_CREDENTIALS)
     if (!row.is_active) throw new HttpError(HttpStatus.FORBIDDEN, INACTIVE)
     return { token: sign(row), user: toAuthUser(row) }
   },
-  verify: async (token: string): Promise<IAuthUser> => {
+  verify: async (token: string) => {
     let payload: ITokenPayload
     try {
       payload = jwt.verify(token, config.jwtSecret) as ITokenPayload
@@ -35,7 +35,7 @@ export const authService = {
     if (!row || !row.is_active) throw new HttpError(HttpStatus.UNAUTHORIZED, BAD_TOKEN)
     return toAuthUser(row)
   },
-  changePassword: async (userId: string, current: string, next: string): Promise<{ ok: true }> => {
+  changePassword: async (userId: string, current: string, next: string) => {
     const row = await usersDb.findRow(userId)
     const valid = row ? await Bun.password.verify(current, row.password_hash) : false
     if (!row || !valid) throw new HttpError(HttpStatus.BAD_REQUEST, BAD_CURRENT)
