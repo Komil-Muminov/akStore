@@ -10,6 +10,14 @@ export const requireString = (value: unknown, field: string, min: number, max: n
   return text
 }
 
+export const optionalString = (value: unknown, field: string, max: number): string => {
+  const text = typeof value === 'string' ? value.trim() : ''
+  if (text.length > max) {
+    throw new HttpError(HttpStatus.BAD_REQUEST, `Поле ${field} не длиннее ${max} символов`)
+  }
+  return text
+}
+
 export const requireUuid = (value: unknown, field: string): string => {
   if (typeof value !== 'string' || !UUID_PATTERN.test(value)) {
     throw new HttpError(HttpStatus.BAD_REQUEST, `Поле ${field} должно быть UUID`)

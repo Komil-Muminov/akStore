@@ -3,22 +3,33 @@ export enum PassStatus {
   REVOKED = 'revoked',
 }
 
-export interface IPass {
-  id: string
+export interface IPassInput {
   holderName: string
+  hostName: string
+  organization: string
+  purpose: string
+  phone: string
+  carPlate: string
+}
+
+export interface IPass extends IPassInput {
+  id: string
   status: PassStatus
   createdAt: string
+  updatedAt: string
 }
 
 export interface IPassRow {
   id: string
   holder_name: string
+  host_name: string
+  organization: string
+  purpose: string
+  phone: string
+  car_plate: string
   status: PassStatus
   created_at: Date
-}
-
-export interface ICreatePassDto {
-  holderName: string
+  updated_at: Date
 }
 
 export enum UserRole {

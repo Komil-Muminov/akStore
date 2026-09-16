@@ -1,0 +1,1 @@
+export { PassDetails } from './ui'

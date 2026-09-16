@@ -48,10 +48,17 @@ assets/icons/           lucide SVG
 
 ## API
 
-Все запросы с заголовком `Authorization: Bearer <API_TOKEN>`.
+Все запросы с заголовком `Authorization: Bearer <API_TOKEN>`. Ответ — `{ data }`, ошибка — `{ message }`.
 
-| Метод | Путь | Роль |
-|---|---|---|
-| GET | `/passes/search` | admin, guard |
-| POST | `/passes/create` | admin |
-| PATCH | `/passes/deactivate/:id` | admin |
+| Метод | Путь | Роль | Что делает |
+|---|---|---|---|
+| GET | `/passes/search` | admin, guard | Список пропусков |
+| POST | `/passes/create` | admin | Выдать пропуск |
+| PATCH | `/passes/update/:id` | admin | Изменить данные пропуска |
+| PATCH | `/passes/deactivate/:id` | admin | Отозвать (проход запрещён) |
+| PATCH | `/passes/activate/:id` | admin | Восстановить отозванный |
+| DELETE | `/passes/delete/:id` | admin | Удалить безвозвратно |
+
+Поля пропуска: `holderName` (посетитель, обязательно), `hostName` (к кому, обязательно),
+`organization`, `purpose`, `phone`, `carPlate`. Схема БД обновляется идемпотентно при старте
+сервера (`initDb`), ручные миграции не нужны.

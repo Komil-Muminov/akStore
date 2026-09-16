@@ -1,36 +1,31 @@
-import { Router } from 'express'
+import { Router, type NextFunction, type Request, type Response } from 'express'
 import { rbacMiddleware } from '../middleware'
 import { passesService } from '../services'
-import { HttpStatus, requireString, requireUuid } from '../shared/utils'
+import { HttpStatus, requireUuid } from '../shared/utils'
 import { UserRole } from '../types'
+import { parsePassInput } from './passes.validation'
 
-const HOLDER_MIN = 2
-const HOLDER_MAX = 120
+type THandler = (req: Request) => Promise<unknown>
+
+const respond =
+  (handler: THandler, status: number = HttpStatus.OK) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.status(status).json({ data: await handler(req) })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+const idOf = (req: Request) => requireUuid(req.params.id, 'id')
+const admin = rbacMiddleware(UserRole.ADMIN)
+const anyRole = rbacMiddleware(UserRole.ADMIN, UserRole.GUARD)
 
 export const passesRouter = Router()
 
-passesRouter.get('/search', rbacMiddleware(UserRole.ADMIN, UserRole.GUARD), async (_req, res, next) => {
-  try {
-    res.json({ data: await passesService.search() })
-  } catch (error) {
-    next(error)
-  }
-})
-
-passesRouter.post('/create', rbacMiddleware(UserRole.ADMIN), async (req, res, next) => {
-  try {
-    const holderName = requireString(req.body?.holderName, 'holderName', HOLDER_MIN, HOLDER_MAX)
-    res.status(HttpStatus.CREATED).json({ data: await passesService.create({ holderName }) })
-  } catch (error) {
-    next(error)
-  }
-})
-
-passesRouter.patch('/deactivate/:id', rbacMiddleware(UserRole.ADMIN), async (req, res, next) => {
-  try {
-    const id = requireUuid(req.params.id, 'id')
-    res.json({ data: await passesService.deactivate(id) })
-  } catch (error) {
-    next(error)
-  }
-})
+passesRouter.get('/search', anyRole, respond(() => passesService.search()))
+passesRouter.post('/create', admin, respond((req) => passesService.create(parsePassInput(req.body)), HttpStatus.CREATED))
+passesRouter.patch('/update/:id', admin, respond((req) => passesService.update(idOf(req), parsePassInput(req.body))))
+passesRouter.patch('/deactivate/:id', admin, respond((req) => passesService.deactivate(idOf(req))))
+passesRouter.patch('/activate/:id', admin, respond((req) => passesService.activate(idOf(req))))
+passesRouter.delete('/delete/:id', admin, respond((req) => passesService.remove(idOf(req))))

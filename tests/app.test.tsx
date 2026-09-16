@@ -12,7 +12,7 @@ describeNative('gatePass', () => {
     render(<App />)
     const app = await connectTest(renderer)
 
-    await app.getByTestId('pass-composer__input').waitFor({ timeoutMs: 10_000 })
+    await app.getByTestId('passes__create').waitFor({ timeoutMs: 10_000 })
     expect(renderer.getPaintedText()).toContain(TITLE)
 
     await app.close()

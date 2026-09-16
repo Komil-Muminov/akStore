@@ -15,8 +15,9 @@ const VARIANTS: Record<TButtonVariant, { background: string; hover: string; colo
   danger: { background: theme.colors.dangerSoft, hover: theme.colors.danger, color: theme.colors.danger },
 }
 
-export const root = (variant: TButtonVariant, disabled: boolean): StyleDesc => ({
+export const root = (variant: TButtonVariant, disabled: boolean, fullWidth: boolean): StyleDesc => ({
   height: theme.size.button,
+  flexGrow: fullWidth ? 1 : 0,
   paddingLeft: theme.spacing.lg,
   paddingRight: theme.spacing.lg,
   borderRadius: theme.radius.md,

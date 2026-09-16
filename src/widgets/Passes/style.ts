@@ -6,6 +6,7 @@ const MAC_TITLEBAR_CLEARANCE = 52
 const TITLEBAR_CLEARANCE = 20
 
 export const layout: StyleDesc = {
+  position: 'relative',
   display: 'flex',
   flexDirection: 'row',
   width: '100%',
@@ -23,8 +24,7 @@ export const main: StyleDesc = {
 
 export const header: StyleDesc = {
   display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
+  flexDirection: 'column',
   gap: theme.spacing.lg,
   paddingTop: isMac ? MAC_TITLEBAR_CLEARANCE : TITLEBAR_CLEARANCE,
   paddingLeft: theme.spacing.xl,
@@ -33,17 +33,16 @@ export const header: StyleDesc = {
   flexShrink: 0,
 }
 
+export const headerRow: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.lg,
+}
+
 export const headerText: StyleDesc = { display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }
 
-export const search: StyleDesc = { width: theme.size.sidebar, flexShrink: 0 }
-
-export const composer: StyleDesc = {
-  paddingLeft: theme.spacing.xl,
-  paddingRight: theme.spacing.xl,
-  paddingBottom: theme.spacing.lg,
-  maxWidth: theme.size.contentMaxWidth + theme.spacing.xl * 2,
-  flexShrink: 0,
-}
+export const search: StyleDesc = { display: 'flex', flexDirection: 'row' }
 
 export const sectionHead: StyleDesc = {
   display: 'flex',

@@ -24,4 +24,4 @@ export const NAV_ITEMS: INavItem[] = [
   { id: PassFilter.REVOKED, label: 'Отозванные', hint: 'Проход запрещён', icon: 'shieldOff' },
 ]
 
-export const FOOTER_HINT = 'Enter в форме — выдать пропуск'
+export const FOOTER_HINT = 'Клик по строке — карточка пропуска'

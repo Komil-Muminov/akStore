@@ -34,7 +34,7 @@ export const emptyMark: StyleDesc = {
   marginBottom: theme.spacing.sm,
 }
 
-export const row = (active: boolean): StyleDesc => ({
+export const row = (active: boolean, selected: boolean): StyleDesc => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -44,11 +44,19 @@ export const row = (active: boolean): StyleDesc => ({
   paddingRight: theme.spacing.md,
   borderRadius: theme.radius.lg,
   borderWidth: 1,
-  borderColor: theme.colors.border,
-  backgroundColor: theme.colors.raised,
+  borderColor: selected ? theme.colors.accent : theme.colors.border,
+  backgroundColor: selected ? theme.colors.raisedHover : theme.colors.raised,
   opacity: active ? 1 : 0.7,
-  hover: { backgroundColor: theme.colors.raisedHover, borderColor: theme.colors.borderStrong },
+  cursor: 'pointer',
+  hover: { backgroundColor: theme.colors.raisedHover, borderColor: selected ? theme.colors.accent : theme.colors.borderStrong },
 })
+
+export const subline: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.xs,
+}
 
 export const avatar = (active: boolean): StyleDesc => ({
   width: theme.size.avatar,

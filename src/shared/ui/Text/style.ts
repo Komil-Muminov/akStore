@@ -18,6 +18,7 @@ export const variants: Record<TTextVariant, StyleDesc> = {
     lineHeight: theme.font.lineHeight.lg,
     fontWeight: theme.font.weight.semibold,
     color: theme.colors.text,
+    whiteSpace: 'nowrap',
   },
   title: { ...base, fontSize: theme.font.size.lg, fontWeight: theme.font.weight.semibold, color: theme.colors.text },
   body: { ...base, color: theme.colors.text },

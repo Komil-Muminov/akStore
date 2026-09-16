@@ -1,64 +1,92 @@
 import { useCallback, useMemo, useState } from 'react'
-import { PassComposer } from '@/features/PassComposer'
+import { PassDetails } from '@/features/PassDetails'
+import { PassForm } from '@/features/PassForm'
 import { PassList } from '@/features/PassList'
 import { Sidebar } from '@/features/Sidebar'
-import type { ICreatePassDto, IPass, PassFilter } from '@/entities/pass'
-import { ApiRoutes, QueryKeys } from '@/shared/config'
-import { useGetQuery, useMutationQuery } from '@/shared/hooks'
-import { If, Spinner, Text, TextInput } from '@/shared/ui'
+import type { IPass, IPassInput, PassFilter } from '@/entities/pass'
+import { ConfirmDialog, If, Spinner, Text } from '@/shared/ui'
+import { usePassMutations, usePassesQuery } from './hooks'
 import { countByFilter, selectVisible } from './lib'
-import { COUNT_SUFFIX, HEADERS, INITIAL_FILTER, SEARCH_PLACEHOLDER } from './model'
-import { composer, header, headerText, layout, main, search, sectionHead } from './style'
+import { CLOSED_FORM, COUNT_SUFFIX, DELETE_DIALOG, HEADERS, INITIAL_FILTER, type IFormState } from './model'
+import { layout, main, sectionHead } from './style'
 import { ErrorState } from './ui/ErrorState'
+import { Header } from './ui/Header'
 
 export const Passes = () => {
   const [filter, setFilter] = useState<PassFilter>(INITIAL_FILTER)
   const [query, setQuery] = useState('')
-  const passes = useGetQuery<IPass[]>(QueryKeys.PASSES, ApiRoutes.PASSES_SEARCH)
-  const create = useMutationQuery<IPass, ICreatePassDto>(ApiRoutes.PASSES_CREATE, {
-    invalidate: [QueryKeys.PASSES],
-  })
-  const deactivate = useMutationQuery<IPass, string>(ApiRoutes.PASSES_DEACTIVATE, {
-    method: 'PATCH',
-    invalidate: [QueryKeys.PASSES],
-  })
-
-  const createPass = create.mutate
-  const deactivatePass = deactivate.mutate
-  const refetch = passes.refetch
-  const handleCreate = useCallback((holderName: string) => createPass({ holderName }), [createPass])
-  const handleDeactivate = useCallback((id: string) => deactivatePass(id), [deactivatePass])
-  const handleRetry = useCallback(() => void refetch(), [refetch])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [form, setForm] = useState<IFormState>(CLOSED_FORM)
+  const [deleting, setDeleting] = useState<IPass | null>(null)
+  const passes = usePassesQuery()
+  const { create, update, revoke, restore, remove, pending } = usePassMutations()
 
   const items = passes.data ?? []
   const counts = useMemo(() => countByFilter(items), [items])
   const visible = useMemo(() => selectVisible(items, filter, query), [items, filter, query])
-  const searching = query.trim().length > 0
+  const selected = useMemo(() => items.find((pass) => pass.id === selectedId) ?? null, [items, selectedId])
   const heading = HEADERS[filter]
+  const formError = form.mode === 'edit' ? update.error?.message : create.error?.message
+  const formPending = create.isPending || update.isPending
+
+  const refetch = passes.refetch
+  const handleRetry = useCallback(() => void refetch(), [refetch])
+  const openCreate = useCallback(() => setForm({ mode: 'create' }), [])
+  const openEdit = useCallback((pass: IPass) => setForm({ mode: 'edit', pass }), [])
+  const closeForm = useCallback(() => setForm(CLOSED_FORM), [])
+  const closeDetails = useCallback(() => setSelectedId(null), [])
+  const cancelDelete = useCallback(() => setDeleting(null), [])
+
+  const handleSubmit = useCallback(
+    (input: IPassInput) => {
+      const onSuccess = () => setForm(CLOSED_FORM)
+      form.mode === 'edit' && form.pass
+        ? update.mutate({ id: form.pass.id, input }, { onSuccess })
+        : create.mutate(input, { onSuccess })
+    },
+    [form, create, update],
+  )
+  const handleRevoke = useCallback((id: string) => revoke.mutate(id), [revoke])
+  const handleRestore = useCallback((id: string) => restore.mutate(id), [restore])
+  const handleDelete = useCallback(() => {
+    if (!deleting) return
+    remove.mutate(deleting.id, {
+      onSuccess: () => {
+        setDeleting(null)
+        setSelectedId((current) => (current === deleting.id ? null : current))
+      },
+    })
+  }, [deleting, remove])
 
   return (
     <div style={layout} testId="passes__layout">
       <Sidebar active={filter} counts={counts} onSelect={setFilter} />
       <div style={main}>
-        <div style={header}>
-          <div style={headerText}>
-            <Text variant="heading">{heading.title}</Text>
-            <Text variant="secondary">{heading.description}</Text>
-          </div>
-          <div style={search}>
-            <TextInput value={query} onChange={setQuery} placeholder={SEARCH_PLACEHOLDER} icon="search" testId="passes__search" />
-          </div>
-        </div>
-        <div style={composer}>
-          <PassComposer onCreate={handleCreate} pending={create.isPending} error={create.error?.message} />
-        </div>
+        <Header
+          title={heading.title}
+          description={heading.description}
+          query={query}
+          onQueryChange={setQuery}
+          onCreate={openCreate}
+        />
         <div style={sectionHead}>
           <Text variant="label">{`${heading.title.toUpperCase()} · ${visible.length}${COUNT_SUFFIX}`}</Text>
         </div>
         <If condition={passes.isPending} fallback={
           <If
             condition={passes.isError}
-            fallback={<PassList passes={visible} filter={filter} searching={searching} onDeactivate={handleDeactivate} />}
+            fallback={
+              <PassList
+                passes={visible}
+                filter={filter}
+                searching={query.trim().length > 0}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                onRevoke={handleRevoke}
+                onRestore={handleRestore}
+                onDelete={setDeleting}
+              />
+            }
           >
             <ErrorState details={passes.error?.message ?? ''} onRetry={handleRetry} />
           </If>
@@ -66,6 +94,37 @@ export const Passes = () => {
           <Spinner />
         </If>
       </div>
+      <If condition={selected !== null}>
+        {() => (
+          <PassDetails
+            pass={selected as IPass}
+            pending={pending}
+            onEdit={openEdit}
+            onRevoke={handleRevoke}
+            onRestore={handleRestore}
+            onDelete={setDeleting}
+            onClose={closeDetails}
+          />
+        )}
+      </If>
+      <PassForm
+        mode={form.mode}
+        initial={form.pass}
+        pending={formPending}
+        error={formError}
+        onSubmit={handleSubmit}
+        onClose={closeForm}
+      />
+      <ConfirmDialog
+        open={deleting !== null}
+        title={DELETE_DIALOG.title}
+        text={DELETE_DIALOG.text}
+        confirmLabel={DELETE_DIALOG.confirm}
+        cancelLabel={DELETE_DIALOG.cancel}
+        pending={remove.isPending}
+        onConfirm={handleDelete}
+        onCancel={cancelDelete}
+      />
     </div>
   )
 }

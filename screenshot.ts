@@ -13,7 +13,7 @@ const app = await launch({
   args: ['app.tsx'],
   env: { GPUIX_BACKGROUND: '1' },
 })
-await app.getByTestId('pass-composer__input').waitFor({ timeoutMs: WAIT_TIMEOUT_MS })
+await app.getByTestId('passes__create').waitFor({ timeoutMs: WAIT_TIMEOUT_MS })
 await app.clock.pause()
 await app.screenshot({ path: out })
 await app.close()

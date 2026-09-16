@@ -7,7 +7,7 @@ import { PassRow } from './ui/PassRow'
 
 const ESTIMATED_ROW_HEIGHT = theme.size.row + theme.spacing.sm
 
-export const PassList = ({ passes, filter, searching, onDeactivate }: IProps) => {
+export const PassList = ({ passes, filter, searching, selectedId, onSelect, onRevoke, onRestore, onDelete }: IProps) => {
   const emptyState = searching
     ? { icon: 'search' as const, title: SEARCH_EMPTY_TITLE, text: SEARCH_EMPTY_TEXT }
     : { icon: 'users' as const, ...EMPTY_STATES[filter] }
@@ -17,7 +17,14 @@ export const PassList = ({ passes, filter, searching, onDeactivate }: IProps) =>
       <virtual-list estimatedItemHeight={ESTIMATED_ROW_HEIGHT} style={list} testId="pass-list">
         {passes.map((pass) => (
           <div key={pass.id} style={rowWrapper}>
-            <PassRow pass={pass} onDeactivate={onDeactivate} />
+            <PassRow
+              pass={pass}
+              selected={pass.id === selectedId}
+              onSelect={onSelect}
+              onRevoke={onRevoke}
+              onRestore={onRestore}
+              onDelete={onDelete}
+            />
           </div>
         ))}
       </virtual-list>

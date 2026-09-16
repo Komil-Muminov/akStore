@@ -4,8 +4,18 @@ import { TooltipProvider } from '@/shared/ui'
 import { ErrorFallback } from './ui/ErrorFallback'
 import { Router } from './ui/Router'
 
+const RETRY_COUNT = 5
+const RETRY_BASE_MS = 500
+const RETRY_MAX_MS = 3000
+
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+  defaultOptions: {
+    queries: {
+      retry: RETRY_COUNT,
+      retryDelay: (attempt) => Math.min(RETRY_BASE_MS * 2 ** attempt, RETRY_MAX_MS),
+      refetchOnWindowFocus: false,
+    },
+  },
 })
 
 export const App = () => (

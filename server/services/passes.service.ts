@@ -1,13 +1,23 @@
 import { passesDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { PassStatus, type ICreatePassDto, type IPass } from '../types'
+import { PassStatus, type IPass, type IPassInput } from '../types'
+
+const NOT_FOUND = 'Пропуск не найден'
+
+const orNotFound = (pass: IPass | null): IPass => {
+  if (!pass) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
+  return pass
+}
 
 export const passesService = {
   search: (): Promise<IPass[]> => passesDb.search(),
-  create: (dto: ICreatePassDto): Promise<IPass> => passesDb.create(dto.holderName),
-  deactivate: async (id: string): Promise<IPass> => {
-    const pass = await passesDb.setStatus(id, PassStatus.REVOKED)
-    if (!pass) throw new HttpError(HttpStatus.NOT_FOUND, 'Пропуск не найден')
-    return pass
+  create: (input: IPassInput): Promise<IPass> => passesDb.create(input),
+  update: async (id: string, input: IPassInput): Promise<IPass> => orNotFound(await passesDb.update(id, input)),
+  deactivate: async (id: string): Promise<IPass> => orNotFound(await passesDb.setStatus(id, PassStatus.REVOKED)),
+  activate: async (id: string): Promise<IPass> => orNotFound(await passesDb.setStatus(id, PassStatus.ACTIVE)),
+  remove: async (id: string): Promise<{ id: string }> => {
+    const removed = await passesDb.remove(id)
+    if (!removed) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
+    return { id }
   },
 }

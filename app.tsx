@@ -3,8 +3,8 @@ import { App } from '@/app'
 
 const WINDOW = {
   title: 'gatePass',
-  width: 940,
-  height: 660,
+  width: 1180,
+  height: 720,
   trafficLightX: 16,
   trafficLightY: 17,
 } as const
