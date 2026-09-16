@@ -29,4 +29,5 @@ export const NAV_ITEMS: INavItem[] = [
   { id: AppRoutes.PASSES, label: 'Пропуска', hint: 'Выдача и учёт', icon: 'shieldCheck', minRole: UserRole.EMPLOYEE },
   { id: AppRoutes.STRUCTURE, label: 'Структура', hint: 'Подразделения и должности', icon: 'building', minRole: UserRole.ADMIN },
   { id: AppRoutes.USERS, label: 'Пользователи', hint: 'Учётные записи и роли', icon: 'userCog', minRole: UserRole.ADMIN },
+  { id: AppRoutes.REPORTS, label: 'Отчёты', hint: 'Статистика и экспорт в Excel', icon: 'chart', minRole: UserRole.ADMIN },
 ]

@@ -2,6 +2,7 @@ export enum AppRoutes {
   PASSES = 'passes',
   STRUCTURE = 'structure',
   USERS = 'users',
+  REPORTS = 'reports',
 }
 
 export const ApiRoutes = {
@@ -21,6 +22,9 @@ export const ApiRoutes = {
   USERS_RESET_PASSWORD: (id: string) => `/users/reset-password/${id}`,
   USERS_DELETE: (id: string) => `/users/delete/${id}`,
   HOSTS_SEARCH: '/hosts/search',
+  REPORTS_SUMMARY: (query: string) => `/reports/summary?${query}`,
+  REPORTS_PASSES: (query: string) => `/reports/passes?${query}`,
+  REPORTS_EXPORT: (query: string) => `/reports/export?${query}`,
   PASSES_SEARCH: (query?: string, status?: string, page = 1, limit = 10) => {
     const params = new URLSearchParams()
     if (query?.trim()) params.set('q', query.trim())

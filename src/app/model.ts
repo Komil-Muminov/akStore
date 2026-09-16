@@ -7,6 +7,7 @@ export const PAGES: Record<AppRoutes, LazyExoticComponent<() => JSX.Element>> = 
   [AppRoutes.PASSES]: lazy(() => import('@/pages/PassesPage')),
   [AppRoutes.STRUCTURE]: lazy(() => import('@/pages/StructurePage')),
   [AppRoutes.USERS]: lazy(() => import('@/pages/UsersPage')),
+  [AppRoutes.REPORTS]: lazy(() => import('@/pages/ReportsPage')),
 }
 
 export const LoginPage = lazy(() => import('@/pages/LoginPage'))

@@ -25,6 +25,10 @@ import iconLock from '../../../../assets/icons/lock.svg' with { type: 'text' }
 import iconUserCog from '../../../../assets/icons/user-cog.svg' with { type: 'text' }
 import iconShieldAlert from '../../../../assets/icons/shield-alert.svg' with { type: 'text' }
 import iconMap from '../../../../assets/icons/map.svg' with { type: 'text' }
+import iconChart from '../../../../assets/icons/chart-column-big.svg' with { type: 'text' }
+import iconDownload from '../../../../assets/icons/download.svg' with { type: 'text' }
+import iconFolderOpen from '../../../../assets/icons/folder-open.svg' with { type: 'text' }
+import iconCalendar from '../../../../assets/icons/calendar-days.svg' with { type: 'text' }
 
 export const ICONS = {
   ban: iconBan,
@@ -54,6 +58,10 @@ export const ICONS = {
   userCog: iconUserCog,
   shieldAlert: iconShieldAlert,
   map: iconMap,
+  chart: iconChart,
+  download: iconDownload,
+  folderOpen: iconFolderOpen,
+  calendar: iconCalendar,
 } as const
 
 export type TIconName = keyof typeof ICONS
