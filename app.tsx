@@ -22,6 +22,16 @@ if (isEntryPoint) {
     titlebarTransparent: true,
     windowBackground: 'blurred',
     focus,
+    onKeyDown: (event, renderer) => {
+      const isTab = event.key?.toLowerCase() === 'tab' || event.keyChar === '\t'
+      if (isTab) {
+        if (event.modifiers?.shift) {
+          renderer.focusPrevious()
+        } else {
+          renderer.focusNext()
+        }
+      }
+    },
   })
 }
 

@@ -1,3 +1,5 @@
+import type { EventPayload } from '@gpuix/react'
+import { useCallback } from 'react'
 import { theme } from '@/shared/config'
 import { Icon, type TIconName } from '../Icon'
 import { If } from '../If'
@@ -14,6 +16,8 @@ interface IProps {
   fullWidth?: boolean
   tabIndex?: number
   testId?: string
+  buttonRef?: { current: { id: number } | null } | ((instance: { id: number } | null) => void)
+  onKeyDown?: (event: EventPayload) => void
 }
 
 export const Button = ({
@@ -26,11 +30,37 @@ export const Button = ({
   fullWidth = false,
   tabIndex,
   testId,
-}: IProps) => (
-  <div testId={testId} tabIndex={tabIndex} onClick={disabled ? undefined : onClick} style={root(variant, disabled, fullWidth, size)}>
-    <If condition={icon !== undefined}>
-      <Icon name={icon ?? 'plus'} size={size === 'lg' ? theme.size.iconLg : theme.size.iconMd} color={iconColor(variant)} />
-    </If>
-    <text style={label(variant, size)}>{text}</text>
-  </div>
-)
+  buttonRef,
+  onKeyDown,
+}: IProps) => {
+  const handleKeyDown = useCallback(
+    (event: EventPayload) => {
+      const isActivate =
+        event.key === 'enter' ||
+        event.key === 'space' ||
+        event.keyChar === ' ' ||
+        event.keyChar === '\r'
+      if (isActivate && !disabled) {
+        onClick()
+      }
+      onKeyDown?.(event)
+    },
+    [disabled, onClick, onKeyDown],
+  )
+
+  return (
+    <div
+      ref={buttonRef}
+      testId={testId}
+      tabIndex={tabIndex}
+      onClick={disabled ? undefined : onClick}
+      onKeyDown={handleKeyDown}
+      style={root(variant, disabled, fullWidth, size)}
+    >
+      <If condition={icon !== undefined}>
+        <Icon name={icon ?? 'plus'} size={size === 'lg' ? theme.size.iconLg : theme.size.iconMd} color={iconColor(variant)} />
+      </If>
+      <text style={label(variant, size)}>{text}</text>
+    </div>
+  )
+}

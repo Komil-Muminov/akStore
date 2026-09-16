@@ -1,4 +1,4 @@
-import type { StyleDesc } from '@gpuix/react'
+import type { EventPayload, StyleDesc } from '@gpuix/react'
 import { useCallback, useState } from 'react'
 import { theme } from '@/shared/config'
 import { Icon } from '../Icon'
@@ -16,6 +16,7 @@ interface IProps {
   tabIndex?: number
   testId?: string
   style?: StyleDesc
+  inputRef?: { current: { id: number } | null } | ((instance: { id: number } | null) => void)
 }
 
 export const PasswordInput = ({
@@ -28,6 +29,7 @@ export const PasswordInput = ({
   tabIndex = 0,
   testId,
   style: customStyle,
+  inputRef,
 }: IProps) => {
   const [visible, setVisible] = useState(false)
   const displayed = visible ? value : MASK_CHAR.repeat(value.length)
@@ -50,6 +52,7 @@ export const PasswordInput = ({
     <div style={customStyle ? { ...root, ...customStyle } : root}>
       <Icon name="lock" size={theme.size.iconMd} color={theme.colors.tertiary} />
       <input
+        ref={inputRef}
         testId={testId}
         value={displayed}
         placeholder={placeholder}
