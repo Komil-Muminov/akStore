@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { fileSizeOf, type IMessage } from '@/entities/message'
 import { theme } from '@/shared/config'
 import { Icon } from '@/shared/ui'
-import { fileCard, fileNameOf, fileSizeStyle, fileText } from '../style'
+import { fileCard, fileNameOf, fileSizeStyle, fileText } from '../style.file'
 
 interface IProps {
   message: IMessage

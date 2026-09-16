@@ -19,7 +19,8 @@ import {
   THREAD_EMPTY_TITLE,
   type IProps,
 } from './model'
-import { dropOverlay, list, loadOlderRow, root, typingRow, typingText } from './style'
+import { list, loadOlderRow, root, typingRow, typingText } from './style'
+import { dropOverlay } from './style.file'
 import { Bubble } from './ui/Bubble'
 import { DayChip } from './ui/DayChip'
 import { Placeholder } from './ui/Placeholder'
