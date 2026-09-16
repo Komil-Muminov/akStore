@@ -73,6 +73,10 @@ export const SCHEMA = `
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS chat_messages_conversation_idx ON chat_messages (conversation_id, created_at);
+  ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'direct';
+  ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS title TEXT NOT NULL DEFAULT '';
+  ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+  ALTER TABLE chat_conversations ALTER COLUMN direct_key DROP NOT NULL;
 `
 
 export const SEED_LEADERSHIP = { name: 'Руководство' }

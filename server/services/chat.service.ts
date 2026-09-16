@@ -1,20 +1,45 @@
-import { chatDb, chatMessagesDb, usersDb } from '../db'
+import { chatDb, chatMembersDb, chatMessagesDb, usersDb } from '../db'
 import { hub } from '../realtime'
 import { HttpError, HttpStatus } from '../shared/utils'
+import { ConversationKind } from '../types'
 
 const HISTORY_LIMIT = 200
 const KEY_SEPARATOR = ':'
+const GROUP_MIN_MEMBERS = 2
 const SELF_CHAT_ERROR = 'Нельзя начать диалог с самим собой'
 const COMPANION_MISSING = 'Сотрудник не найден'
 const NOT_A_MEMBER = 'Диалог недоступен'
+const GROUP_TOO_SMALL = 'В группе нужно минимум два участника'
+const GROUP_ONLY = 'Действие доступно только в группах'
 
-const directKeyOf = (first: string, second: string) =>
-  [first, second].sort().join(KEY_SEPARATOR)
+const directKeyOf = (first: string, second: string) => [first, second].sort().join(KEY_SEPARATOR)
 
 const requireMembership = async (conversationId: string, userId: string) => {
-  const members = await chatDb.participants(conversationId)
+  const members = await chatMembersDb.ids(conversationId)
   if (!members.includes(userId)) throw new HttpError(HttpStatus.FORBIDDEN, NOT_A_MEMBER)
   return members
+}
+
+const requireGroup = async (conversationId: string, userId: string) => {
+  const conversation = await chatDb.find(userId, conversationId)
+  if (!conversation) throw new HttpError(HttpStatus.FORBIDDEN, NOT_A_MEMBER)
+  if (conversation.kind !== ConversationKind.GROUP) throw new HttpError(HttpStatus.BAD_REQUEST, GROUP_ONLY)
+  return conversation
+}
+
+const requireActiveUsers = async (userIds: string[]) => {
+  const unique = [...new Set(userIds)]
+  for (const userId of unique) {
+    const user = await usersDb.find(userId)
+    if (!user || !user.isActive) throw new HttpError(HttpStatus.NOT_FOUND, COMPANION_MISSING)
+  }
+  return unique
+}
+
+const loaded = async (userId: string, conversationId: string) => {
+  const conversation = await chatDb.find(userId, conversationId)
+  if (!conversation) throw new HttpError(HttpStatus.NOT_FOUND, NOT_A_MEMBER)
+  return conversation
 }
 
 export const chatService = {
@@ -22,12 +47,39 @@ export const chatService = {
 
   openDirect: async (userId: string, companionId: string) => {
     if (userId === companionId) throw new HttpError(HttpStatus.BAD_REQUEST, SELF_CHAT_ERROR)
-    const companion = await usersDb.find(companionId)
-    if (!companion || !companion.isActive) throw new HttpError(HttpStatus.NOT_FOUND, COMPANION_MISSING)
-    const conversationId = await chatDb.ensure(directKeyOf(userId, companionId), [userId, companionId])
-    const conversation = await chatDb.find(userId, conversationId)
-    if (!conversation) throw new HttpError(HttpStatus.NOT_FOUND, COMPANION_MISSING)
-    return conversation
+    await requireActiveUsers([companionId])
+    const conversationId = await chatDb.ensureDirect(directKeyOf(userId, companionId))
+    await chatMembersDb.add(conversationId, [userId, companionId])
+    return loaded(userId, conversationId)
+  },
+
+  createGroup: async (userId: string, title: string, memberIds: string[]) => {
+    const others = (await requireActiveUsers(memberIds)).filter((id) => id !== userId)
+    if (others.length < GROUP_MIN_MEMBERS) throw new HttpError(HttpStatus.BAD_REQUEST, GROUP_TOO_SMALL)
+    const conversationId = await chatDb.createGroup(title, userId)
+    await chatMembersDb.add(conversationId, [userId, ...others])
+    return loaded(userId, conversationId)
+  },
+
+  members: async (userId: string, conversationId: string) => {
+    await requireMembership(conversationId, userId)
+    return chatMembersDb.list(conversationId)
+  },
+
+  addMembers: async (userId: string, conversationId: string, memberIds: string[]) => {
+    await requireMembership(conversationId, userId)
+    await requireGroup(conversationId, userId)
+    const added = await requireActiveUsers(memberIds)
+    await chatMembersDb.add(conversationId, added)
+    return chatMembersDb.list(conversationId)
+  },
+
+  leave: async (userId: string, conversationId: string) => {
+    await requireMembership(conversationId, userId)
+    await requireGroup(conversationId, userId)
+    await chatMembersDb.remove(conversationId, userId)
+    if ((await chatMembersDb.count(conversationId)) === 0) await chatMembersDb.dropEmpty(conversationId)
+    return { ok: true as const }
   },
 
   history: async (userId: string, conversationId: string) => {

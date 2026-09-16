@@ -139,3 +139,10 @@ export const placeholderMark: StyleDesc = {
   justifyContent: 'center',
   backgroundColor: theme.colors.accentSoft,
 }
+
+export const authorLabel: StyleDesc = {
+  fontFamily: theme.font.family,
+  fontSize: theme.font.size.xs,
+  fontWeight: theme.font.weight.semibold,
+  color: theme.colors.info,
+}

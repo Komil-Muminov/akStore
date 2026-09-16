@@ -1,6 +1,7 @@
-import { If, Text, TextInput } from '@/shared/ui'
+import { IconButton, If, Text, TextInput, Tooltip } from '@/shared/ui'
 import {
   COMPANIONS_SECTION,
+  CREATE_GROUP_TOOLTIP,
   DIALOGS_SECTION,
   EMPTY_HINT,
   EMPTY_TITLE,
@@ -10,7 +11,7 @@ import {
   SIDEBAR_TITLE,
   type IProps,
 } from './model'
-import { head, list, root, sectionLabel } from './style'
+import { head, headTop, list, root, sectionLabel } from './style'
 import { CompanionRow } from './ui/CompanionRow'
 import { ConversationRow } from './ui/ConversationRow'
 import { EmptyState } from './ui/EmptyState'
@@ -23,13 +24,19 @@ export const ChatSidebar = ({
   onQueryChange,
   onSelect,
   onOpenCompanion,
+  onCreateGroup,
 }: IProps) => {
   const searching = query.trim().length > 0
 
   return (
     <div style={root} testId="chat__sidebar">
       <div style={head}>
-        <Text variant="title">{SIDEBAR_TITLE}</Text>
+        <div style={headTop}>
+          <Text variant="title">{SIDEBAR_TITLE}</Text>
+          <Tooltip title={CREATE_GROUP_TOOLTIP}>
+            <IconButton icon="users" onClick={onCreateGroup} testId="chat__create-group" />
+          </Tooltip>
+        </div>
         <TextInput
           value={query}
           onChange={onQueryChange}

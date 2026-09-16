@@ -132,3 +132,11 @@ export const sectionLabel: StyleDesc = {
 }
 
 export const emptyHint: StyleDesc = { textAlign: 'center' }
+
+export const headTop: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: theme.spacing.sm,
+}

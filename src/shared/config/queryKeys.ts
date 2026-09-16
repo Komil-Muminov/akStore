@@ -9,4 +9,5 @@ export enum QueryKeys {
   REPORT_PASSES = 'report-passes',
   CHAT = 'chat',
   CHAT_HISTORY = 'chat-history',
+  CHAT_MEMBERS = 'chat-members',
 }

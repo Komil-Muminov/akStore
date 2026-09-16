@@ -1,3 +1,12 @@
-export type { IConversation, IMessage } from './model'
-export { EMPTY_PREVIEW } from './model'
-export { dayLabelOf, isDayStart, timeOf, unreadLabelOf } from './lib'
+export { ConversationKind, DIRECT_HINT } from './model'
+export type { IConversation, IMember, IMessage } from './model'
+export {
+  dayLabelOf,
+  isDayStart,
+  isGroup,
+  membersLabelOf,
+  previewOf,
+  timeOf,
+  titleOf,
+  unreadLabelOf,
+} from './lib'

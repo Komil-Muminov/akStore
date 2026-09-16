@@ -1,21 +1,43 @@
 import { initialsOf } from '@/entities/pass'
-import type { IConversation } from '@/entities/message'
-import { Text } from '@/shared/ui'
-import { COMPANION_HINT } from '../model'
+import { isGroup, membersLabelOf, titleOf, type IConversation, type IMember } from '@/entities/message'
+import { theme } from '@/shared/config'
+import { Icon, IconButton, If, Text, Tooltip } from '@/shared/ui'
+import { COMPANION_HINT, LEAVE_TOOLTIP, MEMBERS_SEPARATOR } from '../model'
 import { head, headAvatar, headAvatarText, headText } from '../style'
 
 interface IProps {
   conversation: IConversation
+  members: IMember[]
+  onLeave: () => void
 }
 
-export const ThreadHead = ({ conversation }: IProps) => (
-  <div style={head} testId="chat__thread-head">
-    <div style={headAvatar}>
-      <text style={headAvatarText}>{initialsOf(conversation.companionName || conversation.companionLogin)}</text>
+export const ThreadHead = ({ conversation, members, onLeave }: IProps) => {
+  const group = isGroup(conversation)
+  const names = members.map((member) => member.fullName || member.login).join(MEMBERS_SEPARATOR)
+
+  return (
+    <div style={head} testId="chat__thread-head">
+      <div style={headAvatar}>
+        <If
+          condition={group}
+          fallback={<text style={headAvatarText}>{initialsOf(titleOf(conversation))}</text>}
+        >
+          <Icon name="users" size={theme.size.iconMd} color={theme.colors.accent} />
+        </If>
+      </div>
+      <div style={headText}>
+        <Text variant="bodyStrong">{titleOf(conversation)}</Text>
+        <If condition={group} fallback={<Text variant="caption">{COMPANION_HINT}</Text>}>
+          <Tooltip title={names}>
+            <Text variant="caption">{membersLabelOf(conversation.membersCount)}</Text>
+          </Tooltip>
+        </If>
+      </div>
+      <If condition={group}>
+        <Tooltip title={LEAVE_TOOLTIP}>
+          <IconButton icon="logOut" onClick={onLeave} hoverColor={theme.colors.dangerSoft} testId="chat__leave" />
+        </Tooltip>
+      </If>
     </div>
-    <div style={headText}>
-      <Text variant="bodyStrong">{conversation.companionName || conversation.companionLogin}</Text>
-      <Text variant="caption">{COMPANION_HINT}</Text>
-    </div>
-  </div>
-)
+  )
+}

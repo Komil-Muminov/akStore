@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { dayLabelOf, isDayStart, type IConversation } from '@/entities/message'
+import { dayLabelOf, isDayStart, isGroup, type IConversation } from '@/entities/message'
 import { If, Spinner } from '@/shared/ui'
 import {
   ESTIMATED_MESSAGE_HEIGHT,
@@ -15,7 +15,7 @@ import { DayChip } from './ui/DayChip'
 import { Placeholder } from './ui/Placeholder'
 import { ThreadHead } from './ui/ThreadHead'
 
-export const ChatThread = ({ conversation, messages, currentUserId, loading }: IProps) => (
+export const ChatThread = ({ conversation, messages, members, currentUserId, loading, onLeave }: IProps) => (
   <div style={root} testId="chat__thread">
     <If
       condition={conversation !== null}
@@ -23,7 +23,7 @@ export const ChatThread = ({ conversation, messages, currentUserId, loading }: I
     >
       {() => (
         <>
-          <ThreadHead conversation={conversation as IConversation} />
+          <ThreadHead conversation={conversation as IConversation} members={members} onLeave={onLeave} />
           <If
             condition={loading}
             fallback={
@@ -43,7 +43,11 @@ export const ChatThread = ({ conversation, messages, currentUserId, loading }: I
                       <If condition={isDayStart(message, messages[index - 1])}>
                         <DayChip label={dayLabelOf(message.createdAt)} />
                       </If>
-                      <Bubble message={message} own={message.authorId === currentUserId} />
+                      <Bubble
+                        message={message}
+                        own={message.authorId === currentUserId}
+                        showAuthor={isGroup(conversation as IConversation) && message.authorId !== currentUserId}
+                      />
                     </Fragment>
                   ))}
                 </virtual-list>

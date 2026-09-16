@@ -3,7 +3,7 @@ import { rbacMiddleware } from '../middleware'
 import { chatService } from '../services'
 import { HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
-import { parseCompanionId, parseMessageBody } from './chat.validation'
+import { parseCompanionId, parseGroupInput, parseMemberList, parseMessageBody } from './chat.validation'
 import { idOf, respond } from './respond'
 
 const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
@@ -13,12 +13,21 @@ export const chatRouter = Router()
 
 chatRouter.get('/search', anyRole, respond((req) => chatService.search(actorOf(req))))
 chatRouter.get('/history/:id', anyRole, respond((req) => chatService.history(actorOf(req), idOf(req))))
+chatRouter.get('/members/:id', anyRole, respond((req) => chatService.members(actorOf(req), idOf(req))))
 chatRouter.post('/open', anyRole, respond(
   (req) => chatService.openDirect(actorOf(req), parseCompanionId(req.body)),
   HttpStatus.CREATED,
+))
+chatRouter.post('/create-group', anyRole, respond((req) => {
+  const { title, memberIds } = parseGroupInput(req.body)
+  return chatService.createGroup(actorOf(req), title, memberIds)
+}, HttpStatus.CREATED))
+chatRouter.post('/add-members/:id', anyRole, respond(
+  (req) => chatService.addMembers(actorOf(req), idOf(req), parseMemberList(req.body)),
 ))
 chatRouter.post('/send/:id', anyRole, respond(
   (req) => chatService.send(actorOf(req), idOf(req), parseMessageBody(req.body)),
   HttpStatus.CREATED,
 ))
+chatRouter.patch('/leave/:id', anyRole, respond((req) => chatService.leave(actorOf(req), idOf(req))))
 chatRouter.patch('/read/:id', anyRole, respond((req) => chatService.markRead(actorOf(req), idOf(req))))

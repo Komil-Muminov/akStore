@@ -1,9 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import type { IHost } from '@/entities/host'
-import type { IConversation, IMessage } from '@/entities/message'
+import type { IConversation, IMember, IMessage } from '@/entities/message'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
+import type { IGroupSubmit } from '@/features/ChatGroupForm'
 import { socketClient } from '@/shared/lib'
 
 interface ISendVariables {
@@ -12,6 +13,7 @@ interface ISendVariables {
 }
 
 const INVALIDATE = [QueryKeys.CHAT, QueryKeys.CHAT_HISTORY]
+const GROUP_INVALIDATE = [QueryKeys.CHAT, QueryKeys.CHAT_MEMBERS]
 
 export const useConversationsQuery = () =>
   useGetQuery<IConversation[]>(QueryKeys.CHAT, ApiRoutes.CHAT_SEARCH)
@@ -23,6 +25,13 @@ export const useHistoryQuery = (conversationId: string | null) =>
     QueryKeys.CHAT_HISTORY,
     ApiRoutes.CHAT_HISTORY(conversationId ?? ''),
     conversationId !== null,
+  )
+
+export const useMembersQuery = (conversationId: string | null, enabled: boolean) =>
+  useGetQuery<IMember[]>(
+    QueryKeys.CHAT_MEMBERS,
+    ApiRoutes.CHAT_MEMBERS(conversationId ?? ''),
+    conversationId !== null && enabled,
   )
 
 export const useChatMutations = () => {
@@ -37,7 +46,14 @@ export const useChatMutations = () => {
     method: 'PATCH',
     invalidate: [QueryKeys.CHAT],
   })
-  return { open, send, read }
+  const createGroup = useMutationQuery<IConversation, IGroupSubmit>(ApiRoutes.CHAT_CREATE_GROUP, {
+    invalidate: GROUP_INVALIDATE,
+  })
+  const leave = useMutationQuery<{ ok: true }, string>(ApiRoutes.CHAT_LEAVE, {
+    method: 'PATCH',
+    invalidate: GROUP_INVALIDATE,
+  })
+  return { open, send, read, createGroup, leave }
 }
 
 export const useChatSocket = () => {
