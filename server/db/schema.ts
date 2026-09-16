@@ -52,17 +52,4 @@ export const SCHEMA = `
   ALTER TABLE unit_positions ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id) ON DELETE SET NULL;
 `
 
-export const SEED_POSITIONS: { name: string; rank: number }[] = [
-  { name: 'Министр', rank: 1 },
-  { name: 'Первый заместитель министра', rank: 2 },
-  { name: 'Заместитель министра', rank: 3 },
-  { name: 'Начальник управления', rank: 10 },
-  { name: 'Заместитель начальника управления', rank: 11 },
-  { name: 'Начальник отдела', rank: 20 },
-  { name: 'Заведующий сектором', rank: 30 },
-  { name: 'Главный специалист', rank: 40 },
-  { name: 'Ведущий специалист', rank: 41 },
-  { name: 'Специалист', rank: 50 },
-]
-
-export const SEED_LEADERSHIP = { name: 'Руководство', positionRanks: [1, 2, 3] }
+export const SEED_LEADERSHIP = { name: 'Руководство' }
