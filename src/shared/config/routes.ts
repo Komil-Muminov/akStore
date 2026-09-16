@@ -20,6 +20,7 @@ export const ApiRoutes = {
   USERS_UPDATE: (id: string) => `/users/update/${id}`,
   USERS_RESET_PASSWORD: (id: string) => `/users/reset-password/${id}`,
   USERS_DELETE: (id: string) => `/users/delete/${id}`,
+  HOSTS_SEARCH: '/hosts/search',
   PASSES_SEARCH: (query?: string, status?: string, page = 1, limit = 10) => {
     const params = new URLSearchParams()
     if (query?.trim()) params.set('q', query.trim())

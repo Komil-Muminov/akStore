@@ -1,4 +1,4 @@
-import { optionalString, requireString } from '../shared/utils'
+import { optionalString, requireString, requireUuid } from '../shared/utils'
 import type { IPassInput } from '../types'
 
 const NAME_MIN = 2
@@ -9,9 +9,11 @@ const PLATE_MAX = 16
 
 export const parsePassInput = (body: unknown): IPassInput => {
   const raw = (body ?? {}) as Record<string, unknown>
+  const hostUserId = raw.hostUserId ? requireUuid(raw.hostUserId, 'hostUserId') : null
   return {
     holderName: requireString(raw.holderName, 'holderName', NAME_MIN, NAME_MAX),
-    hostName: requireString(raw.hostName, 'hostName', NAME_MIN, NAME_MAX),
+    hostUserId,
+    hostName: hostUserId ? optionalString(raw.hostName, 'hostName', NAME_MAX) : requireString(raw.hostName, 'hostName', NAME_MIN, NAME_MAX),
     organization: optionalString(raw.organization, 'organization', TEXT_MAX),
     purpose: optionalString(raw.purpose, 'purpose', TEXT_MAX),
     phone: optionalString(raw.phone, 'phone', PHONE_MAX),

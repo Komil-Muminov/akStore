@@ -4,4 +4,5 @@ export enum QueryKeys {
   UNITS = 'units',
   ME = 'me',
   USERS = 'users',
+  HOSTS = 'hosts',
 }

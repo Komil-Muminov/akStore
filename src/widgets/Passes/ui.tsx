@@ -4,7 +4,7 @@ import { PassForm } from '@/features/PassForm'
 import { PassList } from '@/features/PassList'
 import type { IPass, IPassInput, PassFilter } from '@/entities/pass'
 import { ConfirmDialog, If, Pagination, Spinner, Text } from '@/shared/ui'
-import { usePassMutations, usePassesQuery } from './hooks'
+import { useHostsQuery, usePassMutations, usePassesQuery } from './hooks'
 import { countByFilter } from './lib'
 import { CLOSED_FORM, COUNT_SUFFIX, DELETE_DIALOG, HEADERS, INITIAL_FILTER, type IFormState } from './model'
 import { layout, main, sectionHead } from './style'
@@ -21,6 +21,7 @@ export const Passes = () => {
   const [deleting, setDeleting] = useState<IPass | null>(null)
   const passes = usePassesQuery(query, filter, page)
   const { create, update, revoke, restore, remove, pending } = usePassMutations()
+  const hosts = useHostsQuery()
 
   const items = useMemo(() => passes.data?.items ?? [], [passes.data?.items])
   const total = passes.data?.total ?? 0
@@ -127,6 +128,7 @@ export const Passes = () => {
       <PassForm
         mode={form.mode}
         initial={form.pass}
+        hosts={hosts.data ?? []}
         pending={formPending}
         error={formError}
         onSubmit={handleSubmit}

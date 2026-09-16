@@ -5,6 +5,7 @@ export enum PassStatus {
 
 export interface IPassInput {
   holderName: string
+  hostUserId: string | null
   hostName: string
   organization: string
   purpose: string
@@ -22,6 +23,7 @@ export interface IPass extends IPassInput {
 export interface IPassRow {
   id: string
   holder_name: string
+  host_user_id: string | null
   host_name: string
   organization: string
   purpose: string
@@ -49,6 +51,7 @@ export interface IPassSearchParams {
 
 export { UserRole, ROLE_RANK } from './auth'
 export type { IAuthUser, IUser, IUserRow, IUserInput, ITokenPayload, IUserSearchParams } from './auth'
+export type { IHost, IHostRow } from './hosts'
 export { UnitType } from './org'
 export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'
 

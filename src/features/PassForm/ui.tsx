@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { hostOptions } from '@/entities/host'
 import {
   EMPTY_PASS_INPUT,
   normalizePassInput,
@@ -13,11 +14,12 @@ import { CANCEL_LABEL, TITLES, type IProps } from './model'
 import { footer, spacer } from './style'
 import { renderFields } from './ui/renderFields'
 
-export const PassForm = ({ mode, initial, pending, error, onSubmit, onClose }: IProps) => {
+export const PassForm = ({ mode, initial, hosts, pending, error, onSubmit, onClose }: IProps) => {
   const [values, setValues] = useState<IPassInput>(EMPTY_PASS_INPUT)
   const [errors, setErrors] = useState<TPassErrors>({})
   const open = mode !== null
   const copy = TITLES[mode ?? 'create']
+  const options = useMemo(() => hostOptions(hosts), [hosts])
 
   useEffect(() => {
     if (!open) return
@@ -28,6 +30,11 @@ export const PassForm = ({ mode, initial, pending, error, onSubmit, onClose }: I
   const handleChange = useCallback((field: TPassField, value: string) => {
     setValues((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
+  }, [])
+
+  const handleHostChange = useCallback((hostUserId: string | null) => {
+    setValues((current) => ({ ...current, hostUserId }))
+    setErrors((current) => ({ ...current, hostName: undefined }))
   }, [])
 
   const handleSubmit = useCallback(() => {
@@ -46,7 +53,7 @@ export const PassForm = ({ mode, initial, pending, error, onSubmit, onClose }: I
       onClose={onClose}
       testId="pass-form"
     >
-      {renderFields({ values, errors, onChange: handleChange, onSubmit: handleSubmit })}
+      {renderFields({ values, errors, hostOptions: options, onChange: handleChange, onHostChange: handleHostChange, onSubmit: handleSubmit })}
       <div style={footer}>
         <div style={spacer}>
           <If condition={error !== undefined}>

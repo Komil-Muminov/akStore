@@ -11,6 +11,7 @@ export enum PassFilter {
 
 export interface IPassInput {
   holderName: string
+  hostUserId: string | null
   hostName: string
   organization: string
   purpose: string
@@ -25,7 +26,7 @@ export interface IPass extends IPassInput {
   updatedAt: string
 }
 
-export type TPassField = keyof IPassInput
+export type TPassField = Exclude<keyof IPassInput, 'hostUserId'>
 export type TPassErrors = Partial<Record<TPassField, string>>
 
 export const PASS_NAME_MIN_LENGTH = 2
@@ -47,6 +48,7 @@ export const PASS_FIELD_LABELS: Record<TPassField, string> = {
 
 export const EMPTY_PASS_INPUT: IPassInput = {
   holderName: '',
+  hostUserId: null,
   hostName: '',
   organization: '',
   purpose: '',

@@ -55,11 +55,12 @@ assets/icons/           lucide SVG
 | GET | `/passes/search` | admin, guard | Список пропусков |
 | POST | `/passes/create` | admin | Выдать пропуск |
 | PATCH | `/passes/update/:id` | admin | Изменить данные пропуска |
+| GET | `/hosts/search` | все | Принимающие: сотрудники, закреплённые за должностями в структуре |
 | PATCH | `/passes/deactivate/:id` | admin | Отозвать (проход запрещён) |
 | PATCH | `/passes/activate/:id` | admin | Восстановить отозванный |
 | DELETE | `/passes/delete/:id` | admin | Удалить безвозвратно |
 
-Поля пропуска: `holderName` (посетитель, обязательно), `hostName` (к кому, обязательно),
+Поля пропуска: `holderName` (посетитель, обязательно), `hostUserId` (к кому — id сотрудника из `/hosts/search`, обязательно; сервер сам сохраняет снимок `hostName` вида «ФИО — должность · подразделение»),
 `organization`, `purpose`, `phone`, `carPlate`.
 
 ### Структура организации

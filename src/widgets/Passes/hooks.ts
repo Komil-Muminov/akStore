@@ -1,3 +1,4 @@
+import type { IHost } from '@/entities/host'
 import type { IPass, IPassInput } from '@/entities/pass'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
@@ -12,6 +13,8 @@ const INVALIDATE = [QueryKeys.PASSES]
 
 export const usePassesQuery = (query?: string, status?: string, page = 1) =>
   useGetQuery<IPagedResponse<IPass>>(QueryKeys.PASSES, ApiRoutes.PASSES_SEARCH(query, status, page))
+
+export const useHostsQuery = () => useGetQuery<IHost[]>(QueryKeys.HOSTS, ApiRoutes.HOSTS_SEARCH)
 
 export const usePassMutations = () => {
   const create = useMutationQuery<IPass, IPassInput>(ApiRoutes.PASSES_CREATE, { invalidate: INVALIDATE })

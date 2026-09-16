@@ -4,6 +4,7 @@ import { PassStatus, type IPass, type IPassInput, type IPassRow, type IPagedResu
 const toPass = (row: IPassRow): IPass => ({
   id: row.id,
   holderName: row.holder_name,
+  hostUserId: row.host_user_id,
   hostName: row.host_name,
   organization: row.organization,
   purpose: row.purpose,
@@ -16,6 +17,7 @@ const toPass = (row: IPassRow): IPass => ({
 
 const toParams = (input: IPassInput) => [
   input.holderName,
+  input.hostUserId,
   input.hostName,
   input.organization,
   input.purpose,
@@ -24,11 +26,11 @@ const toParams = (input: IPassInput) => [
 ]
 
 const CREATE_SQL = `
-  INSERT INTO passes (holder_name, host_name, organization, purpose, phone, car_plate)
-  VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`
+  INSERT INTO passes (holder_name, host_user_id, host_name, organization, purpose, phone, car_plate)
+  VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`
 const UPDATE_SQL = `
-  UPDATE passes SET holder_name = $2, host_name = $3, organization = $4, purpose = $5,
-    phone = $6, car_plate = $7, updated_at = now()
+  UPDATE passes SET holder_name = $2, host_user_id = $3, host_name = $4, organization = $5, purpose = $6,
+    phone = $7, car_plate = $8, updated_at = now()
   WHERE id = $1 RETURNING *`
 const SET_STATUS_SQL = 'UPDATE passes SET status = $2, updated_at = now() WHERE id = $1 RETURNING *'
 const DELETE_SQL = 'DELETE FROM passes WHERE id = $1 RETURNING id'
