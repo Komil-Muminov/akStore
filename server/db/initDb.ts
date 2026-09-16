@@ -58,28 +58,10 @@ const seedSuperadmin = async () => {
   console.log(`db: создан главный администратор ${config.superadmin.login}`)
 }
 
-const SEED_EMPLOYEES = [
-  { login: 'ivanov', fullName: 'Иванов Иван Иванович' },
-  { login: 'petrov', fullName: 'Петров Пётр Сергеевич' },
-  { login: 'sidorova', fullName: 'Сидорова Анна Владимировна' },
-  { login: 'kovalev', fullName: 'Ковалёв Дмитрий Алексеевич' },
-  { login: 'smirnova', fullName: 'Смирнова Елена Игоревна' },
-]
-
-const seedEmployees = async () => {
-  const count = await pool.query<{ total: string }>('SELECT count(*)::text AS total FROM users WHERE role = $1', [UserRole.EMPLOYEE])
-  if (Number(count.rows[0]?.total ?? 0) > 0) return
-  const hash = await Bun.password.hash('123456')
-  for (const emp of SEED_EMPLOYEES) {
-    await usersDb.create(emp.login, hash, UserRole.EMPLOYEE, emp.fullName)
-  }
-}
-
 export const initDb = async () => {
   await ensureDatabase()
   await pool.query(SCHEMA)
   await seedPositions()
   await seedLeadership()
   await seedSuperadmin()
-  await seedEmployees()
 }
