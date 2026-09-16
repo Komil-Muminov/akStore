@@ -24,6 +24,7 @@ import iconKey from '../../../../assets/icons/key-round.svg' with { type: 'text'
 import iconLock from '../../../../assets/icons/lock.svg' with { type: 'text' }
 import iconUserCog from '../../../../assets/icons/user-cog.svg' with { type: 'text' }
 import iconShieldAlert from '../../../../assets/icons/shield-alert.svg' with { type: 'text' }
+import iconMap from '../../../../assets/icons/map.svg' with { type: 'text' }
 
 export const ICONS = {
   ban: iconBan,
@@ -52,6 +53,7 @@ export const ICONS = {
   lock: iconLock,
   userCog: iconUserCog,
   shieldAlert: iconShieldAlert,
+  map: iconMap,
 } as const
 
 export type TIconName = keyof typeof ICONS

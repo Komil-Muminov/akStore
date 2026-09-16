@@ -1,9 +1,11 @@
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react'
 import type { ElementBounds, EventPayload } from '@gpuix/react'
 import type { IPoint, IUnit } from '@/entities/unit'
+import { theme } from '@/shared/config'
+import { Icon, Tooltip } from '@/shared/ui'
 import { buildMiniMap, mapPointToWorld } from '../minimap'
 import type { IViewport } from '../model'
-import { accentOf, miniMap, miniMapNode, miniMapView, MINI_MAP } from '../style'
+import { accentOf, miniMap, miniMapClose, miniMapNode, miniMapView, MINI_MAP } from '../style'
 import { useElementBounds } from '../useElementBounds'
 
 interface IMiniMapListeners {
@@ -18,10 +20,11 @@ interface IProps {
   onCenter: (world: IPoint) => void
   onStartDrag: () => void
   onStopDrag: () => void
+  onToggle?: () => void
   onRegisterListeners?: (listeners: IMiniMapListeners) => void
 }
 
-export const MiniMap = memo(({ units, viewport, canvas, onCenter, onStartDrag, onStopDrag, onRegisterListeners }: IProps) => {
+export const MiniMap = memo(({ units, viewport, canvas, onCenter, onStartDrag, onStopDrag, onToggle, onRegisterListeners }: IProps) => {
   const [ref, , measure] = useElementBounds()
   const dragOffsetRef = useRef<IPoint | null>(null)
   const activeBoundsRef = useRef<ElementBounds | null>(null)
@@ -125,6 +128,11 @@ export const MiniMap = memo(({ units, viewport, canvas, onCenter, onStartDrag, o
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       />
+      <div style={miniMapClose} onClick={onToggle} testId="canvas__minimap-toggle">
+        <Tooltip title="Скрыть мини-карту">
+          <Icon name="eyeOff" size={theme.size.iconSm} color={theme.colors.secondary} />
+        </Tooltip>
+      </div>
     </div>
   )
 })

@@ -16,18 +16,18 @@ export interface IMiniMapModel {
   view: IRect
 }
 
-const WORLD_PADDING = 160
+const WORLD_PADDING = 800
 
 const contentBounds = (units: IUnit[]): IRect => {
   if (units.length === 0) {
-    return { x: -400, y: -300, width: 800, height: 600 }
+    return { x: -800, y: -560, width: 1600, height: 1120 }
   }
   const rects = units.map((unit) => ({ x: unit.x, y: unit.y, ...nodeSize(unit) }))
   const minX = Math.min(...rects.map((rect) => rect.x)) - WORLD_PADDING
   const minY = Math.min(...rects.map((rect) => rect.y)) - WORLD_PADDING
   const maxX = Math.max(...rects.map((rect) => rect.x + rect.width)) + WORLD_PADDING
   const maxY = Math.max(...rects.map((rect) => rect.y + rect.height)) + WORLD_PADDING
-  return { x: minX, y: minY, width: Math.max(maxX - minX, 400), height: Math.max(maxY - minY, 300) }
+  return { x: minX, y: minY, width: Math.max(maxX - minX, 1600), height: Math.max(maxY - minY, 1120) }
 }
 
 export const visibleWorldRect = (viewport: IViewport, canvas: ElementBounds): IRect => ({
@@ -51,11 +51,20 @@ export const buildMiniMap = (units: IUnit[], viewport: IViewport, canvas: Elemen
     width: rect.width * scale,
     height: rect.height * scale,
   })
+  const pv = project(view)
+  const clampedWidth = Math.min(map.width - 2, Math.max(6, pv.width))
+  const clampedHeight = Math.min(map.height - 2, Math.max(6, pv.height))
+  const clampedView: IRect = {
+    x: Math.max(1, Math.min(map.width - clampedWidth - 1, pv.x)),
+    y: Math.max(1, Math.min(map.height - clampedHeight - 1, pv.y)),
+    width: clampedWidth,
+    height: clampedHeight,
+  }
   return {
     scale,
     origin,
     nodes: units.map((unit) => ({ id: unit.id, unit, rect: project({ x: unit.x, y: unit.y, ...nodeSize(unit) }) })),
-    view: project(view),
+    view: clampedView,
   }
 }
 

@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { EventPayload } from '@gpuix/react'
 import type { IPoint, IUnit } from '@/entities/unit'
-import { If, Text } from '@/shared/ui'
+import { IconButton, If, Text, Tooltip } from '@/shared/ui'
 import { useCanvasInteraction } from './hooks'
 import { draggedPoint, dropStateFor, findDropTarget, toScreen } from './lib'
 import { CANVAS_HINT, EMPTY_HINT, type IProps } from './model'
-import { empty, hint, root } from './style'
+import { empty, hint, miniMapToggle, root } from './style'
 import { CanvasNode } from './ui/CanvasNode'
 import { Edges } from './ui/Edges'
 import { MiniMap } from './ui/MiniMap'
@@ -32,7 +32,9 @@ export const OrgCanvas = ({ units, positions, selectedId, onSelect, onMoveNode, 
   } = useCanvasInteraction(units, handlers)
   const [canvasRef, canvasBounds, measureCanvas] = useElementBounds()
   const [miniMapListeners, setMiniMapListeners] = useState<IMiniMapListeners | null>(null)
+  const [showMiniMap, setShowMiniMap] = useState(true)
 
+  const toggleMiniMap = useCallback(() => setShowMiniMap((current) => !current), [])
   const target = useMemo(() => findDropTarget(units, drag, viewport.zoom), [units, drag, viewport.zoom])
   const names = useMemo(() => new Map(positions.map((position) => [position.id, position.name])), [positions])
   const pointOf = useCallback(
@@ -88,15 +90,25 @@ export const OrgCanvas = ({ units, positions, selectedId, onSelect, onMoveNode, 
       <div style={hint}>
         <Text variant="caption">{CANVAS_HINT}</Text>
       </div>
-      <MiniMap
-        units={units}
-        viewport={viewport}
-        canvas={canvasBounds}
-        onCenter={handleCenter}
-        onStartDrag={startMiniMapDrag}
-        onStopDrag={stopMiniMapDrag}
-        onRegisterListeners={setMiniMapListeners}
-      />
+      <If condition={showMiniMap}>
+        <MiniMap
+          units={units}
+          viewport={viewport}
+          canvas={canvasBounds}
+          onCenter={handleCenter}
+          onStartDrag={startMiniMapDrag}
+          onStopDrag={stopMiniMapDrag}
+          onToggle={toggleMiniMap}
+          onRegisterListeners={setMiniMapListeners}
+        />
+      </If>
+      <If condition={!showMiniMap}>
+        <div style={miniMapToggle}>
+          <Tooltip title="Показать мини-карту">
+            <IconButton icon="map" onClick={toggleMiniMap} testId="canvas__minimap-show" />
+          </Tooltip>
+        </div>
+      </If>
     </div>
   )
 }

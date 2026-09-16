@@ -17,9 +17,15 @@ export const PositionRow = memo(({ position, onDelete }: IProps) => {
       <div style={rowText}>
         <Text variant="body">{position.name}</Text>
       </div>
-      <Text variant="caption">{`${RANK_PREFIX}${String(position.rank)}`}</Text>
+      <Text variant="secondary">{`${RANK_PREFIX}${String(position.rank)}`}</Text>
       <Tooltip title={DELETE_TOOLTIP}>
-        <IconButton icon="trash" onClick={handleDelete} color={theme.colors.secondary} hoverColor={theme.colors.dangerSoft} testId={`positions__delete-${position.id}`} />
+        <IconButton
+          icon="trash"
+          onClick={handleDelete}
+          color={theme.colors.secondary}
+          hoverColor={theme.colors.dangerSoft}
+          testId={`positions__delete-${position.id}`}
+        />
       </Tooltip>
     </div>
   )

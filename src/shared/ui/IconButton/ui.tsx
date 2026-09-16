@@ -8,6 +8,7 @@ interface IProps {
   testId?: string
   color?: string
   hoverColor?: string
+  variant?: 'ghost' | 'outline'
 }
 
 export const IconButton = ({
@@ -16,8 +17,9 @@ export const IconButton = ({
   testId,
   color = theme.colors.secondary,
   hoverColor = theme.colors.overlayStrong,
+  variant = 'ghost',
 }: IProps) => (
-  <div testId={testId} onClick={onClick} style={root(hoverColor)}>
+  <div testId={testId} onClick={onClick} style={root(hoverColor, variant)}>
     <Icon name={icon} size={theme.size.iconMd} color={color} />
   </div>
 )

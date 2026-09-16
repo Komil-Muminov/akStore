@@ -25,8 +25,9 @@ export const root: StyleDesc = {
   position: 'relative',
   overflow: 'hidden',
   backgroundColor: theme.colors.canvas,
-  cursor: 'grab',
+  cursor: 'pointer',
   userSelect: 'none',
+  active: { cursor: 'pointer' },
 }
 
 export const hint: StyleDesc = {
@@ -41,16 +42,7 @@ export const hint: StyleDesc = {
   backgroundColor: theme.colors.overlay,
 }
 
-export const empty: StyleDesc = {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}
+export const empty: StyleDesc = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }
 
 export const node = (
   type: UnitType,
@@ -77,6 +69,7 @@ export const node = (
   backgroundColor: dragging ? theme.colors.raisedHover : theme.colors.raised,
   opacity: dragging ? 0.85 : 1,
   cursor: 'pointer',
+  active: { cursor: 'pointer' },
   boxShadow: { offsetX: 0, offsetY: 8 * zoom, blurRadius: 24 * zoom, spreadRadius: 0, color: '#00000066' },
   hover: { backgroundColor: theme.colors.raisedHover },
 })
@@ -146,6 +139,7 @@ export const miniMap: StyleDesc = {
   backgroundColor: '#0F172AE6',
   cursor: 'pointer',
   userSelect: 'none',
+  active: { cursor: 'pointer' },
 }
 
 export const miniMapNode = (rect: { x: number; y: number; width: number; height: number }, color: string): StyleDesc => ({
@@ -157,6 +151,7 @@ export const miniMapNode = (rect: { x: number; y: number; width: number; height:
   borderRadius: 2,
   backgroundColor: color,
   opacity: 0.8,
+  cursor: 'pointer',
 })
 
 export const miniMapView = (rect: { x: number; y: number; width: number; height: number }): StyleDesc => ({
@@ -169,5 +164,29 @@ export const miniMapView = (rect: { x: number; y: number; width: number; height:
   borderWidth: 1.5,
   borderColor: theme.colors.info,
   backgroundColor: theme.colors.infoSoft,
-  cursor: 'grab',
+  cursor: 'pointer',
+  active: { cursor: 'pointer' },
 })
+
+export const miniMapToggle: StyleDesc = {
+  position: 'absolute',
+  right: theme.spacing.lg,
+  bottom: theme.spacing.md,
+}
+
+export const miniMapClose: StyleDesc = {
+  position: 'absolute',
+  right: 6,
+  top: 6,
+  width: 20,
+  height: 20,
+  borderRadius: 4,
+  backgroundColor: '#0F172AB3',
+  borderWidth: 1,
+  borderColor: theme.colors.borderStrong,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  hover: { backgroundColor: theme.colors.raisedHover },
+}

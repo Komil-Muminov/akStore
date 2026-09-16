@@ -2,7 +2,7 @@ import type { StyleDesc } from '@gpuix/react'
 import { theme } from '@/shared/config'
 
 const BACKDROP = '#020617B3'
-const CARD_WIDTH = 520
+const CARD_WIDTH = 580
 
 export const backdrop: StyleDesc = {
   position: 'absolute',
@@ -18,6 +18,7 @@ export const backdrop: StyleDesc = {
 
 export const card: StyleDesc = {
   width: CARD_WIDTH,
+  maxWidth: '90%',
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.lg,
@@ -32,11 +33,17 @@ export const card: StyleDesc = {
 export const head: StyleDesc = {
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   gap: theme.spacing.md,
 }
 
-export const headText: StyleDesc = { display: 'flex', flexDirection: 'column', flexGrow: 1 }
+export const headText: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'column',
+  flexGrow: 1,
+  minWidth: 0,
+  gap: theme.spacing.xxs,
+}
 
 export const fade = {
   initial: { opacity: 0 },
