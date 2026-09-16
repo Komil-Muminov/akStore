@@ -1,12 +1,33 @@
 export enum AppRoutes {
   PASSES = 'passes',
+  STRUCTURE = 'structure',
+  USERS = 'users',
 }
 
 export const ApiRoutes = {
+  AUTH_LOGIN: '/auth/login',
+  AUTH_ME: '/auth/me',
+  AUTH_CHANGE_PASSWORD: '/auth/change-password',
+  USERS_SEARCH: '/users/search',
+  USERS_CREATE: '/users/create',
+  USERS_UPDATE: (id: string) => `/users/update/${id}`,
+  USERS_RESET_PASSWORD: (id: string) => `/users/reset-password/${id}`,
+  USERS_DELETE: (id: string) => `/users/delete/${id}`,
   PASSES_SEARCH: '/passes/search',
   PASSES_CREATE: '/passes/create',
   PASSES_UPDATE: (id: string) => `/passes/update/${id}`,
   PASSES_DEACTIVATE: (id: string) => `/passes/deactivate/${id}`,
   PASSES_ACTIVATE: (id: string) => `/passes/activate/${id}`,
   PASSES_DELETE: (id: string) => `/passes/delete/${id}`,
+  POSITIONS_SEARCH: '/positions/search',
+  POSITIONS_CREATE: '/positions/create',
+  POSITIONS_UPDATE: (id: string) => `/positions/update/${id}`,
+  POSITIONS_DELETE: (id: string) => `/positions/delete/${id}`,
+  UNITS_SEARCH: '/units/search',
+  UNITS_CREATE: '/units/create',
+  UNITS_UPDATE: (id: string) => `/units/update/${id}`,
+  UNITS_MOVE: (id: string) => `/units/move/${id}`,
+  UNITS_SET_LAYOUT: '/units/set-layout',
+  UNITS_SET_POSITIONS: (id: string) => `/units/set-positions/${id}`,
+  UNITS_DELETE: (id: string) => `/units/delete/${id}`,
 } as const

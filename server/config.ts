@@ -7,6 +7,9 @@ dotenv.config({ path: path.join(ROOT, '.env') })
 
 const DEFAULT_PORT = 3000
 const DEFAULT_DB_PORT = 5432
+const DEFAULT_SUPERADMIN_LOGIN = 'km'
+const DEFAULT_SUPERADMIN_PASSWORD = '123'
+const DEFAULT_TOKEN_TTL = '30d'
 
 const required = (name: string): string => {
   const value = process.env[name]
@@ -16,8 +19,13 @@ const required = (name: string): string => {
 
 export const config = {
   port: Number(process.env.PORT ?? DEFAULT_PORT),
-  apiToken: required('API_TOKEN'),
   isProduction: process.env.NODE_ENV === 'production',
+  jwtSecret: required('JWT_SECRET'),
+  tokenTtl: process.env.TOKEN_TTL ?? DEFAULT_TOKEN_TTL,
+  superadmin: {
+    login: process.env.SUPERADMIN_LOGIN ?? DEFAULT_SUPERADMIN_LOGIN,
+    password: process.env.SUPERADMIN_PASSWORD ?? DEFAULT_SUPERADMIN_PASSWORD,
+  },
   db: {
     host: required('DB_HOST'),
     port: Number(process.env.DB_PORT ?? DEFAULT_DB_PORT),

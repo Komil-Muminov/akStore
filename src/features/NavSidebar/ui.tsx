@@ -1,0 +1,43 @@
+import { ROLE_LABELS } from '@/entities/user'
+import { initialsOf } from '@/entities/pass'
+import { theme } from '@/shared/config'
+import { Icon, IconButton, Text, Tooltip } from '@/shared/ui'
+import { APP_NAME, APP_TAGLINE, CHANGE_PASSWORD_TOOLTIP, LOGOUT_TOOLTIP, NAV_SECTION, type IProps } from './model'
+import { account, accountText, avatar, avatarText, brand, brandMark, brandText, root, section, spacer } from './style'
+import { NavItem } from './ui/NavItem'
+
+export const NavSidebar = ({ active, items, user, onNavigate, onChangePassword, onLogout }: IProps) => (
+  <div style={root} testId="nav">
+    <div style={brand}>
+      <div style={brandMark}>
+        <Icon name="shieldCheck" size={theme.size.iconLg} color={theme.colors.accent} />
+      </div>
+      <div style={brandText}>
+        <Text variant="title">{APP_NAME}</Text>
+        <Text variant="caption">{APP_TAGLINE}</Text>
+      </div>
+    </div>
+    <div style={section}>
+      <Text variant="label">{NAV_SECTION}</Text>
+    </div>
+    {items.map((entry) => (
+      <NavItem key={entry.id} entry={entry} active={entry.id === active} onNavigate={onNavigate} />
+    ))}
+    <div style={spacer} />
+    <div style={account} testId="nav__account">
+      <div style={avatar}>
+        <text style={avatarText}>{initialsOf(user.fullName || user.login)}</text>
+      </div>
+      <div style={accountText}>
+        <Text variant="bodyStrong">{user.fullName || user.login}</Text>
+        <Text variant="caption">{ROLE_LABELS[user.role]}</Text>
+      </div>
+      <Tooltip title={CHANGE_PASSWORD_TOOLTIP}>
+        <IconButton icon="key" onClick={onChangePassword} testId="nav__change-password" />
+      </Tooltip>
+      <Tooltip title={LOGOUT_TOOLTIP}>
+        <IconButton icon="logOut" onClick={onLogout} hoverColor={theme.colors.dangerSoft} testId="nav__logout" />
+      </Tooltip>
+    </div>
+  </div>
+)

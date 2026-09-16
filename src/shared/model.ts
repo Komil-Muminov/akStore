@@ -7,3 +7,15 @@ export interface IApiError {
 }
 
 export type THttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
+
+export interface ISessionUser {
+  id: string
+  login: string
+  role: string
+  fullName: string
+}
+
+export interface ISession {
+  token: string
+  user: ISessionUser
+}

@@ -1,25 +1,13 @@
-import { Router, type NextFunction, type Request, type Response } from 'express'
+import { Router } from 'express'
 import { rbacMiddleware } from '../middleware'
 import { passesService } from '../services'
-import { HttpStatus, requireUuid } from '../shared/utils'
+import { HttpStatus } from '../shared/utils'
 import { UserRole } from '../types'
 import { parsePassInput } from './passes.validation'
+import { idOf, respond } from './respond'
 
-type THandler = (req: Request) => Promise<unknown>
-
-const respond =
-  (handler: THandler, status: number = HttpStatus.OK) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      res.status(status).json({ data: await handler(req) })
-    } catch (error) {
-      next(error)
-    }
-  }
-
-const idOf = (req: Request) => requireUuid(req.params.id, 'id')
 const admin = rbacMiddleware(UserRole.ADMIN)
-const anyRole = rbacMiddleware(UserRole.ADMIN, UserRole.GUARD)
+const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
 
 export const passesRouter = Router()
 

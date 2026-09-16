@@ -1,1 +1,5 @@
 export { passesService } from './passes.service'
+export { positionsService } from './positions.service'
+export { unitsService } from './units.service'
+export { authService } from './auth.service'
+export { usersService } from './users.service'

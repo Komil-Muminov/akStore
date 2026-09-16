@@ -17,6 +17,13 @@ import iconTrash from '../../../../assets/icons/trash-2.svg' with { type: 'text'
 import iconUser from '../../../../assets/icons/user.svg' with { type: 'text' }
 import iconUsers from '../../../../assets/icons/users.svg' with { type: 'text' }
 import iconX from '../../../../assets/icons/x.svg' with { type: 'text' }
+import iconEye from '../../../../assets/icons/eye.svg' with { type: 'text' }
+import iconEyeOff from '../../../../assets/icons/eye-off.svg' with { type: 'text' }
+import iconLogOut from '../../../../assets/icons/log-out.svg' with { type: 'text' }
+import iconKey from '../../../../assets/icons/key-round.svg' with { type: 'text' }
+import iconLock from '../../../../assets/icons/lock.svg' with { type: 'text' }
+import iconUserCog from '../../../../assets/icons/user-cog.svg' with { type: 'text' }
+import iconShieldAlert from '../../../../assets/icons/shield-alert.svg' with { type: 'text' }
 
 export const ICONS = {
   ban: iconBan,
@@ -38,6 +45,13 @@ export const ICONS = {
   user: iconUser,
   users: iconUsers,
   x: iconX,
+  eye: iconEye,
+  eyeOff: iconEyeOff,
+  logOut: iconLogOut,
+  key: iconKey,
+  lock: iconLock,
+  userCog: iconUserCog,
+  shieldAlert: iconShieldAlert,
 } as const
 
 export type TIconName = keyof typeof ICONS

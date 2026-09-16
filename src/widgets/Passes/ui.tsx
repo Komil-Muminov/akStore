@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react'
 import { PassDetails } from '@/features/PassDetails'
 import { PassForm } from '@/features/PassForm'
 import { PassList } from '@/features/PassList'
-import { Sidebar } from '@/features/Sidebar'
 import type { IPass, IPassInput, PassFilter } from '@/entities/pass'
 import { ConfirmDialog, If, Spinner, Text } from '@/shared/ui'
 import { usePassMutations, usePassesQuery } from './hooks'
@@ -10,6 +9,7 @@ import { countByFilter, selectVisible } from './lib'
 import { CLOSED_FORM, COUNT_SUFFIX, DELETE_DIALOG, HEADERS, INITIAL_FILTER, type IFormState } from './model'
 import { layout, main, sectionHead } from './style'
 import { ErrorState } from './ui/ErrorState'
+import { FilterTabs } from './ui/FilterTabs'
 import { Header } from './ui/Header'
 
 export const Passes = () => {
@@ -60,7 +60,6 @@ export const Passes = () => {
 
   return (
     <div style={layout} testId="passes__layout">
-      <Sidebar active={filter} counts={counts} onSelect={setFilter} />
       <div style={main}>
         <Header
           title={heading.title}
@@ -69,6 +68,7 @@ export const Passes = () => {
           onQueryChange={setQuery}
           onCreate={openCreate}
         />
+        <FilterTabs active={filter} counts={counts} onSelect={setFilter} />
         <div style={sectionHead}>
           <Text variant="label">{`${heading.title.toUpperCase()} · ${visible.length}${COUNT_SUFFIX}`}</Text>
         </div>

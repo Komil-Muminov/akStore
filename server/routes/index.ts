@@ -1,6 +1,14 @@
 import { Router } from 'express'
+import { authRouter } from './auth.routes'
 import { passesRouter } from './passes.routes'
+import { positionsRouter } from './positions.routes'
+import { unitsRouter } from './units.routes'
+import { usersRouter } from './users.routes'
 
 export const apiRouter = Router()
 
+apiRouter.use('/auth', authRouter)
+apiRouter.use('/users', usersRouter)
 apiRouter.use('/passes', passesRouter)
+apiRouter.use('/positions', positionsRouter)
+apiRouter.use('/units', unitsRouter)

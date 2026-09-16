@@ -11,8 +11,41 @@ export const layout: StyleDesc = {
   flexDirection: 'row',
   width: '100%',
   height: '100%',
-  backgroundColor: theme.colors.canvas,
 }
+
+export const tabs: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.xs,
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
+  paddingBottom: theme.spacing.md,
+  flexShrink: 0,
+}
+
+export const tab = (active: boolean): StyleDesc => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+  height: theme.size.button,
+  paddingLeft: theme.spacing.md,
+  paddingRight: theme.spacing.md,
+  borderRadius: theme.radius.md,
+  borderWidth: 1,
+  borderColor: active ? theme.colors.borderStrong : theme.colors.border,
+  backgroundColor: active ? theme.colors.raised : undefined,
+  cursor: 'pointer',
+  hover: active ? undefined : { backgroundColor: theme.colors.overlay },
+})
+
+export const tabCount = (active: boolean): StyleDesc => ({
+  fontFamily: theme.font.family,
+  fontSize: theme.font.size.xs,
+  fontWeight: theme.font.weight.medium,
+  color: active ? theme.colors.accent : theme.colors.tertiary,
+})
 
 export const main: StyleDesc = {
   flexGrow: 1,

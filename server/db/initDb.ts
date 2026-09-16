@@ -1,25 +1,12 @@
 import pg from 'pg'
 import { config } from '../config'
+import { UnitType, UserRole } from '../types'
 import { pool } from './pool'
+import { SCHEMA, SEED_LEADERSHIP, SEED_POSITIONS } from './schema'
+import { usersDb } from './users.db'
 
 const MAINTENANCE_DB = 'postgres'
 const DB_NAME_PATTERN = /^[a-z_][a-z0-9_]*$/
-
-const SCHEMA = `
-  CREATE TABLE IF NOT EXISTS passes (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    holder_name TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'active',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-  );
-  ALTER TABLE passes ADD COLUMN IF NOT EXISTS host_name TEXT NOT NULL DEFAULT '';
-  ALTER TABLE passes ADD COLUMN IF NOT EXISTS organization TEXT NOT NULL DEFAULT '';
-  ALTER TABLE passes ADD COLUMN IF NOT EXISTS purpose TEXT NOT NULL DEFAULT '';
-  ALTER TABLE passes ADD COLUMN IF NOT EXISTS phone TEXT NOT NULL DEFAULT '';
-  ALTER TABLE passes ADD COLUMN IF NOT EXISTS car_plate TEXT NOT NULL DEFAULT '';
-  ALTER TABLE passes ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
-  CREATE INDEX IF NOT EXISTS passes_status_idx ON passes (status);
-`
 
 const ensureDatabase = async () => {
   if (!DB_NAME_PATTERN.test(config.db.database)) {
@@ -38,7 +25,45 @@ const ensureDatabase = async () => {
   }
 }
 
+const seedPositions = async () => {
+  const count = await pool.query<{ total: string }>('SELECT count(*)::text AS total FROM positions')
+  if (Number(count.rows[0]?.total ?? 0) > 0) return
+  await Promise.all(
+    SEED_POSITIONS.map((position) =>
+      pool.query('INSERT INTO positions (name, rank) VALUES ($1, $2) ON CONFLICT (name) DO NOTHING', [
+        position.name,
+        position.rank,
+      ]),
+    ),
+  )
+}
+
+const seedLeadership = async () => {
+  const existing = await pool.query('SELECT id FROM units WHERE type = $1 LIMIT 1', [UnitType.LEADERSHIP])
+  if ((existing.rowCount ?? 0) > 0) return
+  const unit = await pool.query<{ id: string }>('INSERT INTO units (name, type) VALUES ($1, $2) RETURNING id', [
+    SEED_LEADERSHIP.name,
+    UnitType.LEADERSHIP,
+  ])
+  const unitId = unit.rows[0]!.id
+  await pool.query(
+    `INSERT INTO unit_positions (unit_id, position_id, sort_order)
+     SELECT $1, id, rank FROM positions WHERE rank = ANY($2::int[])`,
+    [unitId, SEED_LEADERSHIP.positionRanks],
+  )
+}
+
+const seedSuperadmin = async () => {
+  if ((await usersDb.countActiveByRole(UserRole.SUPERADMIN)) > 0) return
+  const hash = await Bun.password.hash(config.superadmin.password)
+  await usersDb.create(config.superadmin.login, hash, UserRole.SUPERADMIN, 'Главный администратор')
+  console.log(`db: создан главный администратор ${config.superadmin.login}`)
+}
+
 export const initDb = async () => {
   await ensureDatabase()
   await pool.query(SCHEMA)
+  await seedPositions()
+  await seedLeadership()
+  await seedSuperadmin()
 }

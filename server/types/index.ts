@@ -32,17 +32,13 @@ export interface IPassRow {
   updated_at: Date
 }
 
-export enum UserRole {
-  ADMIN = 'admin',
-  GUARD = 'guard',
-}
-
-export interface IAuthUser {
-  role: UserRole
-}
+export { UserRole, ROLE_RANK } from './auth'
+export type { IAuthUser, IUser, IUserRow, IUserInput, ITokenPayload } from './auth'
+export { UnitType } from './org'
+export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'
 
 declare module 'express-serve-static-core' {
   interface Request {
-    user?: IAuthUser
+    user?: import('./auth').IAuthUser
   }
 }
