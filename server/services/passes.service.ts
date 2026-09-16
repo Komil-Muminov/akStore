@@ -2,6 +2,7 @@ import { passesDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
 import { PassStatus, type IPass, type IPassInput, type IPassSearchParams } from '../types'
 import { hostsService } from './hosts.service'
+import { notifyHost } from './passes.notify'
 
 const NOT_FOUND = 'Пропуск не найден'
 
@@ -15,7 +16,11 @@ const withHostSnapshot = async (input: IPassInput) =>
 
 export const passesService = {
   search: async (params?: IPassSearchParams) => passesDb.search(params),
-  create: async (input: IPassInput) => passesDb.create(await withHostSnapshot(input)),
+  create: async (input: IPassInput, authorId: string) => {
+    const pass = await passesDb.create(await withHostSnapshot(input))
+    await notifyHost(authorId, pass)
+    return pass
+  },
   update: async (id: string, input: IPassInput) => orNotFound(await passesDb.update(id, await withHostSnapshot(input))),
   deactivate: async (id: string) => orNotFound(await passesDb.setStatus(id, PassStatus.REVOKED)),
   activate: async (id: string) => orNotFound(await passesDb.setStatus(id, PassStatus.ACTIVE)),

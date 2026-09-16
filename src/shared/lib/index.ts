@@ -1,4 +1,5 @@
 export { request, uploadFile } from './api'
+export { chatRequest, useChatRequest } from './navigation'
 export { session, useSession } from './session'
 export { socketClient } from './socket'
 export { storage } from './storage'

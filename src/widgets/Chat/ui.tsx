@@ -3,7 +3,7 @@ import { ChatComposer } from '@/features/ChatComposer'
 import { ChatSidebar } from '@/features/ChatSidebar'
 import { ChatThread } from '@/features/ChatThread'
 import { If, Spinner } from '@/shared/ui'
-import { useSession } from '@/shared/lib'
+import { chatRequest, useChatRequest, useSession } from '@/shared/lib'
 import { isGroup } from '@/entities/message'
 import {
   useChatMutations,
@@ -56,6 +56,14 @@ export const Chat = () => {
   useEffect(() => {
     if (activeId !== null) readMutate(activeId)
   }, [activeId, readMutate])
+
+  const requestedCompanionId = useChatRequest()
+  const openCompanion = controls.openCompanion
+  useEffect(() => {
+    if (requestedCompanionId === null) return
+    openCompanion(requestedCompanionId)
+    chatRequest.clear()
+  }, [requestedCompanionId, openCompanion])
 
   const initialOnline = onlineQuery.data
   useEffect(() => {

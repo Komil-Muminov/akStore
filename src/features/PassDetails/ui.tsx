@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { PASS_FIELD_LABELS, PASS_STATUS_LABELS, PassStatus, formatIssuedAt, initialsOf } from '@/entities/pass'
 import { Badge, Button, IconButton, If, Text } from '@/shared/ui'
+import { chatRequest } from '@/shared/lib'
 import {
   DELETE_LABEL,
   DETAIL_ROWS,
@@ -10,6 +11,7 @@ import {
   REVOKE_LABEL,
   TITLE,
   UPDATED_LABEL,
+  WRITE_HOST_LABEL,
   type IProps,
 } from './model'
 import { actionRow, actions, avatar, avatarText, details, head, meta, person, root, spacer } from './style'
@@ -21,6 +23,9 @@ export const PassDetails = ({ pass, pending, onEdit, onRevoke, onRestore, onDele
   const handleRevoke = useCallback(() => onRevoke(pass.id), [onRevoke, pass.id])
   const handleRestore = useCallback(() => onRestore(pass.id), [onRestore, pass.id])
   const handleDelete = useCallback(() => onDelete(pass), [onDelete, pass])
+  const handleWriteHost = useCallback(() => {
+    if (pass.hostUserId) chatRequest.open(pass.hostUserId)
+  }, [pass.hostUserId])
 
   return (
     <div style={root} testId="pass-details">
@@ -60,6 +65,16 @@ export const PassDetails = ({ pass, pending, onEdit, onRevoke, onRestore, onDele
             <Button label={REVOKE_LABEL} icon="ban" variant="secondary" fullWidth onClick={handleRevoke} disabled={pending} testId="pass-details__revoke" />
           </If>
         </div>
+        <If condition={pass.hostUserId !== null}>
+          <Button
+            label={WRITE_HOST_LABEL}
+            icon="message"
+            variant="secondary"
+            fullWidth
+            onClick={handleWriteHost}
+            testId="pass-details__write-host"
+          />
+        </If>
         <Button label={DELETE_LABEL} icon="trash" variant="danger" fullWidth onClick={handleDelete} disabled={pending} testId="pass-details__delete" />
       </div>
     </div>

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { rbacMiddleware } from '../middleware'
 import { passesService } from '../services'
 import { HttpStatus } from '../shared/utils'
-import { UserRole } from '../types'
+import { UserRole, type IAuthUser } from '../types'
 import { parsePassInput } from './passes.validation'
 import { idOf, respond } from './respond'
 
@@ -17,7 +17,10 @@ passesRouter.get('/search', anyRole, respond((req) => passesService.search({
   page: typeof req.query.page === 'string' ? Number(req.query.page) : undefined,
   limit: typeof req.query.limit === 'string' ? Number(req.query.limit) : undefined,
 })))
-passesRouter.post('/create', admin, respond((req) => passesService.create(parsePassInput(req.body)), HttpStatus.CREATED))
+passesRouter.post('/create', admin, respond(
+  (req) => passesService.create(parsePassInput(req.body), (req.user as IAuthUser).id),
+  HttpStatus.CREATED,
+))
 passesRouter.patch('/update/:id', admin, respond((req) => passesService.update(idOf(req), parsePassInput(req.body))))
 passesRouter.patch('/deactivate/:id', admin, respond((req) => passesService.deactivate(idOf(req))))
 passesRouter.patch('/activate/:id', admin, respond((req) => passesService.activate(idOf(req))))
