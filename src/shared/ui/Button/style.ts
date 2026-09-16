@@ -15,11 +15,18 @@ const VARIANTS: Record<TButtonVariant, { background: string; hover: string; colo
   danger: { background: theme.colors.dangerSoft, hover: theme.colors.dangerSoftHover, color: theme.colors.danger },
 }
 
-export const root = (variant: TButtonVariant, disabled: boolean, fullWidth: boolean): StyleDesc => ({
-  height: theme.size.button,
+const SIZES = {
+  sm: { height: 28, fontSize: theme.font.size.xs, padding: theme.spacing.sm },
+  md: { height: theme.size.button, fontSize: theme.font.size.sm, padding: theme.spacing.lg },
+  lg: { height: theme.size.input, fontSize: theme.font.size.md, padding: theme.spacing.xl },
+} as const
+
+export const root = (variant: TButtonVariant, disabled: boolean, fullWidth: boolean, size: 'sm' | 'md' | 'lg' = 'md'): StyleDesc => ({
+  height: SIZES[size].height,
+  width: fullWidth ? '100%' : undefined,
   flexGrow: fullWidth ? 1 : 0,
-  paddingLeft: theme.spacing.lg,
-  paddingRight: theme.spacing.lg,
+  paddingLeft: SIZES[size].padding,
+  paddingRight: SIZES[size].padding,
   borderRadius: theme.radius.md,
   borderWidth: VARIANTS[variant].border ? 1 : 0,
   borderColor: VARIANTS[variant].border,
@@ -35,11 +42,12 @@ export const root = (variant: TButtonVariant, disabled: boolean, fullWidth: bool
   hover: disabled ? undefined : { backgroundColor: VARIANTS[variant].hover },
 })
 
-export const label = (variant: TButtonVariant): StyleDesc => ({
+export const label = (variant: TButtonVariant, size: 'sm' | 'md' | 'lg' = 'md'): StyleDesc => ({
   fontFamily: theme.font.family,
-  fontSize: theme.font.size.sm,
+  fontSize: SIZES[size].fontSize,
   fontWeight: theme.font.weight.medium,
   color: VARIANTS[variant].color,
 })
 
 export const iconColor = (variant: TButtonVariant) => VARIANTS[variant].color
+

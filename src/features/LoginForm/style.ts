@@ -1,7 +1,7 @@
 import type { StyleDesc } from '@gpuix/react'
 import { theme } from '@/shared/config'
 
-const CARD_WIDTH = 420
+const CARD_WIDTH = 400
 
 export const root: StyleDesc = {
   width: '100%',
@@ -16,13 +16,13 @@ export const card: StyleDesc = {
   width: CARD_WIDTH,
   display: 'flex',
   flexDirection: 'column',
-  gap: theme.spacing.lg,
+  gap: theme.spacing.xl,
   padding: theme.spacing.xxl,
   borderRadius: theme.radius.lg,
   borderWidth: 1,
-  borderColor: theme.colors.border,
+  borderColor: theme.colors.borderStrong,
   backgroundColor: theme.colors.sidebar,
-  boxShadow: { offsetX: 0, offsetY: 24, blurRadius: 64, spreadRadius: 0, color: '#00000080' },
+  boxShadow: { offsetX: 0, offsetY: 24, blurRadius: 48, spreadRadius: 0, color: '#00000099' },
 }
 
 export const brand: StyleDesc = {
@@ -30,19 +30,37 @@ export const brand: StyleDesc = {
   flexDirection: 'column',
   alignItems: 'center',
   gap: theme.spacing.sm,
-  paddingBottom: theme.spacing.sm,
 }
 
 export const brandMark: StyleDesc = {
-  width: theme.size.row,
-  height: theme.size.row,
-  borderRadius: theme.radius.lg,
+  width: 52,
+  height: 52,
+  borderRadius: theme.radius.md,
+  borderWidth: 1,
+  borderColor: theme.colors.accentSoft,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: theme.colors.accentSoft,
 }
 
-export const field: StyleDesc = { display: 'flex', flexDirection: 'column', gap: theme.spacing.xs }
-export const fieldRow: StyleDesc = { display: 'flex', flexDirection: 'row' }
-export const message: StyleDesc = { minHeight: theme.font.lineHeight.sm, display: 'flex', alignItems: 'center' }
+export const formBody: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.md,
+  width: '100%',
+}
+
+export const field: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.xs,
+  width: '100%',
+}
+
+export const message: StyleDesc = {
+  minHeight: theme.font.lineHeight.sm,
+  display: 'flex',
+  alignItems: 'center',
+}
+

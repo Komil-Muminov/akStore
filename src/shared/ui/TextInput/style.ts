@@ -7,6 +7,7 @@ export const root: StyleDesc = {
   alignItems: 'center',
   gap: theme.spacing.sm + theme.spacing.xxs,
   height: theme.size.input,
+  width: '100%',
   flexGrow: 1,
   minWidth: 0,
   paddingLeft: theme.spacing.md,

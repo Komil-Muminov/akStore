@@ -1,3 +1,4 @@
+import type { StyleDesc } from '@gpuix/react'
 import { useCallback, useState } from 'react'
 import { theme } from '@/shared/config'
 import { Icon } from '../Icon'
@@ -12,9 +13,10 @@ interface IProps {
   placeholder?: string
   autoFocus?: boolean
   testId?: string
+  style?: StyleDesc
 }
 
-export const PasswordInput = ({ value, onChange, onSubmit, placeholder, autoFocus, testId }: IProps) => {
+export const PasswordInput = ({ value, onChange, onSubmit, placeholder, autoFocus, testId, style: customStyle }: IProps) => {
   const [visible, setVisible] = useState(false)
   const displayed = visible ? value : MASK_CHAR.repeat(value.length)
 
@@ -33,7 +35,7 @@ export const PasswordInput = ({ value, onChange, onSubmit, placeholder, autoFocu
   const toggle = useCallback(() => setVisible((current) => !current), [])
 
   return (
-    <div style={root}>
+    <div style={customStyle ? { ...root, ...customStyle } : root}>
       <Icon name="lock" size={theme.size.iconMd} color={theme.colors.tertiary} />
       <input
         testId={testId}

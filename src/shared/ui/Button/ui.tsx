@@ -8,17 +8,27 @@ interface IProps {
   label: string
   onClick: () => void
   variant?: TButtonVariant
+  size?: 'sm' | 'md' | 'lg'
   icon?: TIconName
   disabled?: boolean
   fullWidth?: boolean
   testId?: string
 }
 
-export const Button = ({ label: text, onClick, variant = 'primary', icon, disabled = false, fullWidth = false, testId }: IProps) => (
-  <div testId={testId} onClick={disabled ? undefined : onClick} style={root(variant, disabled, fullWidth)}>
+export const Button = ({
+  label: text,
+  onClick,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  disabled = false,
+  fullWidth = false,
+  testId,
+}: IProps) => (
+  <div testId={testId} onClick={disabled ? undefined : onClick} style={root(variant, disabled, fullWidth, size)}>
     <If condition={icon !== undefined}>
-      <Icon name={icon ?? 'plus'} size={theme.size.iconMd} color={iconColor(variant)} />
+      <Icon name={icon ?? 'plus'} size={size === 'lg' ? theme.size.iconLg : theme.size.iconMd} color={iconColor(variant)} />
     </If>
-    <text style={label(variant)}>{text}</text>
+    <text style={label(variant, size)}>{text}</text>
   </div>
 )
