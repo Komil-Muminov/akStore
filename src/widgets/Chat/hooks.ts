@@ -1,11 +1,8 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
 import type { IHost } from '@/entities/host'
 import type { IConversation, IMember, IMessage } from '@/entities/message'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
 import type { IGroupSubmit } from '@/features/ChatGroupForm'
-import { socketClient } from '@/shared/lib'
 
 interface ISendVariables {
   conversationId: string
@@ -56,16 +53,4 @@ export const useChatMutations = () => {
   return { open, send, read, createGroup, leave }
 }
 
-export const useChatSocket = () => {
-  const queryClient = useQueryClient()
-
-  useEffect(
-    () =>
-      socketClient.subscribe(() => {
-        for (const key of INVALIDATE) {
-          void queryClient.invalidateQueries({ queryKey: [key] })
-        }
-      }),
-    [queryClient],
-  )
-}
+export const useOnlineQuery = () => useGetQuery<string[]>(QueryKeys.CHAT_ONLINE, ApiRoutes.CHAT_ONLINE)

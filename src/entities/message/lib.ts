@@ -52,3 +52,7 @@ export const previewOf = (conversation: IConversation) =>
   isGroup(conversation) && conversation.lastMessageAuthor.length > 0
     ? `${conversation.lastMessageAuthor}${AUTHOR_SEPARATOR}${conversation.lastMessage}`
     : conversation.lastMessage
+
+export const isReadByCompanion = (message: IMessage, conversation: IConversation) =>
+  conversation.companionReadAt !== null &&
+  new Date(message.createdAt).getTime() <= new Date(conversation.companionReadAt).getTime()

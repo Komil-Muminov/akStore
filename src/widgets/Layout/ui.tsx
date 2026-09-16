@@ -5,6 +5,7 @@ import { atLeast, toRole, type IAuthUser } from '@/entities/user'
 import { ApiRoutes, type AppRoutes } from '@/shared/config'
 import { useMutationQuery } from '@/shared/hooks'
 import { session, useSession } from '@/shared/lib'
+import { useUnreadTotal } from './hooks'
 import { content, root } from './style'
 
 interface IProps {
@@ -22,6 +23,7 @@ export const Layout = ({ active, onNavigate, children }: IProps) => {
     [current],
   )
   const items = useMemo(() => NAV_ITEMS.filter((item) => atLeast(user.role, item.minRole)), [user.role])
+  const unread = useUnreadTotal(current !== null)
 
   useEffect(() => {
     const first = items[0]
@@ -39,7 +41,7 @@ export const Layout = ({ active, onNavigate, children }: IProps) => {
 
   return (
     <div style={root} testId="layout">
-      <NavSidebar active={active} items={items} user={user} onNavigate={onNavigate} onChangePassword={openChange} onLogout={logout} />
+      <NavSidebar active={active} items={items} unread={unread} user={user} onNavigate={onNavigate} onChangePassword={openChange} onLogout={logout} />
       <div style={content}>{children}</div>
       <PasswordDialog
         mode={passwordMode}

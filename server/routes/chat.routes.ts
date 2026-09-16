@@ -12,6 +12,8 @@ const actorOf = (req: { user?: IAuthUser }) => (req.user as IAuthUser).id
 export const chatRouter = Router()
 
 chatRouter.get('/search', anyRole, respond((req) => chatService.search(actorOf(req))))
+chatRouter.get('/unread-count', anyRole, respond((req) => chatService.unreadTotal(actorOf(req))))
+chatRouter.get('/online', anyRole, respond((req) => chatService.online(actorOf(req))))
 chatRouter.get('/history/:id', anyRole, respond((req) => chatService.history(actorOf(req), idOf(req))))
 chatRouter.get('/members/:id', anyRole, respond((req) => chatService.members(actorOf(req), idOf(req))))
 chatRouter.post('/open', anyRole, respond(

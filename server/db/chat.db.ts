@@ -6,6 +6,7 @@ const toConversation = (row: IConversationRow): IConversation => ({
   kind: row.kind,
   title: row.title,
   companionId: row.companion_id ?? '',
+  companionReadAt: row.companion_read_at ? row.companion_read_at.toISOString() : null,
   companionName: row.companion_name ?? '',
   companionLogin: row.companion_login ?? '',
   membersCount: Number(row.members_count),
@@ -18,6 +19,7 @@ const toConversation = (row: IConversationRow): IConversation => ({
 const BASE_SQL = `
   SELECT c.id, c.kind, c.title,
          peer.user_id AS companion_id, peer.full_name AS companion_name, peer.login AS companion_login,
+         peer.last_read_at AS companion_read_at,
          (SELECT COUNT(*) FROM chat_participants total WHERE total.conversation_id = c.id) AS members_count,
          last.body AS last_message, last.author_name AS last_message_author, last.created_at AS last_message_at,
          (SELECT COUNT(*) FROM chat_messages unread
@@ -27,7 +29,7 @@ const BASE_SQL = `
   FROM chat_conversations c
   JOIN chat_participants me ON me.conversation_id = c.id AND me.user_id = $1
   LEFT JOIN LATERAL (
-    SELECT u.id AS user_id, u.full_name, u.login, u.is_active
+    SELECT u.id AS user_id, u.full_name, u.login, u.is_active, other.last_read_at
     FROM chat_participants other
     JOIN users u ON u.id = other.user_id
     WHERE other.conversation_id = c.id AND other.user_id <> me.user_id AND c.kind = $2
@@ -54,6 +56,12 @@ const CREATE_GROUP_SQL = `
   INSERT INTO chat_conversations (kind, title, created_by) VALUES ($1, $2, $3)
   RETURNING id`
 
+const UNREAD_TOTAL_SQL = `
+  SELECT COUNT(*)::text AS total
+  FROM chat_messages m
+  JOIN chat_participants me ON me.conversation_id = m.conversation_id AND me.user_id = $1
+  WHERE m.author_id <> $1 AND m.created_at > me.last_read_at`
+
 const MARK_READ_SQL = `
   UPDATE chat_participants SET last_read_at = now()
   WHERE conversation_id = $1 AND user_id = $2`
@@ -70,6 +78,8 @@ export const chatDb = {
     (await pool.query<{ id: string }>(CREATE_DIRECT_SQL, [directKey, ConversationKind.DIRECT])).rows[0]?.id ?? '',
   createGroup: async (title: string, authorId: string) =>
     (await pool.query<{ id: string }>(CREATE_GROUP_SQL, [ConversationKind.GROUP, title, authorId])).rows[0]?.id ?? '',
+  unreadTotal: async (userId: string) =>
+    Number((await pool.query<{ total: string }>(UNREAD_TOTAL_SQL, [userId])).rows[0]?.total ?? 0),
   markRead: async (conversationId: string, userId: string) => {
     await pool.query(MARK_READ_SQL, [conversationId, userId])
   },

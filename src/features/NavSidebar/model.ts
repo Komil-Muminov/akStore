@@ -13,6 +13,7 @@ export interface INavItem {
 export interface IProps {
   active: AppRoutes
   items: INavItem[]
+  unread: number
   user: IAuthUser
   onNavigate: (route: AppRoutes) => void
   onChangePassword: () => void

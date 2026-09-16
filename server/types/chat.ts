@@ -10,6 +10,7 @@ export interface IConversation {
   companionId: string
   companionName: string
   companionLogin: string
+  companionReadAt: string | null
   membersCount: number
   lastMessage: string
   lastMessageAuthor: string
@@ -24,6 +25,7 @@ export interface IConversationRow {
   companion_id: string | null
   companion_name: string | null
   companion_login: string | null
+  companion_read_at: Date | null
   members_count: string
   last_message: string | null
   last_message_author: string | null

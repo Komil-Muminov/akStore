@@ -10,6 +10,7 @@ export interface IConversation {
   companionId: string
   companionName: string
   companionLogin: string
+  companionReadAt: string | null
   membersCount: number
   lastMessage: string
   lastMessageAuthor: string
@@ -35,4 +36,7 @@ export interface IMember {
 export const UNREAD_LIMIT = 99
 export const UNREAD_OVERFLOW = '99+'
 export const DIRECT_HINT = 'Личная переписка'
+export const ONLINE_HINT = 'В сети'
+export const OFFLINE_HINT = 'Не в сети'
+export const TYPING_HINT = 'печатает…'
 export const MEMBERS_FORMS = ['участник', 'участника', 'участников']

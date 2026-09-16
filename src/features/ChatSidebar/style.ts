@@ -140,3 +140,17 @@ export const headTop: StyleDesc = {
   justifyContent: 'space-between',
   gap: theme.spacing.sm,
 }
+
+export const avatarWrap: StyleDesc = { position: 'relative', flexShrink: 0 }
+
+export const onlineDot: StyleDesc = {
+  position: 'absolute',
+  right: 0,
+  bottom: 0,
+  width: theme.spacing.md,
+  height: theme.spacing.md,
+  borderRadius: theme.radius.full,
+  borderWidth: 2,
+  borderColor: theme.colors.sidebar,
+  backgroundColor: theme.colors.accent,
+}

@@ -1,5 +1,6 @@
 import { chatDb, chatMembersDb, chatMessagesDb, usersDb } from '../db'
-import { hub } from '../realtime'
+import { hub } from '../realtime/hub'
+import { ChatEventType } from '../realtime/model'
 import { HttpError, HttpStatus } from '../shared/utils'
 import { ConversationKind } from '../types'
 
@@ -92,13 +93,19 @@ export const chatService = {
     const members = await requireMembership(conversationId, userId)
     const message = await chatMessagesDb.create(conversationId, userId, body)
     await chatDb.markRead(conversationId, userId)
-    hub.publish(members, message)
+    hub.publish(members, ChatEventType.MESSAGE, message)
     return message
   },
 
   markRead: async (userId: string, conversationId: string) => {
-    await requireMembership(conversationId, userId)
+    const members = await requireMembership(conversationId, userId)
     await chatDb.markRead(conversationId, userId)
+    const audience = members.filter((id) => id !== userId)
+    hub.publish(audience, ChatEventType.READ, { conversationId, userId, at: new Date().toISOString() })
     return { ok: true as const }
   },
+
+  unreadTotal: async (userId: string) => ({ total: await chatDb.unreadTotal(userId) }),
+
+  online: async (userId: string) => hub.online().filter((id) => id !== userId),
 }

@@ -32,6 +32,7 @@ import iconCalendar from '../../../../assets/icons/calendar-days.svg' with { typ
 import iconMessage from '../../../../assets/icons/message-circle.svg' with { type: 'text' }
 import iconSend from '../../../../assets/icons/send.svg' with { type: 'text' }
 import iconInbox from '../../../../assets/icons/inbox.svg' with { type: 'text' }
+import iconCheckCheck from '../../../../assets/icons/check-check.svg' with { type: 'text' }
 
 export const ICONS = {
   ban: iconBan,
@@ -68,6 +69,7 @@ export const ICONS = {
   message: iconMessage,
   send: iconSend,
   inbox: iconInbox,
+  checkCheck: iconCheckCheck,
 } as const
 
 export type TIconName = keyof typeof ICONS

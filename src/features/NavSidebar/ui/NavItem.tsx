@@ -1,17 +1,19 @@
 import { memo, useCallback } from 'react'
+import { unreadLabelOf } from '@/entities/message'
 import type { AppRoutes } from '@/shared/config'
 import { theme } from '@/shared/config'
-import { Icon, Text } from '@/shared/ui'
+import { Icon, If, Text } from '@/shared/ui'
 import type { INavItem } from '../model'
-import { item, itemText } from '../style'
+import { item, itemBadge, itemBadgeText, itemText } from '../style'
 
 interface IProps {
   entry: INavItem
   active: boolean
+  badge: number
   onNavigate: (route: AppRoutes) => void
 }
 
-export const NavItem = memo(({ entry, active, onNavigate }: IProps) => {
+export const NavItem = memo(({ entry, active, badge, onNavigate }: IProps) => {
   const handleClick = useCallback(() => onNavigate(entry.id), [onNavigate, entry.id])
 
   return (
@@ -21,6 +23,11 @@ export const NavItem = memo(({ entry, active, onNavigate }: IProps) => {
         <Text variant={active ? 'bodyStrong' : 'body'}>{entry.label}</Text>
         <Text variant="caption">{entry.hint}</Text>
       </div>
+      <If condition={badge > 0}>
+        <div style={itemBadge} testId={`nav__badge-${entry.id}`}>
+          <text style={itemBadgeText}>{unreadLabelOf(badge)}</text>
+        </div>
+      </If>
     </div>
   )
 })

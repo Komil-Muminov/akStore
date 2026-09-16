@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { dayLabelOf, isDayStart, isGroup, type IConversation } from '@/entities/message'
+import { dayLabelOf, isDayStart, isGroup, isReadByCompanion, TYPING_HINT, type IConversation } from '@/entities/message'
 import { If, Spinner } from '@/shared/ui'
 import {
   ESTIMATED_MESSAGE_HEIGHT,
@@ -9,13 +9,13 @@ import {
   THREAD_EMPTY_TITLE,
   type IProps,
 } from './model'
-import { list, root } from './style'
+import { list, root, typingRow, typingText } from './style'
 import { Bubble } from './ui/Bubble'
 import { DayChip } from './ui/DayChip'
 import { Placeholder } from './ui/Placeholder'
 import { ThreadHead } from './ui/ThreadHead'
 
-export const ChatThread = ({ conversation, messages, members, currentUserId, loading, onLeave }: IProps) => (
+export const ChatThread = ({ conversation, messages, members, currentUserId, loading, typingName, onLeave }: IProps) => (
   <div style={root} testId="chat__thread">
     <If
       condition={conversation !== null}
@@ -47,6 +47,10 @@ export const ChatThread = ({ conversation, messages, members, currentUserId, loa
                         message={message}
                         own={message.authorId === currentUserId}
                         showAuthor={isGroup(conversation as IConversation) && message.authorId !== currentUserId}
+                        read={isReadByCompanion(message, conversation as IConversation)}
+                        showStatus={
+                          message.authorId === currentUserId && !isGroup(conversation as IConversation)
+                        }
                       />
                     </Fragment>
                   ))}
@@ -55,6 +59,11 @@ export const ChatThread = ({ conversation, messages, members, currentUserId, loa
             }
           >
             <Spinner />
+          </If>
+          <If condition={typingName.length > 0}>
+            <div style={typingRow} testId="chat__typing">
+              <text style={typingText}>{`${typingName} ${TYPING_HINT}`}</text>
+            </div>
           </If>
         </>
       )}

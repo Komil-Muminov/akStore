@@ -6,6 +6,7 @@ export interface IProps {
   members: IMember[]
   currentUserId: string
   loading: boolean
+  typingName: string
   onLeave: () => void
 }
 

@@ -32,6 +32,8 @@ export const ApiRoutes = {
   CHAT_MEMBERS: (id: string) => `/chat/members/${id}`,
   CHAT_ADD_MEMBERS: (id: string) => `/chat/add-members/${id}`,
   CHAT_LEAVE: (id: string) => `/chat/leave/${id}`,
+  CHAT_UNREAD: '/chat/unread-count',
+  CHAT_ONLINE: '/chat/online',
   REPORTS_SUMMARY: (query: string) => `/reports/summary?${query}`,
   REPORTS_PASSES: (query: string) => `/reports/passes?${query}`,
   REPORTS_EXPORT: (query: string) => `/reports/export?${query}`,

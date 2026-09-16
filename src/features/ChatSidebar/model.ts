@@ -4,6 +4,7 @@ import type { IHost } from '@/entities/host'
 export interface IProps {
   conversations: IConversation[]
   companions: IHost[]
+  online: string[]
   query: string
   activeId: string | null
   onQueryChange: (value: string) => void

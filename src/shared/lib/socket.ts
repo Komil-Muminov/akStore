@@ -1,10 +1,11 @@
 import { env } from '@/shared/config'
+import { ChatEventType, type IChatEvent } from '@/shared/model'
 import { session } from './session'
 
 const RECONNECT_DELAY_MS = 3000
 const TOKEN_PARAM = 'token'
 
-type TListener = (payload: unknown) => void
+type TListener = (event: IChatEvent) => void
 
 let socket: WebSocket | null = null
 let timer: ReturnType<typeof setTimeout> | null = null
@@ -21,12 +22,15 @@ const scheduleReconnect = () => {
   timer = setTimeout(() => connect(), RECONNECT_DELAY_MS)
 }
 
+const isChatEvent = (value: unknown): value is IChatEvent =>
+  typeof value === 'object' && value !== null && typeof (value as IChatEvent).type === 'string'
+
 const handleMessage = (event: MessageEvent) => {
   try {
-    const payload: unknown = JSON.parse(String(event.data))
-    listeners.forEach((listener) => listener(payload))
+    const parsed: unknown = JSON.parse(String(event.data))
+    if (isChatEvent(parsed)) listeners.forEach((listener) => listener(parsed))
   } catch {
-    scheduleReconnect()
+    clearTimer()
   }
 }
 
@@ -58,5 +62,9 @@ export const socketClient = {
       listeners.delete(listener)
       if (listeners.size === 0) disconnect()
     }
+  },
+  notifyTyping: (conversationId: string) => {
+    if (socket?.readyState !== WebSocket.OPEN) return
+    socket.send(JSON.stringify({ type: ChatEventType.TYPING, conversationId }))
   },
 }

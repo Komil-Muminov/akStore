@@ -94,6 +94,14 @@ export const bodyOf = (own: boolean): StyleDesc => ({
   color: own ? theme.colors.onAccent : theme.colors.text,
 })
 
+export const metaRow: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: theme.spacing.xxs,
+}
+
 export const metaOf = (own: boolean): StyleDesc => ({
   fontFamily: theme.font.family,
   fontSize: theme.font.size.xs,
@@ -144,5 +152,23 @@ export const authorLabel: StyleDesc = {
   fontFamily: theme.font.family,
   fontSize: theme.font.size.xs,
   fontWeight: theme.font.weight.semibold,
+  color: theme.colors.info,
+}
+
+export const typingRow: StyleDesc = {
+  height: theme.size.control,
+  flexShrink: 0,
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
+  backgroundColor: theme.colors.canvas,
+}
+
+export const typingText: StyleDesc = {
+  fontFamily: theme.font.family,
+  fontSize: theme.font.size.sm,
+  fontWeight: theme.font.weight.medium,
   color: theme.colors.info,
 }

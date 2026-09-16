@@ -93,3 +93,23 @@ export const avatarText: StyleDesc = {
 }
 
 export const accountText: StyleDesc = { display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }
+
+export const itemBadge: StyleDesc = {
+  minWidth: theme.size.iconLg,
+  height: theme.size.iconLg,
+  flexShrink: 0,
+  paddingLeft: theme.spacing.xs,
+  paddingRight: theme.spacing.xs,
+  borderRadius: theme.radius.full,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: theme.colors.accent,
+}
+
+export const itemBadgeText: StyleDesc = {
+  fontFamily: theme.font.family,
+  fontSize: theme.font.size.xs,
+  fontWeight: theme.font.weight.semibold,
+  color: theme.colors.onAccent,
+}

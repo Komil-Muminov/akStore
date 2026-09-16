@@ -1,12 +1,12 @@
 import { ROLE_LABELS } from '@/entities/user'
 import { initialsOf } from '@/entities/pass'
-import { theme } from '@/shared/config'
+import { AppRoutes, theme } from '@/shared/config'
 import { Icon, IconButton, Text, Tooltip } from '@/shared/ui'
 import { APP_NAME, APP_TAGLINE, CHANGE_PASSWORD_TOOLTIP, LOGOUT_TOOLTIP, NAV_SECTION, type IProps } from './model'
 import { account, accountText, avatar, avatarText, brand, brandMark, brandText, root, section, spacer } from './style'
 import { NavItem } from './ui/NavItem'
 
-export const NavSidebar = ({ active, items, user, onNavigate, onChangePassword, onLogout }: IProps) => (
+export const NavSidebar = ({ active, items, unread, user, onNavigate, onChangePassword, onLogout }: IProps) => (
   <div style={root} testId="nav">
     <div style={brand}>
       <div style={brandMark}>
@@ -21,7 +21,13 @@ export const NavSidebar = ({ active, items, user, onNavigate, onChangePassword, 
       <Text variant="label">{NAV_SECTION}</Text>
     </div>
     {items.map((entry) => (
-      <NavItem key={entry.id} entry={entry} active={entry.id === active} onNavigate={onNavigate} />
+      <NavItem
+        key={entry.id}
+        entry={entry}
+        active={entry.id === active}
+        badge={entry.id === AppRoutes.CHAT ? unread : 0}
+        onNavigate={onNavigate}
+      />
     ))}
     <div style={spacer} />
     <div style={account} testId="nav__account">

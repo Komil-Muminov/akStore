@@ -4,16 +4,17 @@ import { ChatGroupForm, type IGroupSubmit } from '@/features/ChatGroupForm'
 import { ChatSidebar } from '@/features/ChatSidebar'
 import { ChatThread } from '@/features/ChatThread'
 import { If, Spinner } from '@/shared/ui'
-import { useSession } from '@/shared/lib'
+import { socketClient, useSession } from '@/shared/lib'
 import { isGroup } from '@/entities/message'
 import {
   useChatMutations,
-  useChatSocket,
   useCompanionsQuery,
   useConversationsQuery,
   useHistoryQuery,
   useMembersQuery,
+  useOnlineQuery,
 } from './hooks'
+import { useChatRealtime } from './realtime'
 import { filterCompanions } from './lib'
 import { pane, root } from './style'
 import { ErrorState } from './ui/ErrorState'
@@ -28,7 +29,8 @@ export const Chat = () => {
   const companions = useCompanionsQuery()
   const history = useHistoryQuery(activeId)
   const { open, send, read, createGroup, leave } = useChatMutations()
-  useChatSocket()
+  const onlineQuery = useOnlineQuery()
+  const { online, setOnline, typingName } = useChatRealtime(activeId)
 
   const items = useMemo(() => conversations.data ?? [], [conversations.data])
   const active = useMemo(() => items.find((item) => item.id === activeId) ?? null, [items, activeId])
@@ -46,6 +48,11 @@ export const Chat = () => {
   useEffect(() => {
     if (activeId !== null) readMutate(activeId)
   }, [activeId, readMutate])
+
+  const initialOnline = onlineQuery.data
+  useEffect(() => {
+    if (initialOnline) setOnline(initialOnline)
+  }, [initialOnline, setOnline])
 
   const refetch = conversations.refetch
   const handleRetry = useCallback(() => void refetch(), [refetch])
@@ -97,6 +104,14 @@ export const Chat = () => {
   const closeGroupForm = useCallback(() => setGroupOpen(false), [])
 
   const sendMutate = send.mutate
+  const handleDraftChange = useCallback(
+    (value: string) => {
+      setDraft(value)
+      if (activeId !== null && value.length > 0) socketClient.notifyTyping(activeId)
+    },
+    [activeId],
+  )
+
   const handleSend = useCallback(() => {
     if (activeId === null) return
     sendMutate({ conversationId: activeId, body: draft.trim() }, { onSuccess: () => setDraft('') })
@@ -112,6 +127,7 @@ export const Chat = () => {
         onQueryChange={setQuery}
         onSelect={handleSelect}
         onOpenCompanion={handleOpenCompanion}
+        online={online}
         onCreateGroup={openGroupForm}
       />
       <div style={pane}>
@@ -126,6 +142,7 @@ export const Chat = () => {
                   members={members.data ?? []}
                   currentUserId={currentUserId}
                   loading={history.isPending && activeId !== null}
+                  typingName={typingName}
                   onLeave={handleLeave}
                 />
                 <If condition={active !== null}>
@@ -134,7 +151,7 @@ export const Chat = () => {
                     disabled={activeId === null}
                     pending={send.isPending}
                     error={send.error?.message}
-                    onChange={setDraft}
+                    onChange={handleDraftChange}
                     onSend={handleSend}
                   />
                 </If>

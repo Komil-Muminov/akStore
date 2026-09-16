@@ -19,6 +19,7 @@ import { EmptyState } from './ui/EmptyState'
 export const ChatSidebar = ({
   conversations,
   companions,
+  online,
   query,
   activeId,
   onQueryChange,
@@ -62,6 +63,7 @@ export const ChatSidebar = ({
                     key={conversation.id}
                     conversation={conversation}
                     active={conversation.id === activeId}
+                    online={online.includes(conversation.companionId)}
                     onSelect={onSelect}
                   />
                 ))}
