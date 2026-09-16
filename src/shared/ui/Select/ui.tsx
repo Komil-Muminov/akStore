@@ -23,12 +23,15 @@ interface IProps {
   onChange: (id: string | null) => void
   placeholder?: string
   icon?: TIconName
+  autoOpen?: boolean
   testId?: string
 }
 
 const NO_GROUP = ''
 
-export const Select = ({ value, options, onChange, placeholder, icon, testId }: IProps) => {
+const AUTO_OPEN_DELAY_MS = 200
+
+export const Select = ({ value, options, onChange, placeholder, icon, autoOpen = false, testId }: IProps) => {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const byId = useMemo(() => new Map(options.map((option) => [option.id, option])), [options])
@@ -59,6 +62,12 @@ export const Select = ({ value, options, onChange, placeholder, icon, testId }: 
   useEffect(() => {
     setQuery(value ? labelOf(value) : '')
   }, [value, labelOf])
+
+  useEffect(() => {
+    if (!autoOpen) return
+    const timer = setTimeout(() => setOpen(true), AUTO_OPEN_DELAY_MS)
+    return () => clearTimeout(timer)
+  }, [autoOpen])
   const filter = useCallback(
     (id: string, needle: string) => {
       const option = byId.get(id)

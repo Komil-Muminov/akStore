@@ -1,14 +1,12 @@
 import { useMemo } from 'react'
 import { POSITION_NAME_MIN_LENGTH } from '@/entities/position'
 import { ROLE_LABELS, UserRole } from '@/entities/user'
-import { Button, Checkbox, If, Modal, Select, Text, TextInput, type ISelectOption } from '@/shared/ui'
+import { Button, Checkbox, If, Modal, Text, TextInput, type ISelectOption } from '@/shared/ui'
 import { useUnitPositionsPicker } from './hooks'
 import {
   ADD_POSITION_LABEL,
   CANCEL_LABEL,
   DESCRIPTION,
-  EMPLOYEE_LABEL,
-  EMPLOYEE_PLACEHOLDER,
   EMPTY,
   ESTIMATED_ITEM_HEIGHT,
   NEW_POSITION_PLACEHOLDER,
@@ -18,7 +16,8 @@ import {
   TITLE,
   type IProps,
 } from './model'
-import { emptyWrap, footer, formRow, inputWrap, itemCard, itemLeft, itemWrapper, list, selectRow, spacer } from './style'
+import { emptyWrap, footer, formRow, inputWrap, itemCard, itemLeft, itemWrapper, list, spacer } from './style'
+import { AssignRow } from './ui/AssignRow'
 
 export const UnitPositionsPicker = ({
   unit,
@@ -38,12 +37,15 @@ export const UnitPositionsPicker = ({
     searchQuery,
     setSearchQuery,
     filteredPositions,
+    editingId,
+    setEditingId,
     toggle,
     handleSelectUser,
     handleCreatePosition,
     handleSubmit,
   } = useUnitPositionsPicker(unit, positions, onCreatePosition, onSubmit, pending)
 
+  const userMap = useMemo(() => new Map(users.map((user) => [user.id, user])), [users])
   const userOptions = useMemo<ISelectOption[]>(
     () =>
       users
@@ -114,17 +116,14 @@ export const UnitPositionsPicker = ({
                     />
                   </div>
                   <If condition={isChecked}>
-                    <div style={selectRow}>
-                      <Text variant="caption">{EMPLOYEE_LABEL}</Text>
-                      <Select
-                        value={assignments[position.id] ?? null}
-                        options={userOptions}
-                        onChange={(userId) => handleSelectUser(position.id, userId)}
-                        placeholder={EMPLOYEE_PLACEHOLDER}
-                        icon="user"
-                        testId={`unit-positions__employee-${position.id}`}
-                      />
-                    </div>
+                    <AssignRow
+                      positionId={position.id}
+                      user={assignments[position.id] ? userMap.get(assignments[position.id] ?? '') ?? null : null}
+                      editing={editingId === position.id}
+                      options={userOptions}
+                      onPick={handleSelectUser}
+                      onEdit={setEditingId}
+                    />
                   </If>
                 </div>
               </div>

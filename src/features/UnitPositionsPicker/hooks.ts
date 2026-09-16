@@ -13,6 +13,7 @@ export const useUnitPositionsPicker = (
   const [assignments, setAssignments] = useState<Record<string, string | null>>({})
   const [newPositionName, setNewPositionName] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
   const open = unit !== null
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export const useUnitPositionsPicker = (
       })
     }
     setAssignments(map)
+    setEditingId(null)
   }, [open, unit])
 
   const filteredPositions = useMemo(() => {
@@ -81,6 +83,8 @@ export const useUnitPositionsPicker = (
     searchQuery,
     setSearchQuery,
     filteredPositions,
+    editingId,
+    setEditingId,
     toggle,
     handleSelectUser,
     handleCreatePosition,

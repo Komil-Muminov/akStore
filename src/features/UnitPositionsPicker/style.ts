@@ -63,14 +63,66 @@ export const itemLeft: StyleDesc = {
   minWidth: 0,
 }
 
-export const selectRow: StyleDesc = {
+export const assignRow: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingLeft: theme.spacing.xl + theme.spacing.md,
+  paddingRight: theme.spacing.sm,
+  paddingBottom: theme.spacing.sm,
+}
+
+export const person: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm + theme.spacing.xxs,
+  flexGrow: 1,
+  minWidth: 0,
+  height: theme.size.button + theme.spacing.xs,
+  paddingLeft: theme.spacing.xs + theme.spacing.xxs,
+  paddingRight: theme.spacing.xs,
+  borderRadius: theme.radius.md,
+  backgroundColor: theme.colors.accentSoft,
+}
+
+export const personAvatar: StyleDesc = {
+  width: theme.size.control,
+  height: theme.size.control,
+  flexShrink: 0,
+  borderRadius: theme.radius.full,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: theme.colors.accent,
+}
+
+export const personAvatarText: StyleDesc = {
+  fontFamily: theme.font.family,
+  fontSize: theme.font.size.xs,
+  fontWeight: theme.font.weight.semibold,
+  color: theme.colors.onAccent,
+}
+
+export const personText: StyleDesc = { display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }
+export const personActions: StyleDesc = { display: 'flex', flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xxs }
+
+export const vacancy: StyleDesc = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.sm,
-  paddingLeft: theme.spacing.xl + theme.spacing.sm,
-  paddingBottom: theme.spacing.xs,
+  height: theme.size.button,
+  paddingLeft: theme.spacing.md,
+  paddingRight: theme.spacing.lg,
+  borderRadius: theme.radius.md,
+  borderWidth: 1,
+  borderColor: theme.colors.ghost,
+  cursor: 'pointer',
+  hover: { backgroundColor: theme.colors.overlay, borderColor: theme.colors.secondary },
 }
+
+export const picker: StyleDesc = { display: 'flex', flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm, flexGrow: 1, minWidth: 0 }
 
 export const footer: StyleDesc = { display: 'flex', flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm }
 export const spacer: StyleDesc = { flexGrow: 1, minWidth: 0 }
