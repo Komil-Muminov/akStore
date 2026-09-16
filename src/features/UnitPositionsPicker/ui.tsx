@@ -98,7 +98,8 @@ export const UnitPositionsPicker = ({
           {filteredPositions.map((position) => {
             const isChecked = position.id in assignments
             const isHovered = hoveredId === position.id
-            const assignedUser = assignments[position.id] ? userMap.get(assignments[position.id]!) ?? null : null
+            const assignedUser = assignments[position.id] ? userMap.get(assignments[position.id]!) : undefined
+            const assignedName = assignedUser?.fullName || assignedUser?.login || ''
             return (
               <div
                 key={position.id}
@@ -114,8 +115,8 @@ export const UnitPositionsPicker = ({
                       onToggle={() => toggle(position.id)}
                       testId={`unit-positions__item-${position.id}`}
                     />
-                    <If condition={assignedUser !== null && !isHovered}>
-                      <Text variant="caption">{`· ${assignedUser.fullName || assignedUser.login}`}</Text>
+                    <If condition={assignedName.length > 0 && !isHovered}>
+                      <Text variant="caption">{`· ${assignedName}`}</Text>
                     </If>
                   </div>
                   <If condition={isChecked && isHovered}>
