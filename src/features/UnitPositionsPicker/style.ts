@@ -42,13 +42,25 @@ export const emptyWrap: StyleDesc = {
 
 export const itemCard: StyleDesc = {
   display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing.xs,
-  padding: theme.spacing.sm,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  height: 44,
+  paddingLeft: theme.spacing.md,
+  paddingRight: theme.spacing.md,
   borderRadius: theme.radius.sm,
   backgroundColor: theme.colors.raised,
   borderWidth: 1,
   borderColor: theme.colors.border,
+  hover: { backgroundColor: theme.colors.raisedHover, borderColor: theme.colors.borderStrong },
+}
+
+export const itemLeft: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+  minWidth: 0,
 }
 
 export const selectRow: StyleDesc = {
@@ -56,7 +68,7 @@ export const selectRow: StyleDesc = {
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.sm,
-  paddingLeft: theme.spacing.xl,
+  flexShrink: 0,
 }
 
 export const selectStyle: StyleDesc = {

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { IUnitAssignment } from '@/entities/unit'
+import { useMemo } from 'react'
 import { POSITION_NAME_MIN_LENGTH } from '@/entities/position'
 import { Button, Checkbox, If, Modal, Text, TextInput } from '@/shared/ui'
+import { useUnitPositionsPicker } from './hooks'
 import {
   ADD_POSITION_LABEL,
   CANCEL_LABEL,
@@ -17,7 +17,7 @@ import {
   TITLE,
   type IProps,
 } from './model'
-import { emptyWrap, footer, formRow, inputWrap, itemCard, itemWrapper, list, selectRow, selectStyle, spacer } from './style'
+import { emptyWrap, footer, formRow, inputWrap, itemCard, itemLeft, itemWrapper, list, selectRow, selectStyle, spacer } from './style'
 
 export const UnitPositionsPicker = ({
   unit,
@@ -29,64 +29,23 @@ export const UnitPositionsPicker = ({
   onSubmit,
   onClose,
 }: IProps) => {
-  const [assignments, setAssignments] = useState<Record<string, string | null>>({})
-  const [newPositionName, setNewPositionName] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
-  const open = unit !== null
+  const {
+    open,
+    assignments,
+    newPositionName,
+    setNewPositionName,
+    searchQuery,
+    setSearchQuery,
+    hoveredId,
+    setHoveredId,
+    filteredPositions,
+    toggle,
+    handleSelectUser,
+    handleCreatePosition,
+    handleSubmit,
+  } = useUnitPositionsPicker(unit, positions, onCreatePosition, onSubmit, pending)
 
-  useEffect(() => {
-    if (!open || !unit) return
-    const map: Record<string, string | null> = {}
-    if (unit.assignments && unit.assignments.length > 0) {
-      unit.assignments.forEach((item) => {
-        map[item.positionId] = item.userId
-      })
-    } else {
-      unit.positionIds.forEach((id) => {
-        map[id] = null
-      })
-    }
-    setAssignments(map)
-  }, [open, unit])
-
-  const filteredPositions = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase()
-    return q ? positions.filter((p) => p.name.toLowerCase().includes(q)) : positions
-  }, [positions, searchQuery])
-
-  const toggle = useCallback((positionId: string) => {
-    setAssignments((current) => {
-      const next = { ...current }
-      if (positionId in next) {
-        delete next[positionId]
-      } else {
-        next[positionId] = null
-      }
-      return next
-    })
-  }, [])
-
-  const handleSelectUser = useCallback((positionId: string, userId: string | null) => {
-    setAssignments((current) => ({ ...current, [positionId]: userId }))
-  }, [])
-
-  const handleCreatePosition = useCallback(async () => {
-    const trimmed = newPositionName.trim()
-    if (trimmed.length < POSITION_NAME_MIN_LENGTH) return
-    setNewPositionName('')
-    const created = await onCreatePosition({ name: trimmed })
-    if (created && 'id' in created) {
-      setAssignments((current) => ({ ...current, [created.id]: null }))
-    }
-  }, [newPositionName, onCreatePosition])
-
-  const handleSubmit = useCallback(() => {
-    if (pending) return
-    const result: IUnitAssignment[] = positions
-      .filter((position) => position.id in assignments)
-      .map((position) => ({ positionId: position.id, userId: assignments[position.id] ?? null }))
-    onSubmit(result)
-  }, [pending, onSubmit, positions, assignments])
+  const userMap = useMemo(() => new Map(users.map((u) => [u.id, u])), [users])
 
   return (
     <Modal
@@ -138,16 +97,28 @@ export const UnitPositionsPicker = ({
         <virtual-list estimatedItemHeight={ESTIMATED_ITEM_HEIGHT} style={list} testId="unit-positions__list">
           {filteredPositions.map((position) => {
             const isChecked = position.id in assignments
+            const isHovered = hoveredId === position.id
+            const assignedUser = assignments[position.id] ? userMap.get(assignments[position.id]!) ?? null : null
             return (
-              <div key={position.id} style={itemWrapper}>
+              <div
+                key={position.id}
+                style={itemWrapper}
+                onMouseEnter={() => setHoveredId(position.id)}
+                onMouseLeave={() => setHoveredId((cur) => (cur === position.id ? null : cur))}
+              >
                 <div style={itemCard}>
-                  <Checkbox
-                    label={position.name}
-                    checked={isChecked}
-                    onToggle={() => toggle(position.id)}
-                    testId={`unit-positions__item-${position.id}`}
-                  />
-                  <If condition={isChecked}>
+                  <div style={itemLeft}>
+                    <Checkbox
+                      label={position.name}
+                      checked={isChecked}
+                      onToggle={() => toggle(position.id)}
+                      testId={`unit-positions__item-${position.id}`}
+                    />
+                    <If condition={assignedUser !== null && !isHovered}>
+                      <Text variant="caption">{`· ${assignedUser.fullName || assignedUser.login}`}</Text>
+                    </If>
+                  </div>
+                  <If condition={isChecked && isHovered}>
                     <div style={selectRow}>
                       <Text variant="caption">{EMPLOYEE_LABEL}</Text>
                       <select
