@@ -55,10 +55,14 @@ export const useUnitPositionsPicker = (
   const handleCreatePosition = useCallback(async () => {
     const trimmed = newPositionName.trim()
     if (trimmed.length < POSITION_NAME_MIN_LENGTH) return
-    setNewPositionName('')
-    const created = await onCreatePosition({ name: trimmed })
-    if (created && typeof created === 'object' && 'id' in created) {
-      setAssignments((current) => ({ ...current, [(created as { id: string }).id]: null }))
+    try {
+      const created = await onCreatePosition({ name: trimmed })
+      setNewPositionName('')
+      if (created && typeof created === 'object' && 'id' in created) {
+        setAssignments((current) => ({ ...current, [(created as { id: string }).id]: null }))
+      }
+    } catch {
+      return
     }
   }, [newPositionName, onCreatePosition])
 

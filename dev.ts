@@ -10,9 +10,13 @@ const spawn = (name: string, args: string[]) => {
 const waitForServer = async () => {
   const deadline = Date.now() + READY_TIMEOUT_MS
   while (Date.now() < deadline) {
-    const ready = await fetch(`http://localhost:${SERVER_PORT}/passes/search`)
-      .then(() => true)
-      .catch(() => false)
+    let ready = false
+    try {
+      await fetch(`http://localhost:${SERVER_PORT}/passes/search`)
+      ready = true
+    } catch {
+      ready = false
+    }
     if (ready) return true
     await Bun.sleep(POLL_INTERVAL_MS)
   }
@@ -33,7 +37,16 @@ const stopAll = () => {
 process.on('SIGINT', stopAll)
 process.on('SIGTERM', stopAll)
 
-await Promise.race(children.map((child) => child.exited))
+let running = true
+while (running) {
+  await Bun.sleep(500)
+  for (const child of children) {
+    if (child.exitCode !== null) {
+      running = false
+      break
+    }
+  }
+}
 stopAll()
 
 export {}
