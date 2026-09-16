@@ -73,13 +73,15 @@ export const Structure = () => {
     [positionMutations.create],
   )
 
+  const isModalOpen = form !== null || picking !== null || deleting !== null
+
   return (
     <div style={layout} testId="structure__layout">
       <div style={main}>
         <Toolbar canAddManagement={root !== null} onAddManagement={openAddManagement} onAutoLayout={handleAutoLayout} />
         <If condition={unitsQuery.isPending} fallback={
           <If condition={unitsQuery.isError} fallback={
-            <OrgCanvas units={units} positions={positions} selectedId={selectedId} onSelect={setSelectedId} onMoveNode={handleMoveNode} onAttach={handleAttach} />
+            <OrgCanvas units={units} positions={positions} selectedId={selectedId} disabled={isModalOpen} onSelect={setSelectedId} onMoveNode={handleMoveNode} onAttach={handleAttach} />
           }>
             <ErrorState details={unitsQuery.error?.message ?? ''} onRetry={handleRetry} />
           </If>

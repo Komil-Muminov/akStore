@@ -17,7 +17,7 @@ const droppedPoint = (drag: IDragState, zoom: number): IPoint => ({
   y: drag.origin.y + (drag.current.y - drag.start.y) / zoom,
 })
 
-export const useCanvasInteraction = (units: IUnit[], handlers: IHandlers) => {
+export const useCanvasInteraction = (units: IUnit[], handlers: IHandlers, disabled = false) => {
   const [viewport, setViewport] = useState<IViewport>(INITIAL_VIEWPORT)
   const [drag, setDrag] = useState<IDragState | null>(null)
   const dragRef = useRef<IDragState | null>(null)
@@ -42,24 +42,25 @@ export const useCanvasInteraction = (units: IUnit[], handlers: IHandlers) => {
 
   const grabNode = useCallback(
     (unit: IUnit, event: EventPayload) => {
+      if (disabled) return
       const start = pointOf(event)
       updateDrag({ id: unit.id, origin: { x: unit.x, y: unit.y }, start, current: start, moved: false })
     },
-    [updateDrag],
+    [updateDrag, disabled],
   )
 
   const handleMouseDown = useCallback(
     (event: EventPayload) => {
-      if (dragRef.current || isMiniMapActiveRef.current) return
+      if (disabled || dragRef.current || isMiniMapActiveRef.current) return
       panRef.current = { start: pointOf(event), pan: viewportRef.current.pan }
       handlers.onSelect(null)
     },
-    [handlers],
+    [handlers, disabled],
   )
 
   const handleMouseMove = useCallback(
     (event: EventPayload) => {
-      if (isMiniMapActiveRef.current) return
+      if (disabled || isMiniMapActiveRef.current) return
       const point = pointOf(event)
       if (panRef.current) {
         const { start, pan } = panRef.current
@@ -71,7 +72,7 @@ export const useCanvasInteraction = (units: IUnit[], handlers: IHandlers) => {
       const moved = current.moved || Math.hypot(point.x - current.start.x, point.y - current.start.y) > DRAG_THRESHOLD
       updateDrag({ ...current, current: point, moved })
     },
-    [updateDrag],
+    [updateDrag, disabled],
   )
 
   const handleMouseUp = useCallback(() => {
@@ -92,12 +93,13 @@ export const useCanvasInteraction = (units: IUnit[], handlers: IHandlers) => {
   }, [units, handlers, updateDrag])
 
   const handleScroll = useCallback((event: EventPayload) => {
+    if (disabled) return
     const delta = event.deltaY ?? 0
     setViewport((current) => ({
       ...current,
       zoom: Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, current.zoom * (1 - delta * ZOOM_WHEEL_FACTOR))),
     }))
-  }, [])
+  }, [disabled])
 
   const resetView = useCallback(() => setViewport(INITIAL_VIEWPORT), [])
 

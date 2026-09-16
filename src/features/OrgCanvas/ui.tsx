@@ -16,7 +16,7 @@ interface IMiniMapListeners {
   onUp: () => void
 }
 
-export const OrgCanvas = ({ units, positions, selectedId, onSelect, onMoveNode, onAttach }: IProps) => {
+export const OrgCanvas = ({ units, positions, selectedId, disabled = false, onSelect, onMoveNode, onAttach }: IProps) => {
   const handlers = useMemo(() => ({ onSelect, onMoveNode, onAttach }), [onSelect, onMoveNode, onAttach])
   const {
     viewport,
@@ -29,7 +29,7 @@ export const OrgCanvas = ({ units, positions, selectedId, onSelect, onMoveNode, 
     centerOn,
     startMiniMapDrag,
     stopMiniMapDrag,
-  } = useCanvasInteraction(units, handlers)
+  } = useCanvasInteraction(units, handlers, disabled)
   const [canvasRef, canvasBounds, measureCanvas] = useElementBounds()
   const [miniMapListeners, setMiniMapListeners] = useState<IMiniMapListeners | null>(null)
   const [showMiniMap, setShowMiniMap] = useState(true)

@@ -23,3 +23,4 @@ export const NO_EMPLOYEE = '— Не назначен (вакансия) —'
 export const EMPLOYEE_LABEL = 'Сотрудник:'
 export const SUBMIT_LABEL = 'Сохранить'
 export const CANCEL_LABEL = 'Отмена'
+export const ESTIMATED_ITEM_HEIGHT = 64

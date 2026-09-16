@@ -5,6 +5,7 @@ export interface IProps {
   units: IUnit[]
   positions: IPosition[]
   selectedId: string | null
+  disabled?: boolean
   onSelect: (id: string | null) => void
   onMoveNode: (id: string, point: IPoint) => void
   onAttach: (childId: string, parentId: string) => void

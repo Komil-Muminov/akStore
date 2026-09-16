@@ -20,8 +20,8 @@ interface IProps {
 
 export const Modal = ({ open, title, description, icon, iconColor = theme.colors.accent, onClose, children, testId }: IProps) => (
   <If condition={open}>
-    <motion.div initial={fade.initial} animate={fade.animate} transition={fade.transition} style={backdrop}>
-      <div style={card} testId={testId}>
+    <motion.div initial={fade.initial} animate={fade.animate} transition={fade.transition} style={backdrop} onScroll={() => {}} onMouseDown={() => {}}>
+      <div style={card} testId={testId} onScroll={() => {}}>
         <div style={head}>
           <If condition={icon !== undefined}>
             <Icon name={icon ?? 'sparkle'} size={theme.size.iconLg} color={iconColor} />

@@ -56,7 +56,7 @@ export const UnitDetails = ({ unit, units, positions, users, pending, onAddChild
   const handleDelete = useCallback(() => onDelete(unit), [onDelete, unit])
 
   return (
-    <div style={root} testId="unit-details">
+    <div style={root} testId="unit-details" onScroll={() => {}}>
       <div style={head}>
         <Text variant="title">{TITLE}</Text>
         <div style={spacer} />

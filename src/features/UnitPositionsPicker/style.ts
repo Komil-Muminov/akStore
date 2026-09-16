@@ -17,15 +17,15 @@ export const inputWrap: StyleDesc = {
 }
 
 export const list: StyleDesc = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing.sm,
-  maxHeight: LIST_MAX_HEIGHT,
-  overflowY: 'scroll',
+  height: LIST_MAX_HEIGHT,
   borderRadius: theme.radius.md,
   borderWidth: 1,
   borderColor: theme.colors.border,
   padding: theme.spacing.sm,
+}
+
+export const itemWrapper: StyleDesc = {
+  paddingBottom: theme.spacing.sm,
 }
 
 export const itemCard: StyleDesc = {
