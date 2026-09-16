@@ -5,6 +5,7 @@ export const INITIAL_ROUTE = AppRoutes.PASSES
 
 export const PAGES: Record<AppRoutes, LazyExoticComponent<() => JSX.Element>> = {
   [AppRoutes.PASSES]: lazy(() => import('@/pages/PassesPage')),
+  [AppRoutes.CHAT]: lazy(() => import('@/pages/ChatPage')),
   [AppRoutes.STRUCTURE]: lazy(() => import('@/pages/StructurePage')),
   [AppRoutes.USERS]: lazy(() => import('@/pages/UsersPage')),
   [AppRoutes.REPORTS]: lazy(() => import('@/pages/ReportsPage')),

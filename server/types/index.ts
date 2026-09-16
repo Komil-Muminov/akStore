@@ -52,6 +52,7 @@ export interface IPassSearchParams {
 export { UserRole, ROLE_RANK } from './auth'
 export type { IAuthUser, IUser, IUserRow, IUserInput, ITokenPayload, IUserSearchParams } from './auth'
 export type { IHost, IHostRow } from './hosts'
+export type { IConversation, IConversationRow, IMessage, IMessageRow, IMessageInput } from './chat'
 export type { IReportPeriod, IReportDay, IReportHost, IReportSummary } from './reports'
 export { UnitType } from './org'
 export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'

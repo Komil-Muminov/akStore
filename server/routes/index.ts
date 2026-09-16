@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { authRouter } from './auth.routes'
+import { chatRouter } from './chat.routes'
 import { hostsRouter } from './hosts.routes'
 import { passesRouter } from './passes.routes'
 import { positionsRouter } from './positions.routes'
@@ -11,6 +12,7 @@ export const apiRouter = Router()
 
 apiRouter.use('/auth', authRouter)
 apiRouter.use('/users', usersRouter)
+apiRouter.use('/chat', chatRouter)
 apiRouter.use('/hosts', hostsRouter)
 apiRouter.use('/passes', passesRouter)
 apiRouter.use('/positions', positionsRouter)

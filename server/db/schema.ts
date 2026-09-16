@@ -50,6 +50,29 @@ export const SCHEMA = `
     PRIMARY KEY (unit_id, position_id)
   );
   ALTER TABLE unit_positions ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id) ON DELETE SET NULL;
+
+  CREATE TABLE IF NOT EXISTS chat_conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    direct_key TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+
+  CREATE TABLE IF NOT EXISTS chat_participants (
+    conversation_id UUID NOT NULL REFERENCES chat_conversations(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    last_read_at TIMESTAMPTZ NOT NULL DEFAULT to_timestamp(0),
+    PRIMARY KEY (conversation_id, user_id)
+  );
+  CREATE INDEX IF NOT EXISTS chat_participants_user_idx ON chat_participants (user_id);
+
+  CREATE TABLE IF NOT EXISTS chat_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id UUID NOT NULL REFERENCES chat_conversations(id) ON DELETE CASCADE,
+    author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    body TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS chat_messages_conversation_idx ON chat_messages (conversation_id, created_at);
 `
 
 export const SEED_LEADERSHIP = { name: 'Руководство' }

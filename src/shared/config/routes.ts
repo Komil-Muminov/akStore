@@ -3,6 +3,7 @@ export enum AppRoutes {
   STRUCTURE = 'structure',
   USERS = 'users',
   REPORTS = 'reports',
+  CHAT = 'chat',
 }
 
 export const ApiRoutes = {
@@ -22,6 +23,11 @@ export const ApiRoutes = {
   USERS_RESET_PASSWORD: (id: string) => `/users/reset-password/${id}`,
   USERS_DELETE: (id: string) => `/users/delete/${id}`,
   HOSTS_SEARCH: '/hosts/search',
+  CHAT_SEARCH: '/chat/search',
+  CHAT_HISTORY: (id: string) => `/chat/history/${id}`,
+  CHAT_OPEN: '/chat/open',
+  CHAT_SEND: (id: string) => `/chat/send/${id}`,
+  CHAT_READ: (id: string) => `/chat/read/${id}`,
   REPORTS_SUMMARY: (query: string) => `/reports/summary?${query}`,
   REPORTS_PASSES: (query: string) => `/reports/passes?${query}`,
   REPORTS_EXPORT: (query: string) => `/reports/export?${query}`,

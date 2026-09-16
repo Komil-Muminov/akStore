@@ -6,6 +6,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 dotenv.config({ path: path.join(ROOT, '.env') })
 
 const DEFAULT_PORT = 3000
+const DEFAULT_WS_PORT = 3001
 const DEFAULT_DB_PORT = 5432
 const DEFAULT_SUPERADMIN_LOGIN = 'km'
 const DEFAULT_SUPERADMIN_PASSWORD = '123'
@@ -19,6 +20,7 @@ const required = (name: string): string => {
 
 export const config = {
   port: Number(process.env.PORT ?? DEFAULT_PORT),
+  wsPort: Number(process.env.WS_PORT ?? DEFAULT_WS_PORT),
   isProduction: process.env.NODE_ENV === 'production',
   jwtSecret: required('JWT_SECRET'),
   tokenTtl: process.env.TOKEN_TTL ?? DEFAULT_TOKEN_TTL,

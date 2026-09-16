@@ -1,0 +1,39 @@
+import { useCallback } from 'react'
+import { initialsOf } from '@/entities/pass'
+import { timeOf, unreadLabelOf, type IConversation } from '@/entities/message'
+import { If, Text } from '@/shared/ui'
+import { avatar, avatarText, badge, badgeText, name, preview, row, rowBody, rowTop } from '../style'
+
+interface IProps {
+  conversation: IConversation
+  active: boolean
+  onSelect: (conversationId: string) => void
+}
+
+export const ConversationRow = ({ conversation, active, onSelect }: IProps) => {
+  const handleClick = useCallback(() => onSelect(conversation.id), [conversation.id, onSelect])
+
+  return (
+    <div style={row(active)} onClick={handleClick} testId={`chat__dialog-${conversation.id}`}>
+      <div style={avatar(active)}>
+        <text style={avatarText(active)}>{initialsOf(conversation.companionName || conversation.companionLogin)}</text>
+      </div>
+      <div style={rowBody}>
+        <div style={rowTop}>
+          <text style={name}>{conversation.companionName || conversation.companionLogin}</text>
+          <If condition={conversation.lastMessageAt !== null}>
+            {() => <Text variant="caption">{timeOf(conversation.lastMessageAt as string)}</Text>}
+          </If>
+        </div>
+        <div style={rowTop}>
+          <text style={preview}>{conversation.lastMessage}</text>
+          <If condition={conversation.unreadCount > 0}>
+            <div style={badge}>
+              <text style={badgeText}>{unreadLabelOf(conversation.unreadCount)}</text>
+            </div>
+          </If>
+        </div>
+      </div>
+    </div>
+  )
+}

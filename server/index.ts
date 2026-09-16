@@ -3,6 +3,7 @@ import express from 'express'
 import { config } from './config'
 import { initDb } from './db'
 import { authMiddleware, errorMiddleware } from './middleware'
+import { startRealtime } from './realtime'
 import { apiRouter } from './routes'
 import { HttpError, HttpStatus } from './shared/utils'
 
@@ -18,6 +19,8 @@ app.use((req, _res, next) => {
 app.use(errorMiddleware)
 
 await initDb()
+
+startRealtime()
 
 app.listen(config.port, () => {
   console.log(`server: http://localhost:${config.port}`)

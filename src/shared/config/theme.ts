@@ -48,6 +48,11 @@ export const theme = {
     header: 64,
     sidebar: 240,
     contentMaxWidth: 720,
+    chatPanel: 312,
+    chatAvatar: 42,
+    chatRow: 72,
+    bubbleMaxWidth: '70%',
+    composerMinHeight: 56,
   },
   motion: { fast: 0.15, normal: 0.25 },
 } as const

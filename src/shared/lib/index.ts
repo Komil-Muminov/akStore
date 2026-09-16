@@ -1,4 +1,5 @@
 export { request } from './api'
 export { session, useSession } from './session'
+export { socketClient } from './socket'
 export { storage } from './storage'
 export { downloadFile, revealFile } from './download'

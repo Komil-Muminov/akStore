@@ -29,6 +29,9 @@ import iconChart from '../../../../assets/icons/chart-column-big.svg' with { typ
 import iconDownload from '../../../../assets/icons/download.svg' with { type: 'text' }
 import iconFolderOpen from '../../../../assets/icons/folder-open.svg' with { type: 'text' }
 import iconCalendar from '../../../../assets/icons/calendar-days.svg' with { type: 'text' }
+import iconMessage from '../../../../assets/icons/message-circle.svg' with { type: 'text' }
+import iconSend from '../../../../assets/icons/send.svg' with { type: 'text' }
+import iconInbox from '../../../../assets/icons/inbox.svg' with { type: 'text' }
 
 export const ICONS = {
   ban: iconBan,
@@ -62,6 +65,9 @@ export const ICONS = {
   download: iconDownload,
   folderOpen: iconFolderOpen,
   calendar: iconCalendar,
+  message: iconMessage,
+  send: iconSend,
+  inbox: iconInbox,
 } as const
 
 export type TIconName = keyof typeof ICONS
