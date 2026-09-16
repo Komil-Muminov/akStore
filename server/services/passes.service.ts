@@ -1,6 +1,6 @@
 import { passesDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { PassStatus, type IPass, type IPassInput, type IPagedResult, type IPassSearchParams } from '../types'
+import { PassStatus, type IPass, type IPassInput, type IPassSearchParams } from '../types'
 import { hostsService } from './hosts.service'
 
 const NOT_FOUND = 'Пропуск не найден'

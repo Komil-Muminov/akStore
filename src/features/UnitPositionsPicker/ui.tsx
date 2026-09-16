@@ -1,23 +1,24 @@
 import { useMemo } from 'react'
 import { POSITION_NAME_MIN_LENGTH } from '@/entities/position'
-import { Button, Checkbox, If, Modal, Text, TextInput } from '@/shared/ui'
+import { ROLE_LABELS, UserRole } from '@/entities/user'
+import { Button, Checkbox, If, Modal, Select, Text, TextInput, type ISelectOption } from '@/shared/ui'
 import { useUnitPositionsPicker } from './hooks'
 import {
   ADD_POSITION_LABEL,
   CANCEL_LABEL,
   DESCRIPTION,
   EMPLOYEE_LABEL,
+  EMPLOYEE_PLACEHOLDER,
   EMPTY,
   ESTIMATED_ITEM_HEIGHT,
   NEW_POSITION_PLACEHOLDER,
-  NO_EMPLOYEE,
   SEARCH_EMPTY,
   SEARCH_POSITION_PLACEHOLDER,
   SUBMIT_LABEL,
   TITLE,
   type IProps,
 } from './model'
-import { emptyWrap, footer, formRow, inputWrap, itemCard, itemLeft, itemWrapper, list, selectRow, selectStyle, spacer } from './style'
+import { emptyWrap, footer, formRow, inputWrap, itemCard, itemLeft, itemWrapper, list, selectRow, spacer } from './style'
 
 export const UnitPositionsPicker = ({
   unit,
@@ -36,8 +37,6 @@ export const UnitPositionsPicker = ({
     setNewPositionName,
     searchQuery,
     setSearchQuery,
-    hoveredId,
-    setHoveredId,
     filteredPositions,
     toggle,
     handleSelectUser,
@@ -45,7 +44,13 @@ export const UnitPositionsPicker = ({
     handleSubmit,
   } = useUnitPositionsPicker(unit, positions, onCreatePosition, onSubmit, pending)
 
-  const userMap = useMemo(() => new Map(users.map((u) => [u.id, u])), [users])
+  const userOptions = useMemo<ISelectOption[]>(
+    () =>
+      users
+        .filter((user) => user.role !== UserRole.SUPERADMIN && user.isActive)
+        .map((user) => ({ id: user.id, label: user.fullName || user.login, description: `${ROLE_LABELS[user.role]} · @${user.login}`, keywords: [user.login] })),
+    [users],
+  )
 
   return (
     <Modal
@@ -97,16 +102,8 @@ export const UnitPositionsPicker = ({
         <virtual-list estimatedItemHeight={ESTIMATED_ITEM_HEIGHT} style={list} testId="unit-positions__list">
           {filteredPositions.map((position) => {
             const isChecked = position.id in assignments
-            const isHovered = hoveredId === position.id
-            const assignedUser = assignments[position.id] ? userMap.get(assignments[position.id]!) : undefined
-            const assignedName = assignedUser?.fullName || assignedUser?.login || ''
             return (
-              <div
-                key={position.id}
-                style={itemWrapper}
-                onMouseEnter={() => setHoveredId(position.id)}
-                onMouseLeave={() => setHoveredId((cur) => (cur === position.id ? null : cur))}
-              >
+              <div key={position.id} style={itemWrapper}>
                 <div style={itemCard}>
                   <div style={itemLeft}>
                     <Checkbox
@@ -115,25 +112,18 @@ export const UnitPositionsPicker = ({
                       onToggle={() => toggle(position.id)}
                       testId={`unit-positions__item-${position.id}`}
                     />
-                    <If condition={assignedName.length > 0 && !isHovered}>
-                      <Text variant="caption">{`· ${assignedName}`}</Text>
-                    </If>
                   </div>
-                  <If condition={isChecked && isHovered}>
+                  <If condition={isChecked}>
                     <div style={selectRow}>
                       <Text variant="caption">{EMPLOYEE_LABEL}</Text>
-                      <select
-                        value={assignments[position.id] ?? ''}
-                        onChange={(e) => handleSelectUser(position.id, e.target.value || null)}
-                        style={selectStyle}
-                      >
-                        <option value="">{NO_EMPLOYEE}</option>
-                        {users.map((user) => (
-                          <option key={user.id} value={user.id}>
-                            {user.fullName || user.login}
-                          </option>
-                        ))}
-                      </select>
+                      <Select
+                        value={assignments[position.id] ?? null}
+                        options={userOptions}
+                        onChange={(userId) => handleSelectUser(position.id, userId)}
+                        placeholder={EMPLOYEE_PLACEHOLDER}
+                        icon="user"
+                        testId={`unit-positions__employee-${position.id}`}
+                      />
                     </div>
                   </If>
                 </div>

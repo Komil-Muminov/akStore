@@ -9,7 +9,6 @@ export const root: StyleDesc = {
   right: 0,
   bottom: 0,
   width: PANEL_WIDTH,
-  zIndex: 10,
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.lg,

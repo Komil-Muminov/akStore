@@ -1,5 +1,5 @@
-import type { EventPayload, StyleDesc } from '@gpuix/react'
-import { useCallback, useState } from 'react'
+import type { EventPayload, PublicInstance, StyleDesc } from '@gpuix/react'
+import { useCallback, useState, type Ref } from 'react'
 import { theme } from '@/shared/config'
 import { Icon } from '../Icon'
 import { IconButton } from '../IconButton'
@@ -16,7 +16,7 @@ interface IProps {
   tabIndex?: number
   testId?: string
   style?: StyleDesc
-  inputRef?: { current: { id: number } | null } | ((instance: { id: number } | null) => void)
+  inputRef?: Ref<PublicInstance>
 }
 
 export const PasswordInput = ({

@@ -26,9 +26,9 @@ if (isEntryPoint) {
       const isTab = event.key?.toLowerCase() === 'tab' || event.keyChar === '\t'
       if (isTab) {
         if (event.modifiers?.shift) {
-          renderer.focusPrevious()
+          renderer.focusPrevious?.()
         } else {
-          renderer.focusNext()
+          renderer.focusNext?.()
         }
       }
     },

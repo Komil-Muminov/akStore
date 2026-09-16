@@ -1,4 +1,4 @@
-import { useGpuix, type EventPayload } from '@gpuix/react'
+import { useGpuix, type EventPayload, type PublicInstance } from '@gpuix/react'
 import { useCallback, useRef, useState } from 'react'
 import { LOGIN_MIN_LENGTH, PASSWORD_MIN_LENGTH } from '@/entities/user'
 import { theme } from '@/shared/config'
@@ -18,9 +18,9 @@ import { brand, brandMark, card, field, formBody, message, root } from './style'
 
 export const LoginForm = ({ pending, error, onSubmit }: IProps) => {
   const { renderer } = useGpuix()
-  const loginRef = useRef<{ id: number } | null>(null)
-  const passwordRef = useRef<{ id: number } | null>(null)
-  const submitRef = useRef<{ id: number } | null>(null)
+  const loginRef = useRef<PublicInstance | null>(null)
+  const passwordRef = useRef<PublicInstance | null>(null)
+  const submitRef = useRef<PublicInstance | null>(null)
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [touched, setTouched] = useState(false)

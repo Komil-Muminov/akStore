@@ -1,5 +1,5 @@
 import { Button, Text } from '@/shared/ui'
-import { ADD_MANAGEMENT_LABEL, AUTO_LAYOUT_LABEL, DESCRIPTION, POSITIONS_LABEL, TITLE } from '../model'
+import { ADD_MANAGEMENT_LABEL, AUTO_LAYOUT_LABEL, DESCRIPTION, TITLE } from '../model'
 import { actions, header, headerText } from '../style'
 
 interface IProps {

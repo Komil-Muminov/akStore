@@ -1,5 +1,5 @@
 import { pool } from './pool'
-import type { IPagedResult, IUser, IUserRow, IUserSearchParams, UserRole } from '../types'
+import type { IUser, IUserRow, IUserSearchParams, UserRole } from '../types'
 
 const toUser = (row: IUserRow): IUser => ({
   id: row.id,
@@ -10,7 +10,6 @@ const toUser = (row: IUserRow): IUser => ({
   createdAt: row.created_at.toISOString(),
 })
 
-const SEARCH_SQL = 'SELECT * FROM users ORDER BY role, created_at'
 const FIND_BY_LOGIN_SQL = 'SELECT * FROM users WHERE login = $1'
 const FIND_SQL = 'SELECT * FROM users WHERE id = $1'
 const COUNT_ROLE_SQL = 'SELECT count(*)::text AS total FROM users WHERE role = $1 AND is_active = true'

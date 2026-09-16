@@ -1,6 +1,6 @@
 import { usersDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { ROLE_RANK, UserRole, type IAuthUser, type IPagedResult, type IUser, type IUserInput, type IUserSearchParams } from '../types'
+import { ROLE_RANK, UserRole, type IAuthUser, type IUserInput, type IUserSearchParams } from '../types'
 
 const NOT_FOUND = 'Пользователь не найден'
 const FORBIDDEN_ROLE = 'Недостаточно прав для этой роли'

@@ -1,6 +1,6 @@
 import { positionsDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
-import type { IPosition, IPositionInput } from '../types'
+import type { IPositionInput } from '../types'
 
 const NOT_FOUND = 'Должность не найдена'
 const IN_USE = 'Должность используется в структуре — сначала уберите её из подразделений'

@@ -42,10 +42,10 @@ export const emptyWrap: StyleDesc = {
 
 export const itemCard: StyleDesc = {
   display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  height: 44,
+  flexDirection: 'column',
+  gap: theme.spacing.xs,
+  paddingTop: theme.spacing.xs,
+  paddingBottom: theme.spacing.xs,
   paddingLeft: theme.spacing.md,
   paddingRight: theme.spacing.md,
   borderRadius: theme.radius.sm,
@@ -68,19 +68,8 @@ export const selectRow: StyleDesc = {
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.sm,
-  flexShrink: 0,
-}
-
-export const selectStyle: StyleDesc = {
-  fontFamily: theme.font.family,
-  fontSize: theme.font.size.xs,
-  color: theme.colors.text,
-  backgroundColor: theme.colors.overlay,
-  borderColor: theme.colors.borderStrong,
-  borderWidth: 1,
-  borderRadius: theme.radius.sm,
-  padding: theme.spacing.xs,
-  outline: 'none',
+  paddingLeft: theme.spacing.xl + theme.spacing.sm,
+  paddingBottom: theme.spacing.xs,
 }
 
 export const footer: StyleDesc = { display: 'flex', flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm }

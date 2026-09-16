@@ -1,5 +1,5 @@
 import { pool } from './pool'
-import { PassStatus, type IPass, type IPassInput, type IPassRow, type IPagedResult, type IPassSearchParams } from '../types'
+import { PassStatus, type IPass, type IPassInput, type IPassRow, type IPassSearchParams } from '../types'
 
 const toPass = (row: IPassRow): IPass => ({
   id: row.id,

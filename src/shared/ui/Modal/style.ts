@@ -10,7 +10,6 @@ export const backdrop: StyleDesc = {
   left: 0,
   right: 0,
   bottom: 0,
-  zIndex: 100,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

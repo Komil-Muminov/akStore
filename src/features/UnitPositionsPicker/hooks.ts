@@ -13,7 +13,6 @@ export const useUnitPositionsPicker = (
   const [assignments, setAssignments] = useState<Record<string, string | null>>({})
   const [newPositionName, setNewPositionName] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
   const open = unit !== null
 
   useEffect(() => {
@@ -81,8 +80,6 @@ export const useUnitPositionsPicker = (
     setNewPositionName,
     searchQuery,
     setSearchQuery,
-    hoveredId,
-    setHoveredId,
     filteredPositions,
     toggle,
     handleSelectUser,
