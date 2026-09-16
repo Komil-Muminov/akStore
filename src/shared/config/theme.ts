@@ -22,6 +22,7 @@ export const theme = {
     infoSoft: '#38BDF826',
     danger: '#F87171',
     dangerSoft: '#F8717126',
+    dangerSoftHover: '#F8717140',
     success: '#22C55E',
     muted: '#64748B',
     mutedSoft: '#64748B33',

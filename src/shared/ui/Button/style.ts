@@ -12,7 +12,7 @@ const VARIANTS: Record<TButtonVariant, { background: string; hover: string; colo
     color: theme.colors.text,
     border: theme.colors.borderStrong,
   },
-  danger: { background: theme.colors.dangerSoft, hover: theme.colors.danger, color: theme.colors.danger },
+  danger: { background: theme.colors.dangerSoft, hover: theme.colors.dangerSoftHover, color: theme.colors.danger },
 }
 
 export const root = (variant: TButtonVariant, disabled: boolean, fullWidth: boolean): StyleDesc => ({
