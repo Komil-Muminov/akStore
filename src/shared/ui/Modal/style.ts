@@ -27,6 +27,7 @@ export const card: StyleDesc = {
   borderWidth: 1,
   borderColor: theme.colors.borderStrong,
   backgroundColor: theme.colors.sidebar,
+  overflow: 'hidden',
   boxShadow: { offsetX: 0, offsetY: 16, blurRadius: 48, spreadRadius: 0, color: '#00000099' },
 }
 

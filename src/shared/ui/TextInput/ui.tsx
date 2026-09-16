@@ -1,3 +1,4 @@
+import type { StyleDesc } from '@gpuix/react'
 import { theme } from '@/shared/config'
 import { Icon, type TIconName } from '../Icon'
 import { If } from '../If'
@@ -11,10 +12,11 @@ interface IProps {
   icon?: TIconName
   autoFocus?: boolean
   testId?: string
+  style?: StyleDesc
 }
 
-export const TextInput = ({ value, onChange, onSubmit, placeholder, icon, autoFocus, testId }: IProps) => (
-  <div style={root}>
+export const TextInput = ({ value, onChange, onSubmit, placeholder, icon, autoFocus, testId, style: customStyle }: IProps) => (
+  <div style={customStyle ? { ...root, ...customStyle } : root}>
     <If condition={icon !== undefined}>
       <Icon name={icon ?? 'search'} size={theme.size.iconMd} color={theme.colors.tertiary} />
     </If>

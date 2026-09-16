@@ -4,8 +4,25 @@ import { theme } from '@/shared/config'
 const LIST_MAX_HEIGHT = 280
 const RANK_WIDTH = 96
 
-export const form: StyleDesc = { display: 'flex', flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm }
-export const rank: StyleDesc = { width: RANK_WIDTH, flexShrink: 0, display: 'flex' }
+export const form: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+  width: '100%',
+}
+
+export const nameWrap: StyleDesc = {
+  flexGrow: 1,
+  minWidth: 0,
+  display: 'flex',
+}
+
+export const rankWrap: StyleDesc = {
+  width: RANK_WIDTH,
+  flexShrink: 0,
+  display: 'flex',
+}
 
 export const list: StyleDesc = {
   display: 'flex',

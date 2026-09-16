@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { POSITION_DEFAULT_RANK, POSITION_NAME_MIN_LENGTH } from '@/entities/position'
 import { Button, If, Modal, Text, TextInput } from '@/shared/ui'
 import { ADD_LABEL, CLOSE_LABEL, DESCRIPTION, EMPTY, NAME_PLACEHOLDER, RANK_PLACEHOLDER, TITLE, type IProps } from './model'
-import { footer, form, list, rank, spacer } from './style'
+import { footer, form, list, nameWrap, rankWrap, spacer } from './style'
 import { PositionRow } from './ui/PositionRow'
 
 export const PositionsManager = ({ open, positions, pending, error, onCreate, onDelete, onClose }: IProps) => {
@@ -21,8 +21,10 @@ export const PositionsManager = ({ open, positions, pending, error, onCreate, on
   return (
     <Modal open={open} title={TITLE} description={DESCRIPTION} icon="briefcase" onClose={onClose} testId="positions">
       <div style={form}>
-        <TextInput value={name} onChange={setName} onSubmit={handleCreate} placeholder={NAME_PLACEHOLDER} icon="briefcase" testId="positions__name" />
-        <div style={rank}>
+        <div style={nameWrap}>
+          <TextInput value={name} onChange={setName} onSubmit={handleCreate} placeholder={NAME_PLACEHOLDER} icon="briefcase" testId="positions__name" />
+        </div>
+        <div style={rankWrap}>
           <TextInput value={rankText} onChange={setRankText} onSubmit={handleCreate} placeholder={RANK_PLACEHOLDER} testId="positions__rank" />
         </div>
         <Button label={ADD_LABEL} icon="plus" onClick={handleCreate} disabled={disabled} testId="positions__add" />
