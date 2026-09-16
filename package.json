@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n server,app -c blue,magenta \"bun run server:dev\" \"bun run app:dev\"",
+    "dev": "bun dev.ts",
     "app:dev": "bun --hot app.tsx",
     "server:dev": "bun --watch server/index.ts",
     "build": "bun build --compile app.tsx --outfile dist/gatePass",
@@ -29,7 +29,6 @@
     "@types/express": "^5.0.6",
     "@types/pg": "^8.23.1",
     "@types/react": "^19.2.0",
-    "concurrently": "^10.0.5",
     "typescript": "^5.3.0",
     "vitest": "^4.0.18"
   }
