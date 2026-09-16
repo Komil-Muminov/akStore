@@ -22,12 +22,22 @@ export const useCanvasInteraction = (units: IUnit[], handlers: IHandlers) => {
   const [drag, setDrag] = useState<IDragState | null>(null)
   const dragRef = useRef<IDragState | null>(null)
   const panRef = useRef<{ start: IPoint; pan: IPoint } | null>(null)
+  const isMiniMapActiveRef = useRef(false)
   const viewportRef = useRef(viewport)
   viewportRef.current = viewport
 
   const updateDrag = useCallback((next: IDragState | null) => {
     dragRef.current = next
     setDrag(next)
+  }, [])
+
+  const startMiniMapDrag = useCallback(() => {
+    isMiniMapActiveRef.current = true
+    panRef.current = null
+  }, [])
+
+  const stopMiniMapDrag = useCallback(() => {
+    isMiniMapActiveRef.current = false
   }, [])
 
   const grabNode = useCallback(
@@ -40,7 +50,7 @@ export const useCanvasInteraction = (units: IUnit[], handlers: IHandlers) => {
 
   const handleMouseDown = useCallback(
     (event: EventPayload) => {
-      if (dragRef.current) return
+      if (dragRef.current || isMiniMapActiveRef.current) return
       panRef.current = { start: pointOf(event), pan: viewportRef.current.pan }
       handlers.onSelect(null)
     },
@@ -49,6 +59,7 @@ export const useCanvasInteraction = (units: IUnit[], handlers: IHandlers) => {
 
   const handleMouseMove = useCallback(
     (event: EventPayload) => {
+      if (isMiniMapActiveRef.current) return
       const point = pointOf(event)
       if (panRef.current) {
         const { start, pan } = panRef.current
@@ -101,5 +112,18 @@ export const useCanvasInteraction = (units: IUnit[], handlers: IHandlers) => {
     panRef.current = null
   }, [])
 
-  return { viewport, drag, grabNode, handleMouseDown, handleMouseMove, handleMouseUp, handleScroll, resetView, centerOn, cancelPan }
+  return {
+    viewport,
+    drag,
+    grabNode,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleScroll,
+    resetView,
+    centerOn,
+    cancelPan,
+    startMiniMapDrag,
+    stopMiniMapDrag,
+  }
 }

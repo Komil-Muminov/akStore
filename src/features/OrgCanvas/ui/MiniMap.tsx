@@ -16,13 +16,16 @@ interface IProps {
   viewport: IViewport
   canvas: ElementBounds
   onCenter: (world: IPoint) => void
-  onCancelPan: () => void
+  onStartDrag: () => void
+  onStopDrag: () => void
   onRegisterListeners?: (listeners: IMiniMapListeners) => void
 }
 
-export const MiniMap = memo(({ units, viewport, canvas, onCenter, onCancelPan, onRegisterListeners }: IProps) => {
+export const MiniMap = memo(({ units, viewport, canvas, onCenter, onStartDrag, onStopDrag, onRegisterListeners }: IProps) => {
   const [ref, , measure] = useElementBounds()
   const dragOffsetRef = useRef<IPoint | null>(null)
+  const activeBoundsRef = useRef<ElementBounds | null>(null)
+
   const model = useMemo(
     () => buildMiniMap(units, viewport, canvas, { x: 0, y: 0, width: MINI_MAP.width, height: MINI_MAP.height }),
     [units, viewport, canvas],
@@ -30,7 +33,7 @@ export const MiniMap = memo(({ units, viewport, canvas, onCenter, onCancelPan, o
 
   const updateCenterFromMouse = useCallback(
     (event: EventPayload) => {
-      const bounds = measure()
+      const bounds = activeBoundsRef.current ?? measure()
       if (bounds.width === 0) return
       const rawLocal = { x: (event.x ?? 0) - bounds.x, y: (event.y ?? 0) - bounds.y }
       const offset = dragOffsetRef.current ?? { x: 0, y: 0 }
@@ -45,9 +48,11 @@ export const MiniMap = memo(({ units, viewport, canvas, onCenter, onCancelPan, o
 
   const handleMouseDown = useCallback(
     (event: EventPayload) => {
-      onCancelPan()
+      onStartDrag()
       const bounds = measure()
       if (bounds.width === 0) return
+      activeBoundsRef.current = bounds
+
       const rawLocal = { x: (event.x ?? 0) - bounds.x, y: (event.y ?? 0) - bounds.y }
       const viewCenter = {
         x: model.view.x + model.view.width / 2,
@@ -65,7 +70,7 @@ export const MiniMap = memo(({ units, viewport, canvas, onCenter, onCancelPan, o
 
       updateCenterFromMouse(event)
     },
-    [measure, model, onCancelPan, updateCenterFromMouse],
+    [measure, model, onStartDrag, updateCenterFromMouse],
   )
 
   const handleMouseMove = useCallback(
@@ -75,9 +80,15 @@ export const MiniMap = memo(({ units, viewport, canvas, onCenter, onCancelPan, o
     [updateCenterFromMouse],
   )
 
-  const handleMouseUp = useCallback(() => {
+  const stopDragInternal = useCallback(() => {
     dragOffsetRef.current = null
-  }, [])
+    activeBoundsRef.current = null
+    onStopDrag()
+  }, [onStopDrag])
+
+  const handleMouseUp = useCallback(() => {
+    stopDragInternal()
+  }, [stopDragInternal])
 
   useEffect(() => {
     onRegisterListeners?.({
@@ -85,10 +96,10 @@ export const MiniMap = memo(({ units, viewport, canvas, onCenter, onCancelPan, o
         if (dragOffsetRef.current !== null) updateCenterFromMouse(event)
       },
       onUp: () => {
-        dragOffsetRef.current = null
+        stopDragInternal()
       },
     })
-  }, [onRegisterListeners, updateCenterFromMouse])
+  }, [onRegisterListeners, stopDragInternal, updateCenterFromMouse])
 
   return (
     <div

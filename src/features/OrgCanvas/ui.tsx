@@ -18,8 +18,18 @@ interface IMiniMapListeners {
 
 export const OrgCanvas = ({ units, positions, selectedId, onSelect, onMoveNode, onAttach }: IProps) => {
   const handlers = useMemo(() => ({ onSelect, onMoveNode, onAttach }), [onSelect, onMoveNode, onAttach])
-  const { viewport, drag, grabNode, handleMouseDown, handleMouseMove, handleMouseUp, handleScroll, centerOn, cancelPan } =
-    useCanvasInteraction(units, handlers)
+  const {
+    viewport,
+    drag,
+    grabNode,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleScroll,
+    centerOn,
+    startMiniMapDrag,
+    stopMiniMapDrag,
+  } = useCanvasInteraction(units, handlers)
   const [canvasRef, canvasBounds, measureCanvas] = useElementBounds()
   const [miniMapListeners, setMiniMapListeners] = useState<IMiniMapListeners | null>(null)
 
@@ -83,7 +93,8 @@ export const OrgCanvas = ({ units, positions, selectedId, onSelect, onMoveNode, 
         viewport={viewport}
         canvas={canvasBounds}
         onCenter={handleCenter}
-        onCancelPan={cancelPan}
+        onStartDrag={startMiniMapDrag}
+        onStopDrag={stopMiniMapDrag}
         onRegisterListeners={setMiniMapListeners}
       />
     </div>
