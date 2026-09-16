@@ -10,6 +10,8 @@ export interface IProps {
   hasMore: boolean
   onLoadOlder: () => void
   onLeave: () => void
+  onEditMessage: (message: IMessage) => void
+  onRemoveMessage: (message: IMessage) => void
 }
 
 export const ESTIMATED_MESSAGE_HEIGHT = 64

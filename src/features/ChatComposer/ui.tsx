@@ -1,13 +1,40 @@
 import { theme } from '@/shared/config'
-import { Icon, If, Text, TextInput, Tooltip } from '@/shared/ui'
-import { PLACEHOLDER, SEND_TOOLTIP, type IProps } from './model'
-import { error as errorStyle, field, root, sendButton } from './style'
+import { Icon, IconButton, If, Text, TextInput, Tooltip } from '@/shared/ui'
+import {
+  CANCEL_TOOLTIP,
+  EDIT_HINT,
+  PLACEHOLDER,
+  SAVE_TOOLTIP,
+  SEND_TOOLTIP,
+  type IProps,
+} from './model'
+import { editBanner, editText, error as errorStyle, field, root, sendButton } from './style'
 
-export const ChatComposer = ({ value, disabled, pending, error, onChange, onSend }: IProps) => {
+export const ChatComposer = ({
+  value,
+  disabled,
+  pending,
+  editing,
+  error,
+  onChange,
+  onSend,
+  onCancelEdit,
+}: IProps) => {
   const ready = !disabled && !pending && value.trim().length > 0
 
   return (
     <>
+      <If condition={editing}>
+        <div style={editBanner} testId="chat__edit-banner">
+          <Icon name="pencil" size={theme.size.iconSm} color={theme.colors.info} />
+          <div style={editText}>
+            <Text variant="secondary">{EDIT_HINT}</Text>
+          </div>
+          <Tooltip title={CANCEL_TOOLTIP}>
+            <IconButton icon="x" onClick={onCancelEdit} testId="chat__cancel-edit" />
+          </Tooltip>
+        </div>
+      </If>
       <If condition={error !== undefined}>
         <div style={errorStyle}>
           <Text variant="danger">{error ?? ''}</Text>
@@ -22,10 +49,10 @@ export const ChatComposer = ({ value, disabled, pending, error, onChange, onSend
           style={field}
           testId="chat__input"
         />
-        <Tooltip title={SEND_TOOLTIP}>
+        <Tooltip title={editing ? SAVE_TOOLTIP : SEND_TOOLTIP}>
           <div style={sendButton(ready)} onClick={ready ? onSend : undefined} testId="chat__send">
             <Icon
-              name="send"
+              name={editing ? 'check' : 'send'}
               size={theme.size.iconMd}
               color={ready ? theme.colors.onAccent : theme.colors.ghost}
             />

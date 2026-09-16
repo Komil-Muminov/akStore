@@ -77,6 +77,8 @@ export const SCHEMA = `
   ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS title TEXT NOT NULL DEFAULT '';
   ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
   ALTER TABLE chat_conversations ALTER COLUMN direct_key DROP NOT NULL;
+  ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS edited_at TIMESTAMPTZ;
+  ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
 `
 
 export const SEED_LEADERSHIP = { name: 'Руководство' }

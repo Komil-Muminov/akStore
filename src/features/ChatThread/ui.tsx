@@ -26,6 +26,8 @@ export const ChatThread = ({
   hasMore,
   onLoadOlder,
   onLeave,
+  onEditMessage,
+  onRemoveMessage,
 }: IProps) => (
   <div style={root} testId="chat__thread">
     <If
@@ -74,6 +76,8 @@ export const ChatThread = ({
                         showStatus={
                           message.authorId === currentUserId && !isGroup(conversation as IConversation)
                         }
+                        onEdit={onEditMessage}
+                        onRemove={onRemoveMessage}
                       />
                     </Fragment>
                   ))}

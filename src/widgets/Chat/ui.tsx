@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ChatComposer } from '@/features/ChatComposer'
-import { ChatGroupForm, type IGroupSubmit } from '@/features/ChatGroupForm'
 import { ChatSidebar } from '@/features/ChatSidebar'
 import { ChatThread } from '@/features/ChatThread'
 import { If, Spinner } from '@/shared/ui'
-import { socketClient, useSession } from '@/shared/lib'
+import { useSession } from '@/shared/lib'
 import { isGroup } from '@/entities/message'
 import {
   useChatMutations,
@@ -16,24 +15,27 @@ import {
 } from './hooks'
 import { useHistoryPages } from './history'
 import { useChatRealtime } from './realtime'
+import { useMessageActions } from './actions'
+import { useChatControls } from './controls'
+import { ChatDialogs } from './ui/ChatDialogs'
 import { filterCompanions } from './lib'
 import { pane, root } from './style'
 import { ErrorState } from './ui/ErrorState'
 
 export const Chat = () => {
   const currentUserId = useSession()?.user.id ?? ''
-  const [query, setQuery] = useState('')
-  const [activeId, setActiveId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
-  const [groupOpen, setGroupOpen] = useState(false)
   const conversations = useConversationsQuery()
   const companions = useCompanionsQuery()
-  const history = useHistoryPages(activeId)
-  const hits = useMessageSearchQuery(query)
   const { open, send, read, createGroup, leave } = useChatMutations()
+  const actions = useMessageActions(setDraft)
+  const controls = useChatControls({ open, createGroup, leave, setDraft, cancelEdit: actions.cancelEdit })
+  const { activeId, query } = controls
   const onlineQuery = useOnlineQuery()
   const { online, setOnline, typingName } = useChatRealtime(activeId)
 
+  const history = useHistoryPages(activeId)
+  const hits = useMessageSearchQuery(query)
   const items = useMemo(() => conversations.data ?? [], [conversations.data])
   const active = useMemo(() => items.find((item) => item.id === activeId) ?? null, [items, activeId])
   const members = useMembersQuery(activeId, active !== null && isGroup(active))
@@ -59,65 +61,18 @@ export const Chat = () => {
   const refetch = conversations.refetch
   const handleRetry = useCallback(() => void refetch(), [refetch])
 
-  const handleSelect = useCallback((conversationId: string) => {
-    setActiveId(conversationId)
-    setDraft('')
-  }, [])
-
-  const openMutate = open.mutate
-  const handleOpenCompanion = useCallback(
-    (companionId: string) => {
-      openMutate(
-        { companionId },
-        {
-          onSuccess: (conversation) => {
-            setActiveId(conversation.id)
-            setQuery('')
-            setDraft('')
-          },
-        },
-      )
-    },
-    [openMutate],
-  )
-
-  const createGroupMutate = createGroup.mutate
-  const handleCreateGroup = useCallback(
-    (values: IGroupSubmit) => {
-      createGroupMutate(values, {
-        onSuccess: (conversation) => {
-          setActiveId(conversation.id)
-          setGroupOpen(false)
-          setQuery('')
-          setDraft('')
-        },
-      })
-    },
-    [createGroupMutate],
-  )
-
-  const leaveMutate = leave.mutate
-  const handleLeave = useCallback(() => {
-    if (activeId === null) return
-    leaveMutate(activeId, { onSuccess: () => setActiveId(null) })
-  }, [activeId, leaveMutate])
-
-  const openGroupForm = useCallback(() => setGroupOpen(true), [])
-  const closeGroupForm = useCallback(() => setGroupOpen(false), [])
-
   const sendMutate = send.mutate
-  const handleDraftChange = useCallback(
-    (value: string) => {
-      setDraft(value)
-      if (activeId !== null && value.length > 0) socketClient.notifyTyping(activeId)
-    },
-    [activeId],
-  )
-
+  const submitEdit = actions.submitEdit
+  const isEditing = actions.editing !== null
   const handleSend = useCallback(() => {
     if (activeId === null) return
-    sendMutate({ conversationId: activeId, body: draft.trim() }, { onSuccess: () => setDraft('') })
-  }, [activeId, draft, sendMutate])
+    const body = draft.trim()
+    if (isEditing) {
+      submitEdit(body)
+      return
+    }
+    sendMutate({ conversationId: activeId, body }, { onSuccess: () => setDraft('') })
+  }, [activeId, draft, isEditing, sendMutate, submitEdit])
 
   return (
     <div style={root} testId="chat__layout">
@@ -126,12 +81,12 @@ export const Chat = () => {
         companions={found}
         query={query}
         activeId={activeId}
-        onQueryChange={setQuery}
-        onSelect={handleSelect}
-        onOpenCompanion={handleOpenCompanion}
+        onQueryChange={controls.setQuery}
+        onSelect={controls.select}
+        onOpenCompanion={controls.openCompanion}
         online={online}
         hits={hits.data ?? []}
-        onCreateGroup={openGroupForm}
+        onCreateGroup={controls.openGroupForm}
       />
       <div style={pane}>
         <If condition={conversations.isPending} fallback={
@@ -148,16 +103,20 @@ export const Chat = () => {
                   hasMore={history.hasMore}
                   onLoadOlder={history.loadOlder}
                   typingName={typingName}
-                  onLeave={handleLeave}
+                  onLeave={controls.leaveGroup}
+                  onEditMessage={actions.startEdit}
+                  onRemoveMessage={actions.askRemove}
                 />
                 <If condition={active !== null}>
                   <ChatComposer
                     value={draft}
                     disabled={activeId === null}
-                    pending={send.isPending}
-                    error={send.error?.message}
-                    onChange={handleDraftChange}
+                    pending={send.isPending || actions.pending}
+                    editing={isEditing}
+                    error={send.error?.message ?? actions.error}
+                    onChange={controls.changeDraft}
                     onSend={handleSend}
+                    onCancelEdit={actions.cancelEdit}
                   />
                 </If>
               </>
@@ -169,13 +128,17 @@ export const Chat = () => {
           <Spinner />
         </If>
       </div>
-      <ChatGroupForm
-        open={groupOpen}
-        companions={colleagues}
-        pending={createGroup.isPending}
-        error={createGroup.error?.message}
-        onSubmit={handleCreateGroup}
-        onClose={closeGroupForm}
+      <ChatDialogs
+        groupOpen={controls.groupOpen}
+        colleagues={colleagues}
+        groupPending={createGroup.isPending}
+        groupError={createGroup.error?.message}
+        removing={actions.removing}
+        removePending={actions.pending}
+        onCreateGroup={controls.submitGroup}
+        onCloseGroup={controls.closeGroupForm}
+        onConfirmRemove={actions.confirmRemove}
+        onCancelRemove={actions.cancelRemove}
       />
     </div>
   )

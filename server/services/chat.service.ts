@@ -15,6 +15,8 @@ const COMPANION_MISSING = 'Сотрудник не найден'
 const NOT_A_MEMBER = 'Диалог недоступен'
 const GROUP_TOO_SMALL = 'В группе нужно минимум два участника'
 const GROUP_ONLY = 'Действие доступно только в группах'
+const MESSAGE_MISSING = 'Сообщение не найдено'
+const NOT_AUTHOR = 'Можно менять только свои сообщения'
 
 const directKeyOf = (first: string, second: string) => [first, second].sort().join(KEY_SEPARATOR)
 
@@ -107,6 +109,28 @@ export const chatService = {
     await chatDb.markRead(conversationId, userId)
     hub.publish(members, ChatEventType.MESSAGE, message)
     return message
+  },
+
+  editMessage: async (userId: string, messageId: string, body: string) => {
+    const existing = await chatMessagesDb.find(messageId)
+    if (!existing || existing.isDeleted) throw new HttpError(HttpStatus.NOT_FOUND, MESSAGE_MISSING)
+    if (existing.authorId !== userId) throw new HttpError(HttpStatus.FORBIDDEN, NOT_AUTHOR)
+    const members = await requireMembership(existing.conversationId, userId)
+    const updated = await chatMessagesDb.update(messageId, body)
+    if (!updated) throw new HttpError(HttpStatus.NOT_FOUND, MESSAGE_MISSING)
+    hub.publish(members, ChatEventType.MESSAGE_UPDATED, updated)
+    return updated
+  },
+
+  removeMessage: async (userId: string, messageId: string) => {
+    const existing = await chatMessagesDb.find(messageId)
+    if (!existing || existing.isDeleted) throw new HttpError(HttpStatus.NOT_FOUND, MESSAGE_MISSING)
+    if (existing.authorId !== userId) throw new HttpError(HttpStatus.FORBIDDEN, NOT_AUTHOR)
+    const members = await requireMembership(existing.conversationId, userId)
+    const removed = await chatMessagesDb.softDelete(messageId)
+    if (!removed) throw new HttpError(HttpStatus.NOT_FOUND, MESSAGE_MISSING)
+    hub.publish(members, ChatEventType.MESSAGE_REMOVED, removed)
+    return removed
   },
 
   markRead: async (userId: string, conversationId: string) => {

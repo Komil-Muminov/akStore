@@ -38,15 +38,10 @@ export const useHistoryPages = (conversationId: string | null) => {
     if (oldest) setBefore(oldest.createdAt)
   }, [messages])
 
-  const drop = useCallback((messageId: string) => {
-    setMessages((current) => current.filter((message) => message.id !== messageId))
-  }, [])
-
   return {
     messages,
     hasMore: loaded?.hasMore ?? false,
     loading: page.isPending && messages.length === 0,
     loadOlder,
-    drop,
   }
 }

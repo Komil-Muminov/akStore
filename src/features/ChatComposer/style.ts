@@ -38,3 +38,19 @@ export const error: StyleDesc = {
   paddingBottom: theme.spacing.sm,
   backgroundColor: theme.colors.sidebar,
 }
+
+export const editBanner: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
+  paddingTop: theme.spacing.sm,
+  paddingBottom: theme.spacing.sm,
+  borderTopWidth: 1,
+  borderColor: theme.colors.border,
+  backgroundColor: theme.colors.infoSoft,
+}
+
+export const editText: StyleDesc = { flexGrow: 1, minWidth: 0 }

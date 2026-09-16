@@ -36,5 +36,11 @@ chatRouter.post('/send/:id', anyRole, respond(
   (req) => chatService.send(actorOf(req), idOf(req), parseMessageBody(req.body)),
   HttpStatus.CREATED,
 ))
+chatRouter.patch('/edit-message/:id', anyRole, respond(
+  (req) => chatService.editMessage(actorOf(req), idOf(req), parseMessageBody(req.body)),
+))
+chatRouter.delete('/delete-message/:id', anyRole, respond((req) =>
+  chatService.removeMessage(actorOf(req), idOf(req)),
+))
 chatRouter.patch('/leave/:id', anyRole, respond((req) => chatService.leave(actorOf(req), idOf(req))))
 chatRouter.patch('/read/:id', anyRole, respond((req) => chatService.markRead(actorOf(req), idOf(req))))

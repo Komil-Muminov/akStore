@@ -180,3 +180,18 @@ export const loadOlderRow: StyleDesc = {
   paddingTop: theme.spacing.sm,
   paddingBottom: theme.spacing.md,
 }
+
+export const bubbleActions: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.xxs,
+  paddingLeft: theme.spacing.xs,
+}
+
+export const deletedBody: StyleDesc = {
+  fontFamily: theme.font.family,
+  fontSize: theme.font.size.md,
+  lineHeight: theme.font.lineHeight.md,
+  color: theme.colors.ghost,
+}

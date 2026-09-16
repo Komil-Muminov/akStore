@@ -40,6 +40,8 @@ export interface IMessage {
   authorName: string
   body: string
   createdAt: string
+  editedAt: string | null
+  isDeleted: boolean
 }
 
 export interface IMessageRow {
@@ -49,6 +51,8 @@ export interface IMessageRow {
   author_name: string
   body: string
   created_at: Date
+  edited_at: Date | null
+  deleted_at: Date | null
 }
 
 export interface IMember {

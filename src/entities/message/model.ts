@@ -25,6 +25,8 @@ export interface IMessage {
   authorName: string
   body: string
   createdAt: string
+  editedAt: string | null
+  isDeleted: boolean
 }
 
 export interface IMember {
@@ -39,4 +41,6 @@ export const DIRECT_HINT = 'Личная переписка'
 export const ONLINE_HINT = 'В сети'
 export const OFFLINE_HINT = 'Не в сети'
 export const TYPING_HINT = 'печатает…'
+export const EDITED_MARK = 'изменено'
+export const DELETED_BODY = 'Сообщение удалено'
 export const MEMBERS_FORMS = ['участник', 'участника', 'участников']
