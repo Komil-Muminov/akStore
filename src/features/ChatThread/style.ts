@@ -172,3 +172,11 @@ export const typingText: StyleDesc = {
   fontWeight: theme.font.weight.medium,
   color: theme.colors.info,
 }
+
+export const loadOlderRow: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  paddingTop: theme.spacing.sm,
+  paddingBottom: theme.spacing.md,
+}

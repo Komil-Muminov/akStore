@@ -4,7 +4,10 @@ import { ChatEventType } from '../realtime/model'
 import { HttpError, HttpStatus } from '../shared/utils'
 import { ConversationKind } from '../types'
 
-const HISTORY_LIMIT = 200
+const HISTORY_LIMIT = 50
+const SEARCH_LIMIT = 40
+const SEARCH_MIN = 2
+const SEARCH_ERROR = `Запрос должен быть не короче ${SEARCH_MIN} символов`
 const KEY_SEPARATOR = ':'
 const GROUP_MIN_MEMBERS = 2
 const SELF_CHAT_ERROR = 'Нельзя начать диалог с самим собой'
@@ -83,10 +86,19 @@ export const chatService = {
     return { ok: true as const }
   },
 
-  history: async (userId: string, conversationId: string) => {
+  history: async (userId: string, conversationId: string, before: string | null) => {
     await requireMembership(conversationId, userId)
-    await chatDb.markRead(conversationId, userId)
-    return chatMessagesDb.history(conversationId, HISTORY_LIMIT)
+    if (before === null) await chatDb.markRead(conversationId, userId)
+    const items = await chatMessagesDb.history(conversationId, HISTORY_LIMIT, before)
+    const oldest = items[0]?.createdAt ?? null
+    const hasMore = oldest === null ? false : (await chatMessagesDb.countOlder(conversationId, oldest)) > 0
+    return { items, hasMore }
+  },
+
+  searchMessages: async (userId: string, query: string) => {
+    const needle = query.trim()
+    if (needle.length < SEARCH_MIN) throw new HttpError(HttpStatus.BAD_REQUEST, SEARCH_ERROR)
+    return chatMessagesDb.search(userId, `%${needle}%`, SEARCH_LIMIT)
   },
 
   send: async (userId: string, conversationId: string, body: string) => {

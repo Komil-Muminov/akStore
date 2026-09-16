@@ -24,7 +24,8 @@ export const ApiRoutes = {
   USERS_DELETE: (id: string) => `/users/delete/${id}`,
   HOSTS_SEARCH: '/hosts/search',
   CHAT_SEARCH: '/chat/search',
-  CHAT_HISTORY: (id: string) => `/chat/history/${id}`,
+  CHAT_HISTORY: (id: string, before?: string | null) =>
+    before ? `/chat/history/${id}?before=${encodeURIComponent(before)}` : `/chat/history/${id}`,
   CHAT_OPEN: '/chat/open',
   CHAT_SEND: (id: string) => `/chat/send/${id}`,
   CHAT_READ: (id: string) => `/chat/read/${id}`,
@@ -34,6 +35,7 @@ export const ApiRoutes = {
   CHAT_LEAVE: (id: string) => `/chat/leave/${id}`,
   CHAT_UNREAD: '/chat/unread-count',
   CHAT_ONLINE: '/chat/online',
+  CHAT_SEARCH_MESSAGES: (query: string) => `/chat/search-messages?q=${encodeURIComponent(query)}`,
   REPORTS_SUMMARY: (query: string) => `/reports/summary?${query}`,
   REPORTS_PASSES: (query: string) => `/reports/passes?${query}`,
   REPORTS_EXPORT: (query: string) => `/reports/export?${query}`,

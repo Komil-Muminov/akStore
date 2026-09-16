@@ -10,10 +10,11 @@ import {
   useChatMutations,
   useCompanionsQuery,
   useConversationsQuery,
-  useHistoryQuery,
   useMembersQuery,
+  useMessageSearchQuery,
   useOnlineQuery,
 } from './hooks'
+import { useHistoryPages } from './history'
 import { useChatRealtime } from './realtime'
 import { filterCompanions } from './lib'
 import { pane, root } from './style'
@@ -27,7 +28,8 @@ export const Chat = () => {
   const [groupOpen, setGroupOpen] = useState(false)
   const conversations = useConversationsQuery()
   const companions = useCompanionsQuery()
-  const history = useHistoryQuery(activeId)
+  const history = useHistoryPages(activeId)
+  const hits = useMessageSearchQuery(query)
   const { open, send, read, createGroup, leave } = useChatMutations()
   const onlineQuery = useOnlineQuery()
   const { online, setOnline, typingName } = useChatRealtime(activeId)
@@ -128,6 +130,7 @@ export const Chat = () => {
         onSelect={handleSelect}
         onOpenCompanion={handleOpenCompanion}
         online={online}
+        hits={hits.data ?? []}
         onCreateGroup={openGroupForm}
       />
       <div style={pane}>
@@ -138,10 +141,12 @@ export const Chat = () => {
               <>
                 <ChatThread
                   conversation={active}
-                  messages={history.data ?? []}
+                  messages={history.messages}
                   members={members.data ?? []}
                   currentUserId={currentUserId}
-                  loading={history.isPending && activeId !== null}
+                  loading={history.loading && activeId !== null}
+                  hasMore={history.hasMore}
+                  onLoadOlder={history.loadOlder}
                   typingName={typingName}
                   onLeave={handleLeave}
                 />

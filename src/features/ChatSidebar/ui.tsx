@@ -2,6 +2,7 @@ import { IconButton, If, Text, TextInput, Tooltip } from '@/shared/ui'
 import {
   COMPANIONS_SECTION,
   CREATE_GROUP_TOOLTIP,
+  MESSAGES_SECTION,
   DIALOGS_SECTION,
   EMPTY_HINT,
   EMPTY_TITLE,
@@ -13,6 +14,7 @@ import {
 } from './model'
 import { head, headTop, list, root, sectionLabel } from './style'
 import { CompanionRow } from './ui/CompanionRow'
+import { MessageHit } from './ui/MessageHit'
 import { ConversationRow } from './ui/ConversationRow'
 import { EmptyState } from './ui/EmptyState'
 
@@ -20,6 +22,7 @@ export const ChatSidebar = ({
   conversations,
   companions,
   online,
+  hits,
   query,
   activeId,
   onQueryChange,
@@ -72,16 +75,30 @@ export const ChatSidebar = ({
           }
         >
           <If
-            condition={companions.length > 0}
+            condition={companions.length > 0 || hits.length > 0}
             fallback={<EmptyState title={NOT_FOUND_TITLE} hint={NOT_FOUND_HINT} />}
           >
             <>
-              <Text variant="label" style={sectionLabel}>
-                {COMPANIONS_SECTION}
-              </Text>
-              {companions.map((companion) => (
-                <CompanionRow key={companion.userId} companion={companion} onOpen={onOpenCompanion} />
-              ))}
+              <If condition={companions.length > 0}>
+                <>
+                  <Text variant="label" style={sectionLabel}>
+                    {COMPANIONS_SECTION}
+                  </Text>
+                  {companions.map((companion) => (
+                    <CompanionRow key={companion.userId} companion={companion} onOpen={onOpenCompanion} />
+                  ))}
+                </>
+              </If>
+              <If condition={hits.length > 0}>
+                <>
+                  <Text variant="label" style={sectionLabel}>
+                    {MESSAGES_SECTION}
+                  </Text>
+                  {hits.map((message) => (
+                    <MessageHit key={message.id} message={message} onOpen={onSelect} />
+                  ))}
+                </>
+              </If>
             </>
           </If>
         </If>

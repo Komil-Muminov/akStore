@@ -1,6 +1,7 @@
 import type { IHost } from '@/entities/host'
 import type { IConversation, IMember, IMessage } from '@/entities/message'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
+import { SEARCH_MIN_LENGTH } from './model'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
 import type { IGroupSubmit } from '@/features/ChatGroupForm'
 
@@ -17,11 +18,11 @@ export const useConversationsQuery = () =>
 
 export const useCompanionsQuery = () => useGetQuery<IHost[]>(QueryKeys.HOSTS, ApiRoutes.HOSTS_SEARCH)
 
-export const useHistoryQuery = (conversationId: string | null) =>
+export const useMessageSearchQuery = (query: string) =>
   useGetQuery<IMessage[]>(
-    QueryKeys.CHAT_HISTORY,
-    ApiRoutes.CHAT_HISTORY(conversationId ?? ''),
-    conversationId !== null,
+    QueryKeys.CHAT_SEARCH,
+    ApiRoutes.CHAT_SEARCH_MESSAGES(query.trim()),
+    query.trim().length >= SEARCH_MIN_LENGTH,
   )
 
 export const useMembersQuery = (conversationId: string | null, enabled: boolean) =>

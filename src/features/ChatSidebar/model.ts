@@ -1,10 +1,11 @@
-import type { IConversation } from '@/entities/message'
+import type { IConversation, IMessage } from '@/entities/message'
 import type { IHost } from '@/entities/host'
 
 export interface IProps {
   conversations: IConversation[]
   companions: IHost[]
   online: string[]
+  hits: IMessage[]
   query: string
   activeId: string | null
   onQueryChange: (value: string) => void
@@ -21,4 +22,5 @@ export const EMPTY_HINT = 'Найдите сотрудника через пои
 export const NOT_FOUND_TITLE = 'Никого не нашли'
 export const NOT_FOUND_HINT = 'Проверьте написание фамилии или логина'
 export const COMPANIONS_SECTION = 'СОТРУДНИКИ'
+export const MESSAGES_SECTION = 'НАЙДЕНО В ПЕРЕПИСКЕ'
 export const DIALOGS_SECTION = 'ДИАЛОГИ'

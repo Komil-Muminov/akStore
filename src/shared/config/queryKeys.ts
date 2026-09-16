@@ -12,4 +12,5 @@ export enum QueryKeys {
   CHAT_MEMBERS = 'chat-members',
   CHAT_UNREAD = 'chat-unread',
   CHAT_ONLINE = 'chat-online',
+  CHAT_SEARCH = 'chat-search',
 }

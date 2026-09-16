@@ -14,7 +14,12 @@ export const chatRouter = Router()
 chatRouter.get('/search', anyRole, respond((req) => chatService.search(actorOf(req))))
 chatRouter.get('/unread-count', anyRole, respond((req) => chatService.unreadTotal(actorOf(req))))
 chatRouter.get('/online', anyRole, respond((req) => chatService.online(actorOf(req))))
-chatRouter.get('/history/:id', anyRole, respond((req) => chatService.history(actorOf(req), idOf(req))))
+chatRouter.get('/history/:id', anyRole, respond((req) =>
+  chatService.history(actorOf(req), idOf(req), typeof req.query.before === 'string' ? req.query.before : null),
+))
+chatRouter.get('/search-messages', anyRole, respond((req) =>
+  chatService.searchMessages(actorOf(req), typeof req.query.q === 'string' ? req.query.q : ''),
+))
 chatRouter.get('/members/:id', anyRole, respond((req) => chatService.members(actorOf(req), idOf(req))))
 chatRouter.post('/open', anyRole, respond(
   (req) => chatService.openDirect(actorOf(req), parseCompanionId(req.body)),
