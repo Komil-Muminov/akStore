@@ -7,10 +7,10 @@ React без DOM. Сервер — Express + PostgreSQL. Правила прое
 
 ```bash
 cp .env.example .env
-npm run dev:all
+npm run dev
 ```
 
-`dev:all` поднимает сервер (`server/index.ts`, автосоздание схемы в PostgreSQL)
+`dev` поднимает сервер (`server/index.ts`, автосоздание схемы в PostgreSQL)
 и клиент (`bun --hot app.tsx`) одновременно. Нужен запущенный PostgreSQL по
 `DATABASE_URL` из `.env`.
 
@@ -18,9 +18,9 @@ npm run dev:all
 
 | Скрипт | Что делает |
 |---|---|
-| `npm run dev` | Только клиент, hot remount на том же окне |
+| `npm run app:dev` | Только клиент, hot remount на том же окне |
 | `npm run server:dev` | Только сервер, перезапуск при изменениях |
-| `npm run dev:all` | Сервер + клиент |
+| `npm run dev` | Сервер + клиент |
 | `npm run build` | Бинарник `dist/gatePass` |
 | `npm run web:dev` | Сборка под браузер и сервер на `:4173` |
 | `npm run screenshot` | PNG окна через automation-клиент |

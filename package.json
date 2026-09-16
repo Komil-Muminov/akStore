@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --hot app.tsx",
+    "dev": "concurrently -n server,app -c blue,magenta \"bun run server:dev\" \"bun run app:dev\"",
+    "app:dev": "bun --hot app.tsx",
     "server:dev": "bun --watch server/index.ts",
-    "dev:all": "concurrently -n server,app -c blue,magenta \"bun run server:dev\" \"bun run dev\"",
     "build": "bun build --compile app.tsx --outfile dist/gatePass",
     "web:dev": "bun web.ts",
     "screenshot": "bun screenshot.ts",
