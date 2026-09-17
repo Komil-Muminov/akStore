@@ -164,9 +164,11 @@ export const Select = ({ value, options, onChange, placeholder, icon, autoOpen =
               </ComboboxGroup>
             ))}
           </ComboboxList>
-          <ComboboxEmpty style={empty}>
-            <Text variant="secondary">{EMPTY_LABEL}</Text>
-          </ComboboxEmpty>
+          <If condition={newName.trim().length === 0}>
+            <ComboboxEmpty style={empty}>
+              <Text variant="secondary">{EMPTY_LABEL}</Text>
+            </ComboboxEmpty>
+          </If>
           <If condition={manage !== undefined}>
             <ManagePanel
               options={options}

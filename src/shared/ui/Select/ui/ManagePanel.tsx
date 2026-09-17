@@ -2,8 +2,9 @@ import { theme } from '@/shared/config'
 import { Icon } from '../../Icon'
 import { If } from '../../If'
 import { Text } from '../../Text'
+import { shortNameOf } from '../lib'
 import { CREATE_PREFIX, MANAGE_DONE_LABEL, MANAGE_LABEL, type ISelectOption } from '../model'
-import { createRow, footer, manageList } from '../style.manage'
+import { createLabel, createRow, panel, toggleRow } from '../style.manage'
 import { ManageRow } from './ManageRow'
 
 interface IProps {
@@ -35,31 +36,39 @@ export const ManagePanel = ({
   onConfirmRemove,
   onCreate,
 }: IProps) => (
-  <div style={manageList}>
+  <div style={panel}>
     <If condition={managing}>
-      {options.map((option) => (
-        <ManageRow
-          key={option.id}
-          option={option}
-          draft={drafts[option.id] ?? option.label}
-          confirming={confirmId === option.id}
-          onDraftChange={(value) => onDraftChange(option.id, value)}
-          onSave={() => onSave(option.id)}
-          onAskRemove={() => onAskRemove(option.id)}
-          onCancelRemove={onCancelRemove}
-          onConfirmRemove={() => onConfirmRemove(option.id)}
-        />
-      ))}
+      <>
+        {options.map((option) => (
+          <ManageRow
+            key={option.id}
+            option={option}
+            draft={drafts[option.id] ?? option.label}
+            confirming={confirmId === option.id}
+            onDraftChange={(value) => onDraftChange(option.id, value)}
+            onSave={() => onSave(option.id)}
+            onAskRemove={() => onAskRemove(option.id)}
+            onCancelRemove={onCancelRemove}
+            onConfirmRemove={() => onConfirmRemove(option.id)}
+          />
+        ))}
+      </>
     </If>
     <If condition={newName.trim().length > 0}>
       <div style={createRow} onClick={onCreate} testId="select__create">
-        <Icon name="plus" size={theme.size.iconMd} color={theme.colors.accent} />
-        <Text variant="body">{`${CREATE_PREFIX} «${newName.trim()}»`}</Text>
+        <Icon name="plus" size={theme.size.iconMd} color={theme.colors.accentHover} />
+        <text style={createLabel}>{`${CREATE_PREFIX} «${shortNameOf(newName.trim())}»`}</text>
       </div>
     </If>
-    <div style={footer} onClick={onToggleManage} testId="select__manage-toggle">
-      <Text variant="caption">{managing ? MANAGE_DONE_LABEL : MANAGE_LABEL}</Text>
-      <Icon name={managing ? 'check' : 'pencil'} size={theme.size.iconSm} color={theme.colors.secondary} />
-    </div>
+    <If condition={options.length > 0}>
+      <div style={toggleRow} onClick={onToggleManage} testId="select__manage-toggle">
+        <Icon
+          name={managing ? 'check' : 'pencil'}
+          size={theme.size.iconMd}
+          color={managing ? theme.colors.accent : theme.colors.tertiary}
+        />
+        <Text variant="secondary">{managing ? MANAGE_DONE_LABEL : MANAGE_LABEL}</Text>
+      </div>
+    </If>
   </div>
 )
