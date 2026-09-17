@@ -19,7 +19,8 @@ import {
   THREAD_EMPTY_TITLE,
   type IProps,
 } from './model'
-import { list, loadOlderRow, root, typingRow, typingText } from './style'
+import { list, root } from './style'
+import { loadOlderRow, typingRow, typingText } from './style.chrome'
 import { dropOverlay } from './style.file'
 import { bubbleWidthOf } from './lib'
 import { Bubble } from './ui/Bubble'

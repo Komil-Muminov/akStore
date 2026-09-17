@@ -1,6 +1,6 @@
 import { theme } from '@/shared/config'
 import { Icon, Text } from '@/shared/ui'
-import { placeholder, placeholderMark } from '../style'
+import { placeholder, placeholderMark } from '../style.chrome'
 
 interface IProps {
   title: string

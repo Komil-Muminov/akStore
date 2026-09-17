@@ -2,16 +2,8 @@ import { useCallback, useState } from 'react'
 import { DELETED_BODY, EDITED_MARK, hasFile, timeOf, type IMessage } from '@/entities/message'
 import { theme } from '@/shared/config'
 import { Icon, IconButton, If } from '@/shared/ui'
-import {
-  authorLabel,
-  bodyOf,
-  bubbleActions,
-  bubbleOf,
-  deletedBody,
-  metaOf,
-  metaRow,
-  rowOf,
-} from '../style'
+import { bodyOf, bubbleOf, metaOf, metaRow, rowOf } from '../style'
+import { authorLabel, bubbleActions, deletedBody } from '../style.chrome'
 import { FileCard } from './FileCard'
 
 interface IProps {

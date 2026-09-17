@@ -4,6 +4,7 @@ export enum AppRoutes {
   USERS = 'users',
   REPORTS = 'reports',
   CHAT = 'chat',
+  GATE = 'gate',
 }
 
 export const ApiRoutes = {
@@ -23,6 +24,12 @@ export const ApiRoutes = {
   USERS_RESET_PASSWORD: (id: string) => `/users/reset-password/${id}`,
   USERS_DELETE: (id: string) => `/users/delete/${id}`,
   HOSTS_SEARCH: '/hosts/search',
+  ENTRIES_ON_SITE: '/entries/on-site',
+  ENTRIES_SEARCH: (limit = 100) => `/entries/search?limit=${String(limit)}`,
+  ENTRIES_FIND: (code: string) => `/entries/find/${encodeURIComponent(code)}`,
+  ENTRIES_CHECK_IN: (id: string) => `/entries/check-in/${id}`,
+  ENTRIES_CHECK_OUT: (id: string) => `/entries/check-out/${id}`,
+  PASSES_PRINT: (id: string) => `/passes/print/${id}`,
   CHAT_SEARCH: '/chat/search',
   CHAT_HISTORY: (id: string, before?: string | null) =>
     before ? `/chat/history/${id}?before=${encodeURIComponent(before)}` : `/chat/history/${id}`,

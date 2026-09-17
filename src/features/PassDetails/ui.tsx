@@ -1,7 +1,8 @@
 import { useCallback } from 'react'
+import { ApiRoutes } from '@/shared/config'
 import { PASS_FIELD_LABELS, PASS_STATUS_LABELS, PassStatus, formatIssuedAt, initialsOf } from '@/entities/pass'
 import { Badge, Button, IconButton, If, Text } from '@/shared/ui'
-import { chatRequest } from '@/shared/lib'
+import { chatRequest, openPrintable } from '@/shared/lib'
 import {
   DELETE_LABEL,
   DETAIL_ROWS,
@@ -9,6 +10,8 @@ import {
   ISSUED_LABEL,
   RESTORE_LABEL,
   REVOKE_LABEL,
+  PRINT_FILE,
+  PRINT_LABEL,
   TITLE,
   UPDATED_LABEL,
   WRITE_HOST_LABEL,
@@ -23,6 +26,9 @@ export const PassDetails = ({ pass, pending, onEdit, onRevoke, onRestore, onDele
   const handleRevoke = useCallback(() => onRevoke(pass.id), [onRevoke, pass.id])
   const handleRestore = useCallback(() => onRestore(pass.id), [onRestore, pass.id])
   const handleDelete = useCallback(() => onDelete(pass), [onDelete, pass])
+  const handlePrint = useCallback(() => {
+    void openPrintable(ApiRoutes.PASSES_PRINT(pass.id), PRINT_FILE)
+  }, [pass.id])
   const handleWriteHost = useCallback(() => {
     if (pass.hostUserId) chatRequest.open(pass.hostUserId)
   }, [pass.hostUserId])
@@ -65,6 +71,14 @@ export const PassDetails = ({ pass, pending, onEdit, onRevoke, onRestore, onDele
             <Button label={REVOKE_LABEL} icon="ban" variant="secondary" fullWidth onClick={handleRevoke} disabled={pending} testId="pass-details__revoke" />
           </If>
         </div>
+        <Button
+          label={PRINT_LABEL}
+          icon="download"
+          variant="secondary"
+          fullWidth
+          onClick={handlePrint}
+          testId="pass-details__print"
+        />
         <If condition={pass.hostUserId !== null}>
           <Button
             label={WRITE_HOST_LABEL}

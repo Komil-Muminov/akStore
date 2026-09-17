@@ -21,6 +21,7 @@ export interface IPassInput {
 
 export interface IPass extends IPassInput {
   id: string
+  code: string
   status: PassStatus
   createdAt: string
   updatedAt: string
