@@ -1,9 +1,13 @@
 import type { StyleDesc } from '@gpuix/react'
 import { theme } from '@/shared/config'
 
-export const root = (hoverColor: string, variant: 'ghost' | 'outline' = 'ghost'): StyleDesc => ({
-  width: theme.size.control,
-  height: theme.size.control,
+export const root = (
+  hoverColor: string,
+  variant: 'ghost' | 'outline' = 'ghost',
+  size: 'sm' | 'md' = 'md',
+): StyleDesc => ({
+  width: size === 'sm' ? 24 : theme.size.control,
+  height: size === 'sm' ? 24 : theme.size.control,
   flexShrink: 0,
   borderRadius: theme.radius.sm,
   borderWidth: variant === 'outline' ? 1 : 0,

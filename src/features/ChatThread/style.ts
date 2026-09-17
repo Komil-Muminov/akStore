@@ -11,52 +11,22 @@ export const root: StyleDesc = {
   backgroundColor: theme.colors.canvas,
 }
 
-export const head: StyleDesc = {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: theme.spacing.md,
-  height: theme.size.header,
-  flexShrink: 0,
-  paddingLeft: theme.spacing.xl,
-  paddingRight: theme.spacing.xl,
-  borderBottomWidth: 1,
-  borderColor: theme.colors.border,
-  backgroundColor: theme.colors.sidebar,
-}
-
-export const headAvatar: StyleDesc = {
-  width: theme.size.avatar,
-  height: theme.size.avatar,
-  flexShrink: 0,
-  borderRadius: theme.radius.full,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: theme.colors.accentSoft,
-}
-
-export const headAvatarText: StyleDesc = {
-  fontFamily: theme.font.family,
-  fontSize: theme.font.size.sm,
-  fontWeight: theme.font.weight.semibold,
-  color: theme.colors.accent,
-}
-
-export const headText: StyleDesc = { display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }
-
 export const list: StyleDesc = {
   flexGrow: 1,
+  minHeight: 0,
   paddingTop: theme.spacing.lg,
   paddingBottom: theme.spacing.lg,
-  paddingLeft: theme.spacing.xl,
-  paddingRight: theme.spacing.xl,
 }
 
 export const rowOf = (own: boolean): StyleDesc => ({
+  width: '100%',
+  alignSelf: 'stretch',
   display: 'flex',
   flexDirection: 'row',
+  alignItems: 'flex-end',
   justifyContent: own ? 'flex-end' : 'flex-start',
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
   paddingTop: theme.spacing.xxs,
   paddingBottom: theme.spacing.xxs,
 })
@@ -101,11 +71,29 @@ export const metaRow: StyleDesc = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  justifyContent: 'flex-end',
+  justifyContent: 'space-between',
   gap: theme.spacing.xs,
   flexShrink: 0,
   alignSelf: 'stretch',
   marginTop: theme.spacing.xxs,
+}
+
+export const metaInfo: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: theme.spacing.xs,
+  flexShrink: 0,
+  marginLeft: 'auto',
+}
+
+export const bubbleActions: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.xxs,
+  flexShrink: 0,
 }
 
 export const metaOf = (own: boolean): StyleDesc => ({
@@ -119,9 +107,13 @@ export const metaOf = (own: boolean): StyleDesc => ({
 })
 
 export const daySeparator: StyleDesc = {
+  width: '100%',
+  alignSelf: 'stretch',
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
   paddingTop: theme.spacing.lg,
   paddingBottom: theme.spacing.sm,
 }
@@ -182,19 +174,15 @@ export const typingText: StyleDesc = {
 }
 
 export const loadOlderRow: StyleDesc = {
+  width: '100%',
+  alignSelf: 'stretch',
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
+  paddingLeft: theme.spacing.xl,
+  paddingRight: theme.spacing.xl,
   paddingTop: theme.spacing.sm,
   paddingBottom: theme.spacing.md,
-}
-
-export const bubbleActions: StyleDesc = {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: theme.spacing.xxs,
-  paddingLeft: theme.spacing.xs,
 }
 
 export const deletedBody: StyleDesc = {
@@ -203,5 +191,3 @@ export const deletedBody: StyleDesc = {
   lineHeight: theme.font.lineHeight.md,
   color: theme.colors.ghost,
 }
-
-

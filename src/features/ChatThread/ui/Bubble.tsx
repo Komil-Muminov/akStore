@@ -1,13 +1,15 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { DELETED_BODY, EDITED_MARK, hasFile, timeOf, type IMessage } from '@/entities/message'
 import { theme } from '@/shared/config'
-import { Icon, IconButton, If } from '@/shared/ui'
+import { Icon, IconButton, If, Tooltip } from '@/shared/ui'
+import { EDIT_TOOLTIP, REMOVE_TOOLTIP } from '../model'
 import {
   authorLabel,
   bodyOf,
   bubbleActions,
   bubbleOf,
   deletedBody,
+  metaInfo,
   metaOf,
   metaRow,
   rowOf,
@@ -37,31 +39,13 @@ export const Bubble = ({
   onDownload,
   maxWidth,
 }: IProps) => {
-  const [hovered, setHovered] = useState(false)
-  const handleEnter = useCallback(() => setHovered(true), [])
-  const handleLeave = useCallback(() => setHovered(false), [])
   const handleEdit = useCallback(() => onEdit(message), [message, onEdit])
   const handleRemove = useCallback(() => onRemove(message), [message, onRemove])
-  const editable = own && !message.isDeleted && !hasFile(message)
+  const canRemove = own && !message.isDeleted
+  const canEdit = own && !message.isDeleted && !hasFile(message)
 
   return (
-    <div
-      style={rowOf(own)}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
-      testId={`chat__message-${message.id}`}
-    >
-      <If condition={editable && hovered}>
-        <div style={bubbleActions}>
-          <IconButton icon="pencil" onClick={handleEdit} testId={`chat__edit-${message.id}`} />
-          <IconButton
-            icon="trash"
-            onClick={handleRemove}
-            hoverColor={theme.colors.dangerSoft}
-            testId={`chat__remove-${message.id}`}
-          />
-        </div>
-      </If>
+    <div style={rowOf(own)} testId={`chat__message-${message.id}`}>
       <div style={bubbleOf(own, hasFile(message), maxWidth)}>
         <If condition={showAuthor}>
           <text style={authorLabel}>{message.authorName}</text>
@@ -75,13 +59,41 @@ export const Bubble = ({
           <text style={deletedBody}>{DELETED_BODY}</text>
         </If>
         <div style={metaRow}>
-          <If condition={message.editedAt !== null && !message.isDeleted}>
-            <text style={metaOf(own)}>{EDITED_MARK}</text>
+          <If condition={canRemove}>
+            <div style={bubbleActions}>
+              <If condition={canEdit}>
+                <Tooltip title={EDIT_TOOLTIP}>
+                  <IconButton
+                    icon="pencil"
+                    size="sm"
+                    onClick={handleEdit}
+                    color={own ? theme.colors.onAccent : theme.colors.secondary}
+                    hoverColor={theme.colors.overlayStrong}
+                    testId={`chat__edit-${message.id}`}
+                  />
+                </Tooltip>
+              </If>
+              <Tooltip title={REMOVE_TOOLTIP}>
+                <IconButton
+                  icon="trash"
+                  size="sm"
+                  onClick={handleRemove}
+                  color={own ? theme.colors.onAccent : theme.colors.danger}
+                  hoverColor={theme.colors.dangerSoft}
+                  testId={`chat__remove-${message.id}`}
+                />
+              </Tooltip>
+            </div>
           </If>
-          <text style={metaOf(own)}>{timeOf(message.createdAt)}</text>
-          <If condition={showStatus && !message.isDeleted}>
-            <Icon name={read ? 'checkCheck' : 'check'} size={theme.size.iconSm} color={theme.colors.onAccent} />
-          </If>
+          <div style={metaInfo}>
+            <If condition={message.editedAt !== null && !message.isDeleted}>
+              <text style={metaOf(own)}>{EDITED_MARK}</text>
+            </If>
+            <text style={metaOf(own)}>{timeOf(message.createdAt)}</text>
+            <If condition={showStatus && !message.isDeleted}>
+              <Icon name={read ? 'checkCheck' : 'check'} size={theme.size.iconSm} color={theme.colors.onAccent} />
+            </If>
+          </div>
         </div>
       </div>
     </div>
