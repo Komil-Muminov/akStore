@@ -5,7 +5,7 @@ import { If } from '../../If'
 import { TextInput } from '../../TextInput'
 import { Tooltip } from '../../Tooltip'
 import { CANCEL_TOOLTIP, CONFIRM_TOOLTIP, REMOVE_TOOLTIP, SAVE_TOOLTIP, type ISelectOption } from '../model'
-import { manageField, manageRow } from '../style.manage'
+import { manageField, manageInput, manageRowOf } from '../style.manage'
 
 interface IProps {
   option: ISelectOption
@@ -31,9 +31,14 @@ export const ManageRow = ({
   const handleSave = useCallback(() => onSave(), [onSave])
 
   return (
-    <div style={manageRow}>
+    <div style={manageRowOf(confirming)}>
       <div style={manageField}>
-        <TextInput value={draft} onChange={onDraftChange} testId={`select__manage-${option.id}`} />
+        <TextInput
+          value={draft}
+          onChange={onDraftChange}
+          style={manageInput}
+          testId={`select__manage-${option.id}`}
+        />
       </div>
       <If
         condition={confirming}

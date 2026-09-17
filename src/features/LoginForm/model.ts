@@ -8,7 +8,7 @@ export interface IProps {
 
 export const APP_NAME = 'gatePass'
 export const TITLE = 'Вход в систему'
-export const DESCRIPTION = 'Пропускная система организации'
+export const DESCRIPTION = 'Касса, склад и отчёты магазина'
 export const LOGIN_LABEL = 'Логин'
 export const LOGIN_PLACEHOLDER = 'Введите логин'
 export const PASSWORD_LABEL = 'Пароль'

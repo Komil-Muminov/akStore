@@ -55,6 +55,8 @@ export const theme = {
     fileCardMinWidth: 220,
     bubbleMinWidth: 132,
     dot: 8,
+    manageField: 186,
+    manageInput: 34,
     filterField: 168,
     chartBar: 28,
     chartHeight: 132,

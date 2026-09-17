@@ -116,6 +116,7 @@ export const Select = ({ value, options, onChange, placeholder, icon, autoOpen =
     const name = query.trim()
     if (name.length === 0) return
     manage?.onCreate(name)
+    setQuery(name)
     setManaging(false)
     setOpen(false)
   }, [manage, query])
@@ -140,7 +141,8 @@ export const Select = ({ value, options, onChange, placeholder, icon, autoOpen =
         </If>
         <ComboboxInput placeholder={placeholder} theme={inputTheme} style={input} testId={testId} />
         <ComboboxContent style={content} sideOffset={theme.spacing.xs}>
-          <ComboboxList>
+          <If condition={!managing}>
+            <ComboboxList>
             {groups.map((entry) => (
               <ComboboxGroup key={entry.key || 'default'}>
                 <If condition={entry.key !== NO_GROUP}>
@@ -163,8 +165,9 @@ export const Select = ({ value, options, onChange, placeholder, icon, autoOpen =
                 ))}
               </ComboboxGroup>
             ))}
-          </ComboboxList>
-          <If condition={newName.trim().length === 0}>
+            </ComboboxList>
+          </If>
+          <If condition={newName.trim().length === 0 && !managing}>
             <ComboboxEmpty style={empty}>
               <Text variant="secondary">{EMPTY_LABEL}</Text>
             </ComboboxEmpty>

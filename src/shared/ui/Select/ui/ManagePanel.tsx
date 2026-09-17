@@ -4,7 +4,7 @@ import { If } from '../../If'
 import { Text } from '../../Text'
 import { shortNameOf } from '../lib'
 import { CREATE_PREFIX, MANAGE_DONE_LABEL, MANAGE_LABEL, type ISelectOption } from '../model'
-import { createLabel, createRow, panel, toggleRow } from '../style.manage'
+import { createLabel, createRow, divider, panel, toggleRow } from '../style.manage'
 import { ManageRow } from './ManageRow'
 
 interface IProps {
@@ -36,7 +36,7 @@ export const ManagePanel = ({
   onConfirmRemove,
   onCreate,
 }: IProps) => (
-  <div style={panel}>
+  <div style={managing ? panel : divider}>
     <If condition={managing}>
       <>
         {options.map((option) => (

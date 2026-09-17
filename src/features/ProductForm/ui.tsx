@@ -62,13 +62,6 @@ export const ProductForm = ({
     setForm((current) => ({ ...current, categoryId: createdCategoryId }))
   }, [createdCategoryId])
 
-  useEffect(() => {
-    setForm((current) =>
-      current.categoryId !== null && !categories.some((category) => category.id === current.categoryId)
-        ? { ...current, categoryId: null }
-        : current,
-    )
-  }, [categories])
 
   const setName = useCallback((name: string) => setForm((current) => ({ ...current, name })), [])
   const setBarcode = useCallback((barcode: string) => setForm((current) => ({ ...current, barcode })), [])
@@ -86,6 +79,13 @@ export const ProductForm = ({
   const setCategory = useCallback(
     (value: string | null) => setForm((current) => ({ ...current, categoryId: value })),
     [],
+  )
+  const handleRemoveCategory = useCallback(
+    (id: string) => {
+      setForm((current) => (current.categoryId === id ? { ...current, categoryId: null } : current))
+      onRemoveCategory(id)
+    },
+    [onRemoveCategory],
   )
   const handleSubmit = useCallback(() => onSubmit(form), [form, onSubmit])
 
@@ -114,7 +114,7 @@ export const ProductForm = ({
             onChange={setCategory}
             onCreate={onCreateCategory}
             onRename={onRenameCategory}
-            onRemove={onRemoveCategory}
+            onRemove={handleRemoveCategory}
           />
           <div style={half}>
             <Text variant="label">{UNIT_LABEL}</Text>
