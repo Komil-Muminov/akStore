@@ -1,19 +1,9 @@
 import { useCallback } from 'react'
 import { DELETED_BODY, EDITED_MARK, hasFile, timeOf, type IMessage } from '@/entities/message'
 import { theme } from '@/shared/config'
-import { Icon, IconButton, If, Tooltip } from '@/shared/ui'
-import { EDIT_TOOLTIP, REMOVE_TOOLTIP } from '../model'
-import {
-  authorLabel,
-  bodyOf,
-  bubbleActions,
-  bubbleOf,
-  deletedBody,
-  metaInfo,
-  metaOf,
-  metaRow,
-  rowOf,
-} from '../style'
+import { Icon, IconButton, If } from '@/shared/ui'
+import { bodyOf, bubbleOf, metaOf, metaRow, rowOf } from '../style'
+import { authorLabel, bubbleActions, deletedBody } from '../style.chrome'
 import { FileCard } from './FileCard'
 
 interface IProps {

@@ -1,9 +1,12 @@
 export enum AppRoutes {
-  PASSES = 'passes',
-  STRUCTURE = 'structure',
-  USERS = 'users',
+  SALE = 'sale',
+  PRODUCTS = 'products',
+  STOCK = 'stock',
+  SHIFTS = 'shifts',
   REPORTS = 'reports',
   CHAT = 'chat',
+  STRUCTURE = 'structure',
+  USERS = 'users',
 }
 
 export const ApiRoutes = {
@@ -22,7 +25,36 @@ export const ApiRoutes = {
   USERS_UPDATE: (id: string) => `/users/update/${id}`,
   USERS_RESET_PASSWORD: (id: string) => `/users/reset-password/${id}`,
   USERS_DELETE: (id: string) => `/users/delete/${id}`,
-  HOSTS_SEARCH: '/hosts/search',
+  PRODUCTS_SEARCH: (query?: string, category?: string, page = 1, limit = 20) => {
+    const params = new URLSearchParams()
+    if (query?.trim()) params.set('q', query.trim())
+    if (category) params.set('category', category)
+    params.set('page', String(page))
+    params.set('limit', String(limit))
+    return `/products/search?${params.toString()}`
+  },
+  PRODUCTS_BARCODE: (code: string) => `/products/barcode/${encodeURIComponent(code)}`,
+  PRODUCTS_CATEGORIES: '/products/categories',
+  PRODUCTS_HISTORY: (productId?: string) =>
+    productId ? `/products/history?product=${productId}` : '/products/history',
+  PRODUCTS_CREATE: '/products/create',
+  PRODUCTS_UPDATE: (id: string) => `/products/update/${id}`,
+  PRODUCTS_DELETE: (id: string) => `/products/delete/${id}`,
+  CATEGORY_CREATE: '/products/category-create',
+  CATEGORY_UPDATE: (id: string) => `/products/category-update/${id}`,
+  CATEGORY_DELETE: (id: string) => `/products/category-delete/${id}`,
+  STOCK_INCOME: '/products/income',
+  STOCK_WRITE_OFF: '/products/write-off',
+  STOCK_INVENTORY: '/products/inventory',
+  SHIFT_CURRENT: '/shifts/current',
+  SHIFT_LIST: '/shifts/list',
+  SHIFT_OPEN: '/shifts/open',
+  SHIFT_CLOSE: '/shifts/close',
+  SALES_SEARCH: (shiftId?: string, limit = 50) =>
+    shiftId ? `/sales/search?shift=${shiftId}&limit=${String(limit)}` : `/sales/search?limit=${String(limit)}`,
+  SALES_CREATE: '/sales/create',
+  SALES_REFUND: (id: string) => `/sales/refund/${id}`,
+  FISCAL_STATUS: '/fiscal/status',
   CHAT_SEARCH: '/chat/search',
   CHAT_HISTORY: (id: string, before?: string | null) =>
     before ? `/chat/history/${id}?before=${encodeURIComponent(before)}` : `/chat/history/${id}`,
@@ -43,22 +75,6 @@ export const ApiRoutes = {
   CHAT_EDIT_MESSAGE: (id: string) => `/chat/edit-message/${id}`,
   CHAT_DELETE_MESSAGE: (id: string) => `/chat/delete-message/${id}`,
   CHAT_SEARCH_MESSAGES: (query: string) => `/chat/search-messages?q=${encodeURIComponent(query)}`,
-  REPORTS_SUMMARY: (query: string) => `/reports/summary?${query}`,
-  REPORTS_PASSES: (query: string) => `/reports/passes?${query}`,
-  REPORTS_EXPORT: (query: string) => `/reports/export?${query}`,
-  PASSES_SEARCH: (query?: string, status?: string, page = 1, limit = 10) => {
-    const params = new URLSearchParams()
-    if (query?.trim()) params.set('q', query.trim())
-    if (status && status !== 'all') params.set('status', status)
-    params.set('page', String(page))
-    params.set('limit', String(limit))
-    return `/passes/search?${params.toString()}`
-  },
-  PASSES_CREATE: '/passes/create',
-  PASSES_UPDATE: (id: string) => `/passes/update/${id}`,
-  PASSES_DEACTIVATE: (id: string) => `/passes/deactivate/${id}`,
-  PASSES_ACTIVATE: (id: string) => `/passes/activate/${id}`,
-  PASSES_DELETE: (id: string) => `/passes/delete/${id}`,
   POSITIONS_SEARCH: (query?: string) =>
     query?.trim() ? `/positions/search?q=${encodeURIComponent(query.trim())}` : '/positions/search',
   POSITIONS_CREATE: '/positions/create',

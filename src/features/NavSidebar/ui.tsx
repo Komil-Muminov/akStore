@@ -1,5 +1,4 @@
 import { ROLE_LABELS } from '@/entities/user'
-import { initialsOf } from '@/entities/pass'
 import { AppRoutes, theme } from '@/shared/config'
 import { Icon, IconButton, Text, Tooltip } from '@/shared/ui'
 import { APP_NAME, APP_TAGLINE, CHANGE_PASSWORD_TOOLTIP, LOGOUT_TOOLTIP, NAV_SECTION, type IProps } from './model'
@@ -17,6 +16,7 @@ import {
   spacer,
 } from './style'
 import { NavItem } from './ui/NavItem'
+import { initialsOf } from '@/shared/lib'
 
 export const NavSidebar = ({ active, items, unread, user, onNavigate, onChangePassword, onLogout }: IProps) => (
   <div style={root} testId="nav">

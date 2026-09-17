@@ -1,5 +1,5 @@
 import { Text } from '@/shared/ui'
-import { dayChip, daySeparator } from '../style'
+import { dayChip, daySeparator } from '../style.chrome'
 
 interface IProps {
   label: string

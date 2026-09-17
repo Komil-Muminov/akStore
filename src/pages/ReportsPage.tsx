@@ -1,5 +1,5 @@
-import { Reports } from '@/widgets/Reports'
+import { SalesReport } from '@/widgets/SalesReport'
 
-const ReportsPage = () => <Reports />
+const ReportsPage = () => <SalesReport />
 
 export default ReportsPage

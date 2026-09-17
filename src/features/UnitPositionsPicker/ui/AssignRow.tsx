@@ -1,10 +1,10 @@
 import { memo, useCallback } from 'react'
-import { initialsOf } from '@/entities/pass'
 import { ROLE_LABELS, type IUser } from '@/entities/user'
 import { theme } from '@/shared/config'
 import { Icon, IconButton, If, Select, Text, Tooltip, type ISelectOption } from '@/shared/ui'
 import { ASSIGN_LABEL, CANCEL_PICK_TOOLTIP, CHANGE_TOOLTIP, EMPLOYEE_PLACEHOLDER, UNASSIGN_TOOLTIP } from '../model'
 import { assignRow, person, personActions, personAvatar, personAvatarText, personText, picker, vacancy } from '../style'
+import { initialsOf } from '@/shared/lib'
 
 interface IProps {
   positionId: string

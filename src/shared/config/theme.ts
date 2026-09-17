@@ -54,6 +54,7 @@ export const theme = {
     composerMinHeight: 56,
     fileCardMinWidth: 220,
     bubbleMinWidth: 132,
+    dot: 8,
   },
   motion: { fast: 0.15, normal: 0.25 },
 } as const

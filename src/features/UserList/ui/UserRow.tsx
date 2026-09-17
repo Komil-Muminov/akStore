@@ -1,5 +1,4 @@
 import { memo, useCallback } from 'react'
-import { initialsOf } from '@/entities/pass'
 import { ROLE_LABELS, UserRole, type IUser } from '@/entities/user'
 import { theme } from '@/shared/config'
 import { Badge, IconButton, If, Text, Tooltip } from '@/shared/ui'
@@ -13,6 +12,7 @@ import {
   RESET_TOOLTIP,
 } from '../model'
 import { actions, avatar, avatarText, info, row } from '../style'
+import { initialsOf } from '@/shared/lib'
 
 interface IProps {
   user: IUser

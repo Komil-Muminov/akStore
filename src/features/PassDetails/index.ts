@@ -1,1 +1,0 @@
-export { PassDetails } from './ui'
