@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
-import { initialsOf } from '@/entities/pass'
 import { isGroup, previewOf, timeOf, titleOf, unreadLabelOf, type IConversation } from '@/entities/message'
 import { theme } from '@/shared/config'
 import { Icon, If, Text } from '@/shared/ui'
 import { avatar, avatarText, avatarWrap, badge, badgeText, name, onlineDot, preview, row, rowBody, rowTop } from '../style'
+import { initialsOf } from '@/shared/lib'
 
 interface IProps {
   conversation: IConversation

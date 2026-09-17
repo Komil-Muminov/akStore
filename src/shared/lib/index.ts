@@ -1,4 +1,5 @@
 export { request, uploadFile } from './api'
+export { initialsOf } from './format'
 export { chatRequest, useChatRequest } from './navigation'
 export { session, useSession } from './session'
 export { socketClient } from './socket'

@@ -1,9 +1,9 @@
-import { initialsOf } from '@/entities/pass'
 import { isGroup, membersLabelOf, titleOf, type IConversation, type IMember } from '@/entities/message'
 import { theme } from '@/shared/config'
 import { Icon, IconButton, If, Text, Tooltip } from '@/shared/ui'
 import { COMPANION_HINT, LEAVE_TOOLTIP, MANAGE_TOOLTIP, MEMBERS_SEPARATOR } from '../model'
 import { head, headAvatar, headAvatarText, headText } from '../style'
+import { initialsOf } from '@/shared/lib'
 
 interface IProps {
   conversation: IConversation

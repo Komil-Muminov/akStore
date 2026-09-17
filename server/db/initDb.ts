@@ -2,7 +2,7 @@ import pg from 'pg'
 import { config } from '../config'
 import { UnitType, UserRole } from '../types'
 import { pool } from './pool'
-import { SCHEMA, SEED_LEADERSHIP } from './schema'
+import { RETAIL_SCHEMA, SCHEMA, SEED_LEADERSHIP } from './schema'
 import { usersDb } from './users.db'
 
 const MAINTENANCE_DB = 'postgres'
@@ -42,6 +42,7 @@ const seedSuperadmin = async () => {
 export const initDb = async () => {
   await ensureDatabase()
   await pool.query(SCHEMA)
+  await pool.query(RETAIL_SCHEMA)
   await seedLeadership()
   await seedSuperadmin()
 }

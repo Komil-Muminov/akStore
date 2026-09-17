@@ -1,1 +1,0 @@
-export { Gate } from './ui'

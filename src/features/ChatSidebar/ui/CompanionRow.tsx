@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
-import { initialsOf } from '@/entities/pass'
 import type { IColleague } from '@/entities/message'
 import { avatar, avatarText, name, preview, row, rowBody, rowTop } from '../style'
+import { initialsOf } from '@/shared/lib'
 
 interface IProps {
   companion: IColleague
