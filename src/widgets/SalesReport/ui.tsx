@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { moneyOf } from '@/entities/product'
-import { PAYMENT_LABELS, saleStampOf, type ISale } from '@/entities/sale'
+import { FISCAL_LABEL, PAYMENT_LABELS, saleStampOf, type ISale } from '@/entities/sale'
 import { ApiRoutes, QueryKeys, theme } from '@/shared/config'
 import { useGetQuery } from '@/shared/hooks'
 import { Badge, Icon, If, Spinner, Text } from '@/shared/ui'
@@ -49,6 +49,9 @@ export const SalesReport = () => {
                     {`${saleStampOf(sale.createdAt)} · ${PAYMENT_LABELS[sale.payment]} · ${String(sale.items.length)} поз.`}
                   </Text>
                 </div>
+                <If condition={sale.fiscal !== null}>
+                  {() => <Badge tone="info" label={`${FISCAL_LABEL} ${sale.fiscal?.number ?? ''}`} />}
+                </If>
                 <If condition={sale.refundedAt !== null}>
                   <Badge tone="danger" label={REFUNDED_LABEL} />
                 </If>

@@ -134,6 +134,10 @@ export const RETAIL_SCHEMA = `
   );
   CREATE INDEX IF NOT EXISTS sales_shift_idx ON sales (shift_id, created_at DESC);
   CREATE INDEX IF NOT EXISTS sales_time_idx ON sales (created_at DESC);
+  ALTER TABLE sales ADD COLUMN IF NOT EXISTS fiscal_number TEXT NOT NULL DEFAULT '';
+  ALTER TABLE sales ADD COLUMN IF NOT EXISTS fiscal_sign TEXT NOT NULL DEFAULT '';
+  ALTER TABLE sales ADD COLUMN IF NOT EXISTS fiscal_device TEXT NOT NULL DEFAULT '';
+  ALTER TABLE sales ADD COLUMN IF NOT EXISTS fiscal_at TIMESTAMPTZ;
 
   CREATE TABLE IF NOT EXISTS sale_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -11,6 +11,7 @@ const DEFAULT_DB_PORT = 5432
 const DEFAULT_SUPERADMIN_LOGIN = 'km'
 const DEFAULT_SUPERADMIN_PASSWORD = '123'
 const DEFAULT_TOKEN_TTL = '30d'
+const DEFAULT_FISCAL_MODE = 'disabled'
 
 const required = (name: string): string => {
   const value = process.env[name]
@@ -24,6 +25,7 @@ export const config = {
   isProduction: process.env.NODE_ENV === 'production',
   jwtSecret: required('JWT_SECRET'),
   tokenTtl: process.env.TOKEN_TTL ?? DEFAULT_TOKEN_TTL,
+  fiscalMode: process.env.FISCAL_MODE ?? DEFAULT_FISCAL_MODE,
   superadmin: {
     login: process.env.SUPERADMIN_LOGIN ?? DEFAULT_SUPERADMIN_LOGIN,
     password: process.env.SUPERADMIN_PASSWORD ?? DEFAULT_SUPERADMIN_PASSWORD,

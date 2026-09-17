@@ -1,5 +1,5 @@
 import { pool } from './pool'
-import type { ISale, ISaleItem, ISaleItemRow, ISaleRow, ISalesParams, PaymentKind } from '../types'
+import type { IFiscalReceipt, ISale, ISaleItem, ISaleItemRow, ISaleRow, ISalesParams, PaymentKind } from '../types'
 
 const toItem = (row: ISaleItemRow): ISaleItem => ({
   id: row.id,
@@ -9,6 +9,16 @@ const toItem = (row: ISaleItemRow): ISaleItem => ({
   price: Number(row.price),
   total: Number(row.quantity) * Number(row.price),
 })
+
+const toFiscal = (row: ISaleRow): IFiscalReceipt | null =>
+  row.fiscal_at === null
+    ? null
+    : {
+        number: row.fiscal_number,
+        sign: row.fiscal_sign,
+        device: row.fiscal_device,
+        registeredAt: row.fiscal_at.toISOString(),
+      }
 
 const toSale = (row: ISaleRow, items: ISaleItem[]): ISale => ({
   id: row.id,
@@ -22,12 +32,14 @@ const toSale = (row: ISaleRow, items: ISaleItem[]): ISale => ({
   change: Math.max(0, Number(row.paid) - Number(row.total)),
   refundedAt: row.refunded_at ? row.refunded_at.toISOString() : null,
   createdAt: row.created_at.toISOString(),
+  fiscal: toFiscal(row),
   items,
 })
 
 const BASE_SQL = `
   SELECT s.id, s.number, s.shift_id, u.full_name AS cashier_name, s.payment,
-         s.total, s.discount, s.paid, s.refunded_at, s.created_at
+         s.total, s.discount, s.paid, s.refunded_at, s.created_at,
+         s.fiscal_number, s.fiscal_sign, s.fiscal_device, s.fiscal_at
   FROM sales s
   JOIN users u ON u.id = s.cashier_id`
 
@@ -48,6 +60,10 @@ const CREATE_SALE_SQL = `
 const CREATE_ITEM_SQL = `
   INSERT INTO sale_items (sale_id, product_id, name, quantity, price, cost_price)
   VALUES ($1, $2, $3, $4, $5, $6)`
+
+const FISCAL_SQL = `
+  UPDATE sales SET fiscal_number = $2, fiscal_sign = $3, fiscal_device = $4, fiscal_at = now()
+  WHERE id = $1 RETURNING id`
 
 const REFUND_SQL = 'UPDATE sales SET refunded_at = now() WHERE id = $1 AND refunded_at IS NULL RETURNING id'
 
@@ -87,6 +103,9 @@ export const salesDb = {
     ).rows
     const grouped = await itemsOf(rows.map((row) => row.id))
     return rows.map((row) => toSale(row, grouped.get(row.id) ?? []))
+  },
+  attachFiscal: async (id: string, number: string, sign: string, device: string) => {
+    await pool.query(FISCAL_SQL, [id, number, sign, device])
   },
   refund: async (id: string) => ((await pool.query(REFUND_SQL, [id])).rowCount ?? 0) > 0,
 }

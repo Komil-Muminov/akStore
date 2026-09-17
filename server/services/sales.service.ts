@@ -1,6 +1,7 @@
 import { productsDb, salesDb, stockDb } from '../db'
+import { fiscalDriver } from '../fiscal'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { StockMoveKind, type ISaleInput, type ISalesParams } from '../types'
+import { StockMoveKind, type ISale, type ISaleInput, type ISalesParams } from '../types'
 import { shiftsService } from './shifts.service'
 
 const SALES_LIMIT = 200
@@ -13,6 +14,19 @@ const ALREADY_REFUNDED = 'Чек уже возвращён'
 const REFUND_NOTE = 'Возврат по чеку'
 
 const roundMoney = (value: number) => Math.round(value * 100) / 100
+
+const registerFiscal = async (sale: ISale) => {
+  if (!fiscalDriver.enabled) return sale
+  try {
+    const receipt = await fiscalDriver.register(sale)
+    if (!receipt) return sale
+    await salesDb.attachFiscal(sale.id, receipt.number, receipt.sign, receipt.device)
+    return (await salesDb.find(sale.id)) ?? sale
+  } catch (error) {
+    console.error('Фискальный регистратор не принял чек', error)
+    return sale
+  }
+}
 
 export const salesService = {
   create: async (cashierId: string, input: ISaleInput) => {
@@ -50,7 +64,7 @@ export const salesService = {
 
     const sale = await salesDb.find(saleId)
     if (!sale) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
-    return sale
+    return registerFiscal(sale)
   },
 
   refund: async (cashierId: string, saleId: string) => {

@@ -21,6 +21,13 @@ export interface ISaleItem {
   total: number
 }
 
+export interface IFiscalReceipt {
+  number: string
+  sign: string
+  device: string
+  registeredAt: string
+}
+
 export interface ISale {
   id: string
   number: number
@@ -33,6 +40,7 @@ export interface ISale {
   change: number
   refundedAt: string | null
   createdAt: string
+  fiscal: IFiscalReceipt | null
   items: ISaleItem[]
 }
 
@@ -61,6 +69,9 @@ export interface IShiftState {
   shift: IShift
   totals: IShiftTotals
 }
+
+export const FISCAL_LABEL = 'Фискальный'
+export const NOT_FISCAL_LABEL = 'Без фискализации'
 
 export const PAYMENT_LABELS: Record<PaymentKind, string> = {
   [PaymentKind.CASH]: 'Наличные',

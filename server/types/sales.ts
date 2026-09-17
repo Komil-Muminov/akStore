@@ -64,6 +64,13 @@ export interface ISaleItem {
   total: number
 }
 
+export interface IFiscalReceipt {
+  number: string
+  sign: string
+  device: string
+  registeredAt: string
+}
+
 export interface ISale {
   id: string
   number: number
@@ -76,6 +83,7 @@ export interface ISale {
   change: number
   refundedAt: string | null
   createdAt: string
+  fiscal: IFiscalReceipt | null
   items: ISaleItem[]
 }
 
@@ -90,6 +98,10 @@ export interface ISaleRow {
   paid: string
   refunded_at: Date | null
   created_at: Date
+  fiscal_number: string
+  fiscal_sign: string
+  fiscal_device: string
+  fiscal_at: Date | null
 }
 
 export interface ISaleItemRow {
