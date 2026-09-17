@@ -85,15 +85,6 @@ export const metaInfo: StyleDesc = {
   justifyContent: 'flex-end',
   gap: theme.spacing.xs,
   flexShrink: 0,
-  marginLeft: 'auto',
-}
-
-export const bubbleActions: StyleDesc = {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: theme.spacing.xxs,
-  flexShrink: 0,
 }
 
 export const metaOf = (own: boolean): StyleDesc => ({
