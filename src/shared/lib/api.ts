@@ -63,7 +63,10 @@ export const request = async <T>(url: string, options: IRequestOptions = {}) => 
 }
 
 
+const UPLOAD_UNSUPPORTED = 'Отправка файлов доступна только в десктоп-версии'
+
 export const uploadFile = async <T>(url: string, filePath: string, caption: string) => {
+  if (typeof Bun === 'undefined') throw new Error(UPLOAD_UNSUPPORTED)
   const token = session.get()?.token
   const path = await import('node:path')
   const form = new FormData()

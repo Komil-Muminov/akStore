@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { CLIENT_ENV_KEYS } from './src/shared/config/env'
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url))
 const OUT = path.join(ROOT, 'web-dist')
@@ -19,13 +20,17 @@ const CONTENT_TYPES: Record<string, string> = {
 
 const contentType = (pathname: string) => CONTENT_TYPES[path.extname(pathname)] ?? 'text/html'
 
+const define = Object.fromEntries(
+  CLIENT_ENV_KEYS.map((key) => [`process.env.${key}`, JSON.stringify(process.env[key] ?? '')]),
+)
+
 const bundle = await Bun.build({
   entrypoints: [path.join(ROOT, 'app.tsx')],
   outdir: OUT,
   target: 'browser',
   format: 'esm',
   naming: 'app.js',
-  env: 'APP_*',
+  define,
   throw: false,
 })
 
