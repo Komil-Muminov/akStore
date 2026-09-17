@@ -55,6 +55,9 @@ export const theme = {
     fileCardMinWidth: 220,
     bubbleMinWidth: 132,
     dot: 8,
+    filterField: 168,
+    chartBar: 28,
+    chartHeight: 132,
   },
   motion: { fast: 0.15, normal: 0.25 },
 } as const

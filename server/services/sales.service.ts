@@ -1,7 +1,7 @@
 import { productsDb, salesDb, stockDb } from '../db'
 import { vatAmountOf } from '../fiscal'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { StockMoveKind, type IProduct, type ISaleInput, type ISalesParams } from '../types'
+import { StockMoveKind, type IPageParams, type IProduct, type IReportParams, type ISaleInput } from '../types'
 import { fiscalService } from './fiscal.service'
 import { shiftsService } from './shifts.service'
 
@@ -97,5 +97,6 @@ export const salesService = {
     return sale
   },
 
-  search: async (params: ISalesParams) => salesDb.search(params, Math.min(params.limit ?? SALES_LIMIT, SALES_LIMIT)),
+  search: async (params: IReportParams, page: IPageParams) =>
+    salesDb.search(params, { page: page.page, limit: Math.min(page.limit, SALES_LIMIT) }),
 }

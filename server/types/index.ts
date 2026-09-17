@@ -34,13 +34,26 @@ export type {
   ISaleItemRow,
   ISaleInput,
   ISaleItemInput,
-  ISalesParams,
   ISaleRecord,
   ISaleItemRecord,
   IFiscalReceipt,
   IFiscalStamp,
   IFiscalTaskRow,
 } from './sales'
+export type {
+  IReportParams,
+  IPageParams,
+  IReportSummary,
+  IReportSummaryRow,
+  ITopProduct,
+  ITopProductRow,
+  ICashierStat,
+  ICashierStatRow,
+  IDailyPoint,
+  IDailyPointRow,
+  IExportFile,
+  IZReport,
+} from './reports'
 export { UnitType } from './org'
 export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'
 

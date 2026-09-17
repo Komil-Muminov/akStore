@@ -1,6 +1,9 @@
 import { pool } from './pool'
+import { filterOf } from './reports.filters'
 import type {
   IFiscalReceipt,
+  IPageParams,
+  IReportParams,
   IFiscalStamp,
   ISale,
   ISaleItem,
@@ -8,7 +11,6 @@ import type {
   ISaleItemRow,
   ISaleRecord,
   ISaleRow,
-  ISalesParams,
 } from '../types'
 
 const toItem = (row: ISaleItemRow): ISaleItem => ({
@@ -60,11 +62,11 @@ const BASE_SQL = `
 
 const FIND_SQL = `${BASE_SQL} WHERE s.id = $1`
 
-const SEARCH_SQL = `${BASE_SQL}
-  WHERE ($1::uuid IS NULL OR s.shift_id = $1)
-    AND ($2::timestamptz IS NULL OR s.created_at >= $2)
-    AND ($3::timestamptz IS NULL OR s.created_at <= $3)
-  ORDER BY s.created_at DESC LIMIT $4`
+const searchSql = (where: string, limitIndex: number) =>
+  `${BASE_SQL} ${where} ORDER BY s.created_at DESC LIMIT $${limitIndex} OFFSET $${limitIndex + 1}`
+
+const countSql = (where: string) =>
+  `SELECT count(*)::text AS total FROM sales s JOIN users u ON u.id = s.cashier_id ${where}`
 
 const ITEMS_SQL = `
   SELECT id, sale_id, product_id, name, quantity, price, vat_rate, vat_amount, mark_code
@@ -128,12 +130,24 @@ export const salesDb = {
     const grouped = await itemsOf([row.id])
     return toSale(row, grouped.get(row.id) ?? [])
   },
-  search: async (params: ISalesParams, limit: number) => {
+  search: async (params: IReportParams, page: IPageParams) => {
+    const { where, values } = filterOf(params)
+    const total = Number((await pool.query<{ total: string }>(countSql(where), values)).rows[0]?.total ?? 0)
     const rows = (
-      await pool.query<ISaleRow>(SEARCH_SQL, [params.shiftId ?? null, params.from ?? null, params.to ?? null, limit])
+      await pool.query<ISaleRow>(searchSql(where, values.length + 1), [
+        ...values,
+        page.limit,
+        (page.page - 1) * page.limit,
+      ])
     ).rows
     const grouped = await itemsOf(rows.map((row) => row.id))
-    return rows.map((row) => toSale(row, grouped.get(row.id) ?? []))
+    return {
+      items: rows.map((row) => toSale(row, grouped.get(row.id) ?? [])),
+      total,
+      page: page.page,
+      limit: page.limit,
+      totalPages: Math.ceil(total / page.limit),
+    }
   },
   attachFiscal: async (id: string, stamp: IFiscalStamp) => {
     await pool.query(FISCAL_SQL, [id, stamp.number, stamp.sign, stamp.device, stamp.qr])

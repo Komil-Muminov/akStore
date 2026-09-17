@@ -5,3 +5,7 @@ export const EMPTY_HINT = 'Откройте смену на кассе, чтоб
 export const OPEN_LABEL = 'Открыта'
 export const CLOSED_LABEL = 'Закрыта'
 export const ESTIMATED_ROW_HEIGHT = 64
+export const PRINT_TOOLTIP = 'Печать Z-отчёта'
+export const PRINT_FILE = 'z-otchet.html'
+export const START_LABEL = 'Начало'
+export const END_LABEL = 'Конец'

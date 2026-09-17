@@ -1,12 +1,16 @@
-import { shiftsDb } from '../db'
+import { reportsDb, shiftsDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
+import { UserRole, type IAuthUser } from '../types'
 import { fiscalService } from './fiscal.service'
+import { zReportHtml } from './shifts.report'
 
 const LIST_LIMIT = 50
 const ALREADY_OPEN = 'Смена уже открыта'
 const NOT_OPEN = 'Открытой смены нет'
 const NOT_FOUND = 'Смена не найдена'
 const FOREIGN_SHIFT = 'Это смена другого кассира'
+
+const EMPTY_FILTERS = { from: null, to: null, cashierId: null, payment: null, query: '' }
 
 export const shiftsService = {
   current: async (cashierId: string) => {
@@ -46,6 +50,17 @@ export const shiftsService = {
     if (!shift) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
     if (shift.cashierId !== cashierId) throw new HttpError(HttpStatus.FORBIDDEN, FOREIGN_SHIFT)
     return { shift, totals: await shiftsDb.totals(shift.id, shift.openingCash) }
+  },
+
+  printable: async (actor: IAuthUser, shiftId: string) => {
+    const shift = await shiftsDb.find(shiftId)
+    if (!shift) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
+    if (shift.cashierId !== actor.id && actor.role !== UserRole.SUPERADMIN && actor.role !== UserRole.ADMIN) {
+      throw new HttpError(HttpStatus.FORBIDDEN, FOREIGN_SHIFT)
+    }
+    const totals = await shiftsDb.totals(shift.id, shift.openingCash)
+    const summary = await reportsDb.summary({ ...EMPTY_FILTERS, shiftId })
+    return zReportHtml(shift, totals, summary, null)
   },
 
   list: async () => shiftsDb.list(LIST_LIMIT),

@@ -159,9 +159,3 @@ export interface ISaleItemRow {
   mark_code: string
 }
 
-export interface ISalesParams {
-  shiftId?: string
-  from?: string
-  to?: string
-  limit?: number
-}

@@ -3,6 +3,7 @@ import { authRouter } from './auth.routes'
 import { chatRouter } from './chat.routes'
 import { positionsRouter } from './positions.routes'
 import { productsRouter } from './products.routes'
+import { reportsRouter } from './reports.routes'
 import { fiscalRouter, salesRouter, shiftsRouter } from './sales.routes'
 import { unitsRouter } from './units.routes'
 import { usersRouter } from './users.routes'
@@ -16,5 +17,6 @@ apiRouter.use('/products', productsRouter)
 apiRouter.use('/shifts', shiftsRouter)
 apiRouter.use('/sales', salesRouter)
 apiRouter.use('/fiscal', fiscalRouter)
+apiRouter.use('/reports', reportsRouter)
 apiRouter.use('/positions', positionsRouter)
 apiRouter.use('/units', unitsRouter)

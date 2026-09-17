@@ -27,6 +27,7 @@ import iconShieldAlert from '../../../../assets/icons/shield-alert.svg' with { t
 import iconMap from '../../../../assets/icons/map.svg' with { type: 'text' }
 import iconChart from '../../../../assets/icons/chart-column-big.svg' with { type: 'text' }
 import iconDownload from '../../../../assets/icons/download.svg' with { type: 'text' }
+import iconPrinter from '../../../../assets/icons/printer.svg' with { type: 'text' }
 import iconFolderOpen from '../../../../assets/icons/folder-open.svg' with { type: 'text' }
 import iconCalendar from '../../../../assets/icons/calendar-days.svg' with { type: 'text' }
 import iconMessage from '../../../../assets/icons/message-circle.svg' with { type: 'text' }
@@ -64,6 +65,7 @@ export const ICONS = {
   map: iconMap,
   chart: iconChart,
   download: iconDownload,
+  printer: iconPrinter,
   folderOpen: iconFolderOpen,
   calendar: iconCalendar,
   message: iconMessage,
