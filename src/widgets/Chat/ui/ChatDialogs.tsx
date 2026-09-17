@@ -1,5 +1,4 @@
-import type { IHost } from '@/entities/host'
-import type { IMember, IMessage } from '@/entities/message'
+import type { IColleague, IMember, IMessage } from '@/entities/message'
 import { ChatGroupPanel } from '@/features/ChatGroupPanel'
 import { ChatGroupForm, type IGroupSubmit } from '@/features/ChatGroupForm'
 import { ConfirmDialog } from '@/shared/ui'
@@ -7,7 +6,7 @@ import { REMOVE_DIALOG } from '../model'
 
 interface IProps {
   groupOpen: boolean
-  colleagues: IHost[]
+  colleagues: IColleague[]
   groupPending: boolean
   groupError?: string
   removing: IMessage | null

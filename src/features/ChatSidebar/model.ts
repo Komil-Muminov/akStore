@@ -1,9 +1,9 @@
-import type { IConversation, IMessage } from '@/entities/message'
-import type { IHost } from '@/entities/host'
+import type { IColleague, IConversation, IMessage } from '@/entities/message'
+
 
 export interface IProps {
   conversations: IConversation[]
-  companions: IHost[]
+  companions: IColleague[]
   online: string[]
   hits: IMessage[]
   query: string

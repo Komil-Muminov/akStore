@@ -39,6 +39,13 @@ export interface IMember {
   login: string
 }
 
+export interface IColleague {
+  userId: string
+  fullName: string
+  login: string
+  positionName: string
+}
+
 export const UNREAD_LIMIT = 99
 export const UNREAD_OVERFLOW = '99+'
 export const DIRECT_HINT = 'Личная переписка'

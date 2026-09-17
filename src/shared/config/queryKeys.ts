@@ -11,6 +11,7 @@ export enum QueryKeys {
   CHAT_HISTORY = 'chat-history',
   CHAT_MEMBERS = 'chat-members',
   CHAT_UNREAD = 'chat-unread',
+  CHAT_COLLEAGUES = 'chat-colleagues',
   CHAT_ONLINE = 'chat-online',
   CHAT_SEARCH = 'chat-search',
 }

@@ -76,6 +76,20 @@ export interface IMemberRow {
   login: string
 }
 
+export interface IColleague {
+  userId: string
+  fullName: string
+  login: string
+  positionName: string
+}
+
+export interface IColleagueRow {
+  user_id: string
+  full_name: string
+  login: string
+  position_name: string | null
+}
+
 export interface IAttachment {
   fileName: string
   filePath: string

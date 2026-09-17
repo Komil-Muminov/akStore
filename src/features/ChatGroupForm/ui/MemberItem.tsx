@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
-import type { IHost } from '@/entities/host'
+import type { IColleague } from '@/entities/message'
 import { Checkbox } from '@/shared/ui'
 import { item } from '../style'
 
 interface IProps {
-  companion: IHost
+  companion: IColleague
   checked: boolean
   onToggle: (userId: string) => void
 }

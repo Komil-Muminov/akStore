@@ -8,7 +8,7 @@ export {
   ONLINE_HINT,
   TYPING_HINT,
 } from './model'
-export type { IConversation, IMember, IMessage } from './model'
+export type { IColleague, IConversation, IMember, IMessage } from './model'
 export {
   dayLabelOf,
   fileSizeOf,

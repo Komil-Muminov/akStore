@@ -34,6 +34,7 @@ export const ApiRoutes = {
   CHAT_ADD_MEMBERS: (id: string) => `/chat/add-members/${id}`,
   CHAT_LEAVE: (id: string) => `/chat/leave/${id}`,
   CHAT_UNREAD: '/chat/unread-count',
+  CHAT_COLLEAGUES: '/chat/colleagues',
   CHAT_ONLINE: '/chat/online',
   CHAT_UPLOAD: (id: string) => `/chat/upload/${id}`,
   CHAT_FILE: (id: string) => `/chat/file/${id}`,

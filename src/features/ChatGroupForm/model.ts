@@ -1,4 +1,4 @@
-import type { IHost } from '@/entities/host'
+import type { IColleague } from '@/entities/message'
 
 export interface IGroupSubmit {
   title: string
@@ -7,7 +7,7 @@ export interface IGroupSubmit {
 
 export interface IProps {
   open: boolean
-  companions: IHost[]
+  companions: IColleague[]
   pending: boolean
   error?: string
   onSubmit: (values: IGroupSubmit) => void

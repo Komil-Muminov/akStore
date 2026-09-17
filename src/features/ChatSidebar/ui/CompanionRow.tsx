@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
 import { initialsOf } from '@/entities/pass'
-import type { IHost } from '@/entities/host'
+import type { IColleague } from '@/entities/message'
 import { avatar, avatarText, name, preview, row, rowBody, rowTop } from '../style'
 
 interface IProps {
-  companion: IHost
+  companion: IColleague
   onOpen: (companionId: string) => void
 }
 

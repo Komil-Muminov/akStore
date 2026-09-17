@@ -1,5 +1,4 @@
-import type { IHost } from '@/entities/host'
-import type { IConversation, IMember, IMessage } from '@/entities/message'
+import type { IColleague, IConversation, IMember, IMessage } from '@/entities/message'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { SEARCH_MIN_LENGTH } from './model'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
@@ -16,7 +15,8 @@ const GROUP_INVALIDATE = [QueryKeys.CHAT, QueryKeys.CHAT_MEMBERS]
 export const useConversationsQuery = () =>
   useGetQuery<IConversation[]>(QueryKeys.CHAT, ApiRoutes.CHAT_SEARCH)
 
-export const useCompanionsQuery = () => useGetQuery<IHost[]>(QueryKeys.HOSTS, ApiRoutes.HOSTS_SEARCH)
+export const useCompanionsQuery = () =>
+  useGetQuery<IColleague[]>(QueryKeys.CHAT_COLLEAGUES, ApiRoutes.CHAT_COLLEAGUES)
 
 export const useMessageSearchQuery = (query: string) =>
   useGetQuery<IMessage[]>(

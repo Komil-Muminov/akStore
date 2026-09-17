@@ -54,6 +54,8 @@ const loaded = async (userId: string, conversationId: string) => {
 export const chatService = {
   search: async (userId: string) => chatDb.search(userId),
 
+  colleagues: async (userId: string) => chatMembersDb.colleagues(userId),
+
   openDirect: async (userId: string, companionId: string) => {
     if (userId === companionId) throw new HttpError(HttpStatus.BAD_REQUEST, SELF_CHAT_ERROR)
     await requireActiveUsers([companionId])

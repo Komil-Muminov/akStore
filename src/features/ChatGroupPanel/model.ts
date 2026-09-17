@@ -1,11 +1,11 @@
-import type { IHost } from '@/entities/host'
+import type { IColleague } from '@/entities/message'
 import type { IMember } from '@/entities/message'
 
 export interface IProps {
   open: boolean
   title: string
   members: IMember[]
-  companions: IHost[]
+  companions: IColleague[]
   isOwner: boolean
   pending: boolean
   error?: string
