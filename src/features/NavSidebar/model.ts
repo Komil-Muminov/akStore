@@ -20,17 +20,19 @@ export interface IProps {
   onLogout: () => void
 }
 
-export const APP_NAME = 'gatePass'
-export const APP_TAGLINE = 'Пропускная система'
+export const APP_NAME = 'Касса'
+export const APP_TAGLINE = 'Торговля и склад'
 export const NAV_SECTION = 'Разделы'
 export const CHANGE_PASSWORD_TOOLTIP = 'Сменить пароль'
 export const LOGOUT_TOOLTIP = 'Выйти'
 
 export const NAV_ITEMS: INavItem[] = [
-  { id: AppRoutes.PASSES, label: 'Пропуска', hint: 'Выдача и учёт', icon: 'shieldCheck', minRole: UserRole.EMPLOYEE },
-  { id: AppRoutes.GATE, label: 'Проходная', hint: 'Вход и выход посетителей', icon: 'target', minRole: UserRole.EMPLOYEE },
+  { id: AppRoutes.SALE, label: 'Касса', hint: 'Продажа и смена', icon: 'listChecks', minRole: UserRole.EMPLOYEE },
+  { id: AppRoutes.PRODUCTS, label: 'Товары', hint: 'Справочник и цены', icon: 'briefcase', minRole: UserRole.ADMIN },
+  { id: AppRoutes.STOCK, label: 'Склад', hint: 'Приход и движения', icon: 'download', minRole: UserRole.ADMIN },
+  { id: AppRoutes.SHIFTS, label: 'Смены', hint: 'Отчёты по сменам', icon: 'calendar', minRole: UserRole.ADMIN },
+  { id: AppRoutes.REPORTS, label: 'Отчёты', hint: 'Выручка и товары', icon: 'chart', minRole: UserRole.ADMIN },
   { id: AppRoutes.CHAT, label: 'Сообщения', hint: 'Переписка с коллегами', icon: 'message', minRole: UserRole.EMPLOYEE },
-  { id: AppRoutes.STRUCTURE, label: 'Структура', hint: 'Подразделения и должности', icon: 'building', minRole: UserRole.ADMIN },
-  { id: AppRoutes.USERS, label: 'Пользователи', hint: 'Учётные записи и роли', icon: 'userCog', minRole: UserRole.ADMIN },
-  { id: AppRoutes.REPORTS, label: 'Отчёты', hint: 'Статистика и экспорт в Excel', icon: 'chart', minRole: UserRole.ADMIN },
+  { id: AppRoutes.STRUCTURE, label: 'Структура', hint: 'Точки и должности', icon: 'building', minRole: UserRole.ADMIN },
+  { id: AppRoutes.USERS, label: 'Сотрудники', hint: 'Учётные записи и роли', icon: 'userCog', minRole: UserRole.ADMIN },
 ]

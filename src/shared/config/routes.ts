@@ -25,6 +25,35 @@ export const ApiRoutes = {
   USERS_UPDATE: (id: string) => `/users/update/${id}`,
   USERS_RESET_PASSWORD: (id: string) => `/users/reset-password/${id}`,
   USERS_DELETE: (id: string) => `/users/delete/${id}`,
+  PRODUCTS_SEARCH: (query?: string, category?: string, page = 1, limit = 20) => {
+    const params = new URLSearchParams()
+    if (query?.trim()) params.set('q', query.trim())
+    if (category) params.set('category', category)
+    params.set('page', String(page))
+    params.set('limit', String(limit))
+    return `/products/search?${params.toString()}`
+  },
+  PRODUCTS_BARCODE: (code: string) => `/products/barcode/${encodeURIComponent(code)}`,
+  PRODUCTS_CATEGORIES: '/products/categories',
+  PRODUCTS_HISTORY: (productId?: string) =>
+    productId ? `/products/history?product=${productId}` : '/products/history',
+  PRODUCTS_CREATE: '/products/create',
+  PRODUCTS_UPDATE: (id: string) => `/products/update/${id}`,
+  PRODUCTS_DELETE: (id: string) => `/products/delete/${id}`,
+  CATEGORY_CREATE: '/products/category-create',
+  CATEGORY_UPDATE: (id: string) => `/products/category-update/${id}`,
+  CATEGORY_DELETE: (id: string) => `/products/category-delete/${id}`,
+  STOCK_INCOME: '/products/income',
+  STOCK_WRITE_OFF: '/products/write-off',
+  STOCK_INVENTORY: '/products/inventory',
+  SHIFT_CURRENT: '/shifts/current',
+  SHIFT_LIST: '/shifts/list',
+  SHIFT_OPEN: '/shifts/open',
+  SHIFT_CLOSE: '/shifts/close',
+  SALES_SEARCH: (shiftId?: string, limit = 50) =>
+    shiftId ? `/sales/search?shift=${shiftId}&limit=${String(limit)}` : `/sales/search?limit=${String(limit)}`,
+  SALES_CREATE: '/sales/create',
+  SALES_REFUND: (id: string) => `/sales/refund/${id}`,
   CHAT_SEARCH: '/chat/search',
   CHAT_HISTORY: (id: string, before?: string | null) =>
     before ? `/chat/history/${id}?before=${encodeURIComponent(before)}` : `/chat/history/${id}`,

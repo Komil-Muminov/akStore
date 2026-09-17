@@ -1,4 +1,10 @@
 export enum QueryKeys {
+  PRODUCTS = 'products',
+  CATEGORIES = 'categories',
+  STOCK_HISTORY = 'stock-history',
+  SHIFT = 'shift',
+  SHIFTS = 'shifts',
+  SALES = 'sales',
   POSITIONS = 'positions',
   UNITS = 'units',
   ME = 'me',

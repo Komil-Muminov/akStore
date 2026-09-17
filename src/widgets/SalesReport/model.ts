@@ -1,0 +1,10 @@
+export const TITLE = 'Отчёты'
+export const DESCRIPTION = 'Продажи, выручка и возвраты'
+export const EMPTY_TITLE = 'Продаж пока нет'
+export const EMPTY_HINT = 'Пробейте первый чек на кассе'
+export const REFUNDED_LABEL = 'Возврат'
+export const ESTIMATED_ROW_HEIGHT = 64
+export const REVENUE_LABEL = 'Выручка'
+export const RECEIPTS_LABEL = 'Чеков'
+export const AVERAGE_LABEL = 'Средний чек'
+export const REFUNDS_LABEL = 'Возвраты'

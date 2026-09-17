@@ -1,15 +1,17 @@
 import { lazy, type JSX, type LazyExoticComponent } from 'react'
 import { AppRoutes } from '@/shared/config'
 
-export const INITIAL_ROUTE = AppRoutes.PASSES
+export const INITIAL_ROUTE = AppRoutes.SALE
 
 export const PAGES: Record<AppRoutes, LazyExoticComponent<() => JSX.Element>> = {
-  [AppRoutes.PASSES]: lazy(() => import('@/pages/PassesPage')),
-  [AppRoutes.GATE]: lazy(() => import('@/pages/GatePage')),
+  [AppRoutes.SALE]: lazy(() => import('@/pages/SalePage')),
+  [AppRoutes.PRODUCTS]: lazy(() => import('@/pages/ProductsPage')),
+  [AppRoutes.STOCK]: lazy(() => import('@/pages/StockPage')),
+  [AppRoutes.SHIFTS]: lazy(() => import('@/pages/ShiftsPage')),
+  [AppRoutes.REPORTS]: lazy(() => import('@/pages/ReportsPage')),
   [AppRoutes.CHAT]: lazy(() => import('@/pages/ChatPage')),
   [AppRoutes.STRUCTURE]: lazy(() => import('@/pages/StructurePage')),
   [AppRoutes.USERS]: lazy(() => import('@/pages/UsersPage')),
-  [AppRoutes.REPORTS]: lazy(() => import('@/pages/ReportsPage')),
 }
 
 export const LoginPage = lazy(() => import('@/pages/LoginPage'))
