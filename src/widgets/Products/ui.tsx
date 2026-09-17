@@ -5,7 +5,7 @@ import { ProductList } from '@/features/ProductList'
 import { StockDialog, type IStockSubmit } from '@/features/StockDialog'
 import { Button, ConfirmDialog, Spinner, Text, TextInput } from '@/shared/ui'
 import { If } from '@/shared/ui'
-import { useCategoriesQuery, useProductMutations, useProductsQuery } from './hooks'
+import { useCategoriesQuery, useCategoryMutation, useProductMutations, useProductsQuery } from './hooks'
 import { ADD_LABEL, ARCHIVE_DIALOG, DESCRIPTION, SEARCH_PLACEHOLDER, TITLE } from './model'
 import { head, headText, root, search } from './style'
 
@@ -17,6 +17,8 @@ export const Products = () => {
   const [archiving, setArchiving] = useState<IProduct | null>(null)
   const products = useProductsQuery(query, null)
   const categories = useCategoriesQuery()
+  const createCategory = useCategoryMutation()
+  const [createdCategoryId, setCreatedCategoryId] = useState<string | null>(null)
   const { create, update, archive, move } = useProductMutations()
 
   const items = useMemo(() => products.data?.items ?? [], [products.data?.items])
@@ -29,7 +31,10 @@ export const Products = () => {
     setEditing(product)
     setFormOpen(true)
   }, [])
-  const closeForm = useCallback(() => setFormOpen(false), [])
+  const closeForm = useCallback(() => {
+    setFormOpen(false)
+    setCreatedCategoryId(null)
+  }, [])
   const closeStock = useCallback(() => setMoving(null), [])
   const cancelArchive = useCallback(() => setArchiving(null), [])
 
@@ -42,6 +47,17 @@ export const Products = () => {
       else createMutate(input, { onSuccess })
     },
     [editing, createMutate, updateMutate],
+  )
+
+  const categoryMutate = createCategory.mutate
+  const handleCreateCategory = useCallback(
+    (name: string) => {
+      categoryMutate(
+        { name },
+        { onSuccess: (list) => setCreatedCategoryId(list.find((item) => item.name === name)?.id ?? null) },
+      )
+    },
+    [categoryMutate],
   )
 
   const moveMutate = move.mutate
@@ -78,6 +94,9 @@ export const Products = () => {
         error={create.error?.message ?? update.error?.message}
         onSubmit={handleSubmit}
         onClose={closeForm}
+        onCreateCategory={handleCreateCategory}
+        categoryPending={createCategory.isPending}
+        createdCategoryId={createdCategoryId}
       />
       <StockDialog
         product={moving}

@@ -8,6 +8,9 @@ export interface IProps {
   error?: string
   onSubmit: (input: IProductInput) => void
   onClose: () => void
+  onCreateCategory: (name: string) => void
+  categoryPending: boolean
+  createdCategoryId: string | null
 }
 
 export const CREATE_TITLE = 'Новый товар'
@@ -26,6 +29,10 @@ export const NO_CATEGORY_OPTION = 'Без категории'
 export const VAT_LABEL = 'Ставка НДС'
 export const MARK_LABEL = 'Код маркировки'
 export const MARK_HINT = 'Обязателен для маркированных товаров'
+export const ADD_CATEGORY_TOOLTIP = 'Новая категория'
+export const SAVE_CATEGORY_TOOLTIP = 'Создать и выбрать'
+export const CANCEL_CATEGORY_TOOLTIP = 'Отменить'
+export const NEW_CATEGORY_HINT = 'Название категории'
 
 export const UNIT_OPTIONS = [
   { id: ProductUnit.PIECE, label: 'Штуки' },

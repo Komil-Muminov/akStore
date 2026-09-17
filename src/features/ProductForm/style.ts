@@ -23,3 +23,12 @@ export const actions: StyleDesc = {
   gap: theme.spacing.sm,
   paddingTop: theme.spacing.md,
 }
+
+export const categoryControl: StyleDesc = { flexGrow: 1, minWidth: 0 }
+
+export const categoryRow: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+}

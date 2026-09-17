@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ProductUnit, VAT_OPTIONS, type IProductInput } from '@/entities/product'
 import { Button, FormField, If, Modal, Select, Text } from '@/shared/ui'
+import { CategoryField } from './ui/CategoryField'
 import {
   BARCODE_HINT,
   BARCODE_LABEL,
   CANCEL_LABEL,
-  CATEGORY_LABEL,
   COST_LABEL,
   CREATE_TITLE,
   DESCRIPTION,
@@ -14,7 +14,6 @@ import {
   MARK_HINT,
   MARK_LABEL,
   NAME_LABEL,
-  NO_CATEGORY_OPTION,
   PRICE_LABEL,
   SUBMIT_LABEL,
   UNIT_LABEL,
@@ -26,8 +25,21 @@ import { actions, body, half, pair } from './style'
 
 const toMoney = (value: string) => Number(value.replace(',', '.')) || 0
 
-export const ProductForm = ({ open, initial, categories, pending, error, onSubmit, onClose }: IProps) => {
+export const ProductForm = ({
+  open,
+  initial,
+  categories,
+  pending,
+  error,
+  onSubmit,
+  onClose,
+  onCreateCategory,
+  categoryPending,
+  createdCategoryId,
+}: IProps) => {
   const [form, setForm] = useState<IProductInput>(EMPTY_FORM)
+  const [addingCategory, setAddingCategory] = useState(false)
+  const [categoryDraft, setCategoryDraft] = useState('')
 
   useEffect(() => {
     setForm(
@@ -46,6 +58,18 @@ export const ProductForm = ({ open, initial, categories, pending, error, onSubmi
     )
   }, [initial, open])
 
+  useEffect(() => {
+    if (createdCategoryId === null) return
+    setForm((current) => ({ ...current, categoryId: createdCategoryId }))
+    setAddingCategory(false)
+    setCategoryDraft('')
+  }, [createdCategoryId])
+
+  useEffect(() => {
+    setAddingCategory(false)
+    setCategoryDraft('')
+  }, [open])
+
   const setName = useCallback((name: string) => setForm((current) => ({ ...current, name })), [])
   const setBarcode = useCallback((barcode: string) => setForm((current) => ({ ...current, barcode })), [])
   const setCost = useCallback((value: string) => setForm((current) => ({ ...current, costPrice: toMoney(value) })), [])
@@ -63,6 +87,16 @@ export const ProductForm = ({ open, initial, categories, pending, error, onSubmi
     (value: string | null) => setForm((current) => ({ ...current, categoryId: value })),
     [],
   )
+  const startAddCategory = useCallback(() => setAddingCategory(true), [])
+  const cancelAddCategory = useCallback(() => {
+    setAddingCategory(false)
+    setCategoryDraft('')
+  }, [])
+  const confirmAddCategory = useCallback(() => {
+    const name = categoryDraft.trim()
+    if (name.length === 0 || categoryPending) return
+    onCreateCategory(name)
+  }, [categoryDraft, categoryPending, onCreateCategory])
   const handleSubmit = useCallback(() => onSubmit(form), [form, onSubmit])
 
   return (
@@ -84,16 +118,18 @@ export const ProductForm = ({ open, initial, categories, pending, error, onSubmi
           testId="product__barcode"
         />
         <div style={pair}>
-          <div style={half}>
-            <Text variant="label">{CATEGORY_LABEL}</Text>
-            <Select
-              value={form.categoryId}
-              options={categories.map((category) => ({ id: category.id, label: category.name }))}
-              placeholder={NO_CATEGORY_OPTION}
-              onChange={setCategory}
-              testId="product__category"
-            />
-          </div>
+          <CategoryField
+            value={form.categoryId}
+            categories={categories}
+            adding={addingCategory}
+            draft={categoryDraft}
+            pending={categoryPending}
+            onChange={setCategory}
+            onDraftChange={setCategoryDraft}
+            onStartAdd={startAddCategory}
+            onCancelAdd={cancelAddCategory}
+            onConfirmAdd={confirmAddCategory}
+          />
           <div style={half}>
             <Text variant="label">{UNIT_LABEL}</Text>
             <Select value={form.unit} options={UNIT_OPTIONS} onChange={setUnit} testId="product__unit" />
