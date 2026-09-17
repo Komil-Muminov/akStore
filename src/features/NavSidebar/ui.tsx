@@ -3,7 +3,19 @@ import { initialsOf } from '@/entities/pass'
 import { AppRoutes, theme } from '@/shared/config'
 import { Icon, IconButton, Text, Tooltip } from '@/shared/ui'
 import { APP_NAME, APP_TAGLINE, CHANGE_PASSWORD_TOOLTIP, LOGOUT_TOOLTIP, NAV_SECTION, type IProps } from './model'
-import { account, accountText, avatar, avatarText, brand, brandMark, brandText, root, section, spacer } from './style'
+import {
+  account,
+  accountLine,
+  accountText,
+  avatar,
+  avatarText,
+  brand,
+  brandMark,
+  brandText,
+  root,
+  section,
+  spacer,
+} from './style'
 import { NavItem } from './ui/NavItem'
 
 export const NavSidebar = ({ active, items, unread, user, onNavigate, onChangePassword, onLogout }: IProps) => (
@@ -35,8 +47,8 @@ export const NavSidebar = ({ active, items, unread, user, onNavigate, onChangePa
         <text style={avatarText}>{initialsOf(user.fullName || user.login)}</text>
       </div>
       <div style={accountText}>
-        <Text variant="bodyStrong">{user.fullName || user.login}</Text>
-        <Text variant="caption">{ROLE_LABELS[user.role]}</Text>
+        <Text variant="bodyStrong" style={accountLine}>{user.fullName || user.login}</Text>
+        <Text variant="caption" style={accountLine}>{ROLE_LABELS[user.role]}</Text>
       </div>
       <Tooltip title={CHANGE_PASSWORD_TOOLTIP}>
         <IconButton icon="key" onClick={onChangePassword} testId="nav__change-password" />

@@ -113,3 +113,5 @@ export const itemBadgeText: StyleDesc = {
   fontWeight: theme.font.weight.semibold,
   color: theme.colors.onAccent,
 }
+
+export const accountLine: StyleDesc = { whiteSpace: 'nowrap', textOverflow: 'ellipsis' }

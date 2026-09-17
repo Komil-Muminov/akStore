@@ -51,7 +51,7 @@ export const Bubble = ({ message, own, showAuthor, read, showStatus, onEdit, onR
           />
         </div>
       </If>
-      <div style={bubbleOf(own)}>
+      <div style={bubbleOf(own, hasFile(message))}>
         <If condition={showAuthor}>
           <text style={authorLabel}>{message.authorName}</text>
         </If>

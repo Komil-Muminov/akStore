@@ -72,6 +72,8 @@ export const rowTop: StyleDesc = {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: theme.spacing.sm,
+  minWidth: 0,
+  overflow: 'hidden',
 }
 
 export const preview: StyleDesc = {
@@ -81,6 +83,9 @@ export const preview: StyleDesc = {
   color: theme.colors.tertiary,
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
+  flexGrow: 1,
+  flexShrink: 1,
+  minWidth: 0,
 }
 
 export const name: StyleDesc = {

@@ -61,8 +61,9 @@ export const rowOf = (own: boolean): StyleDesc => ({
   paddingBottom: theme.spacing.xxs,
 })
 
-export const bubbleOf = (own: boolean): StyleDesc => ({
+export const bubbleOf = (own: boolean, wide = false): StyleDesc => ({
   maxWidth: theme.size.bubbleMaxWidth,
+  minWidth: wide ? theme.size.fileCardMinWidth : undefined,
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.xxs,

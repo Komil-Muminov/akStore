@@ -6,6 +6,7 @@ export const fileCard = (own: boolean): StyleDesc => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.sm,
+  width: '100%',
   marginTop: theme.spacing.xxs,
   marginBottom: theme.spacing.xxs,
   paddingTop: theme.spacing.sm,

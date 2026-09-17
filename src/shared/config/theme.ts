@@ -53,6 +53,7 @@ export const theme = {
     chatRow: 72,
     bubbleMaxWidth: '70%',
     composerMinHeight: 56,
+    fileCardMinWidth: 220,
   },
   motion: { fast: 0.15, normal: 0.25 },
 } as const

@@ -3,6 +3,9 @@ import { session } from './session'
 
 const DOWNLOADS_DIR = 'Downloads'
 const FALLBACK_ERROR = 'Не удалось скачать файл'
+const BROWSER_PATH = ''
+
+const isBun = typeof Bun !== 'undefined'
 
 const downloadsPath = async (fileName: string) => {
   const os = await import('node:os')
@@ -11,6 +14,15 @@ const downloadsPath = async (fileName: string) => {
   const dir = path.join(os.homedir(), DOWNLOADS_DIR)
   fs.mkdirSync(dir, { recursive: true })
   return path.join(dir, fileName)
+}
+
+const saveInBrowser = (bytes: ArrayBuffer, fileName: string) => {
+  const url = URL.createObjectURL(new Blob([bytes]))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 export const downloadFile = async (url: string, fileName: string) => {
@@ -23,12 +35,17 @@ export const downloadFile = async (url: string, fileName: string) => {
     throw new Error(payload?.message ?? FALLBACK_ERROR)
   }
   const bytes = await response.arrayBuffer()
+  if (!isBun) {
+    saveInBrowser(bytes, fileName)
+    return BROWSER_PATH
+  }
   const target = await downloadsPath(fileName)
   await Bun.write(target, bytes)
   return target
 }
 
 export const revealFile = async (filePath: string) => {
+  if (!isBun || filePath.length === 0) return
   if (process.platform === 'win32') {
     Bun.spawn(['explorer', `/select,${filePath}`])
     return

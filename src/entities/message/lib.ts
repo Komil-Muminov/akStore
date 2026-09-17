@@ -1,5 +1,6 @@
 import {
   ConversationKind,
+  FILE_PREVIEW,
   MEMBERS_FORMS,
   SIZE_UNITS,
   UNREAD_LIMIT,
@@ -56,10 +57,15 @@ export const membersLabelOf = (count: number) => {
   return `${String(count)} ${form ?? ''}`
 }
 
+const bodyPreviewOf = (conversation: IConversation) =>
+  conversation.lastMessage.length > 0 || conversation.lastMessageAt === null
+    ? conversation.lastMessage
+    : FILE_PREVIEW
+
 export const previewOf = (conversation: IConversation) =>
   isGroup(conversation) && conversation.lastMessageAuthor.length > 0
-    ? `${conversation.lastMessageAuthor}${AUTHOR_SEPARATOR}${conversation.lastMessage}`
-    : conversation.lastMessage
+    ? `${conversation.lastMessageAuthor}${AUTHOR_SEPARATOR}${bodyPreviewOf(conversation)}`
+    : bodyPreviewOf(conversation)
 
 export const isReadByCompanion = (message: IMessage, conversation: IConversation) =>
   conversation.companionReadAt !== null &&
