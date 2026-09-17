@@ -1,7 +1,8 @@
 import { productsDb, salesDb, stockDb } from '../db'
-import { fiscalDriver } from '../fiscal'
+import { vatAmountOf } from '../fiscal'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { StockMoveKind, type ISale, type ISaleInput, type ISalesParams } from '../types'
+import { StockMoveKind, type IProduct, type ISaleInput, type ISalesParams } from '../types'
+import { fiscalService } from './fiscal.service'
 import { shiftsService } from './shifts.service'
 
 const SALES_LIMIT = 200
@@ -15,16 +16,17 @@ const REFUND_NOTE = 'Возврат по чеку'
 
 const roundMoney = (value: number) => Math.round(value * 100) / 100
 
-const registerFiscal = async (sale: ISale) => {
-  if (!fiscalDriver.enabled) return sale
-  try {
-    const receipt = await fiscalDriver.register(sale)
-    if (!receipt) return sale
-    await salesDb.attachFiscal(sale.id, receipt.number, receipt.sign, receipt.device)
-    return (await salesDb.find(sale.id)) ?? sale
-  } catch (error) {
-    console.error('Фискальный регистратор не принял чек', error)
-    return sale
+const itemRecordOf = (product: IProduct, quantity: number, discountShare: number) => {
+  const total = roundMoney(product.salePrice * quantity - discountShare)
+  return {
+    productId: product.id,
+    name: product.name,
+    quantity,
+    price: product.salePrice,
+    costPrice: product.costPrice,
+    vatRate: product.vatRate,
+    vatAmount: vatAmountOf(total, product.vatRate),
+    markCode: product.markCode,
   }
 }
 
@@ -49,22 +51,30 @@ export const salesService = {
     const total = roundMoney(subtotal - discount)
     if (input.paid < total) throw new HttpError(HttpStatus.BAD_REQUEST, NOT_PAID)
 
-    const saleId = await salesDb.create(shift.id, cashierId, input.payment, total, discount, input.paid)
-    for (const line of prepared) {
-      await salesDb.addItem(
-        saleId,
-        line.product.id,
-        line.product.name,
-        line.quantity,
-        line.product.salePrice,
-        line.product.costPrice,
-      )
-      await stockDb.register(line.product.id, StockMoveKind.SALE, -line.quantity, 0, '', cashierId)
+    const records = prepared.map((line) => {
+      const lineTotal = line.product.salePrice * line.quantity
+      const share = subtotal > 0 ? roundMoney((discount * lineTotal) / subtotal) : 0
+      return itemRecordOf(line.product, line.quantity, share)
+    })
+    const vatTotal = roundMoney(records.reduce((sum, record) => sum + record.vatAmount, 0))
+
+    const saleId = await salesDb.create({
+      shiftId: shift.id,
+      cashierId,
+      payment: input.payment,
+      total,
+      discount,
+      paid: input.paid,
+      vatTotal,
+    })
+    for (const record of records) {
+      await salesDb.addItem(saleId, record)
+      await stockDb.register(record.productId, StockMoveKind.SALE, -record.quantity, 0, '', cashierId)
     }
 
     const sale = await salesDb.find(saleId)
     if (!sale) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
-    return registerFiscal(sale)
+    return fiscalService.registerSale(sale)
   },
 
   refund: async (cashierId: string, saleId: string) => {
@@ -78,7 +88,7 @@ export const salesService = {
     }
     const refunded = await salesDb.find(saleId)
     if (!refunded) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
-    return refunded
+    return fiscalService.registerRefund(refunded)
   },
 
   find: async (id: string) => {

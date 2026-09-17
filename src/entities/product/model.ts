@@ -18,6 +18,8 @@ export interface IProductInput {
   unit: ProductUnit
   costPrice: number
   salePrice: number
+  vatRate: number
+  markCode: string
 }
 
 export interface IProduct extends IProductInput {
@@ -57,6 +59,13 @@ export const MOVE_LABELS: Record<StockMoveKind, string> = {
   [StockMoveKind.REFUND]: 'Возврат',
   [StockMoveKind.INVENTORY]: 'Инвентаризация',
 }
+
+export const VAT_OPTIONS = [
+  { id: '0', label: 'Без НДС' },
+  { id: '5', label: '5%' },
+  { id: '14', label: '14%' },
+  { id: '18', label: '18%' },
+]
 
 export const LOW_STOCK_LIMIT = 5
 export const NO_CATEGORY = 'Без категории'

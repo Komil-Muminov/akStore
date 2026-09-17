@@ -62,12 +62,52 @@ export interface ISaleItem {
   quantity: number
   price: number
   total: number
+  vatRate: number
+  vatAmount: number
+  markCode: string
+}
+
+export interface IFiscalTaskRow {
+  id: string
+  sale_id: string
+  kind: string
+  attempts: string
+  last_error: string
+}
+
+export interface IFiscalStamp {
+  number: string
+  sign: string
+  device: string
+  qr: string
+}
+
+export interface ISaleRecord {
+  shiftId: string
+  cashierId: string
+  payment: PaymentKind
+  total: number
+  discount: number
+  paid: number
+  vatTotal: number
+}
+
+export interface ISaleItemRecord {
+  productId: string
+  name: string
+  quantity: number
+  price: number
+  costPrice: number
+  vatRate: number
+  vatAmount: number
+  markCode: string
 }
 
 export interface IFiscalReceipt {
   number: string
   sign: string
   device: string
+  qr: string
   registeredAt: string
 }
 
@@ -81,6 +121,7 @@ export interface ISale {
   discount: number
   paid: number
   change: number
+  vatTotal: number
   refundedAt: string | null
   createdAt: string
   fiscal: IFiscalReceipt | null
@@ -96,11 +137,13 @@ export interface ISaleRow {
   total: string
   discount: string
   paid: string
+  vat_total: string
   refunded_at: Date | null
   created_at: Date
   fiscal_number: string
   fiscal_sign: string
   fiscal_device: string
+  fiscal_qr: string
   fiscal_at: Date | null
 }
 
@@ -111,6 +154,9 @@ export interface ISaleItemRow {
   name: string
   quantity: string
   price: string
+  vat_rate: string
+  vat_amount: string
+  mark_code: string
 }
 
 export interface ISalesParams {

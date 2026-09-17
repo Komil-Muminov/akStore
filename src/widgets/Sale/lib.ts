@@ -14,6 +14,7 @@ export const addToCart = (lines: ICartLine[], product: IProduct): ICartLine[] =>
         price: product.salePrice,
         quantity: 1,
         stock: product.stock,
+        vatRate: product.vatRate,
       },
     ]
   }

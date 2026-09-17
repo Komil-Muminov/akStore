@@ -2,6 +2,7 @@ import cors from 'cors'
 import express from 'express'
 import { config } from './config'
 import { initDb } from './db'
+import { fiscalDriver, startFiscalQueue } from './fiscal'
 import { authMiddleware, errorMiddleware } from './middleware'
 import { startRealtime } from './realtime'
 import { apiRouter } from './routes'
@@ -21,6 +22,9 @@ app.use(errorMiddleware)
 await initDb()
 
 startRealtime()
+
+await fiscalDriver.connect()
+startFiscalQueue(fiscalDriver)
 
 app.listen(config.port, () => {
   console.log(`server: http://localhost:${config.port}`)

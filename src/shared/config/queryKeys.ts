@@ -5,6 +5,7 @@ export enum QueryKeys {
   SHIFT = 'shift',
   SHIFTS = 'shifts',
   SALES = 'sales',
+  FISCAL = 'fiscal',
   POSITIONS = 'positions',
   UNITS = 'units',
   ME = 'me',

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { rbacMiddleware } from '../middleware'
-import { salesService, shiftsService } from '../services'
+import { fiscalService, salesService, shiftsService } from '../services'
 import { HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
 import { parseCash, parseNote, parseSaleInput } from './retail.validation'
@@ -34,3 +34,7 @@ salesRouter.get('/search', anyRole, respond((req) => salesService.search({
 salesRouter.get('/find/:id', anyRole, respond((req) => salesService.find(idOf(req))))
 salesRouter.post('/create', anyRole, respond((req) => salesService.create(actorOf(req), parseSaleInput(req.body)), HttpStatus.CREATED))
 salesRouter.post('/refund/:id', anyRole, respond((req) => salesService.refund(actorOf(req), idOf(req))))
+
+export const fiscalRouter = Router()
+
+fiscalRouter.get('/status', anyRole, respond(() => fiscalService.status()))

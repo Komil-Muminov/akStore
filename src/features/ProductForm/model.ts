@@ -12,7 +12,7 @@ export interface IProps {
 
 export const CREATE_TITLE = 'Новый товар'
 export const EDIT_TITLE = 'Изменить товар'
-export const DESCRIPTION = 'Штрихкод, цены и категория'
+export const DESCRIPTION = 'Штрихкод, цены, НДС и маркировка'
 export const NAME_LABEL = 'Название'
 export const BARCODE_LABEL = 'Штрихкод'
 export const BARCODE_HINT = 'Отсканируйте или оставьте пустым'
@@ -23,6 +23,9 @@ export const PRICE_LABEL = 'Цена продажи'
 export const SUBMIT_LABEL = 'Сохранить'
 export const CANCEL_LABEL = 'Отмена'
 export const NO_CATEGORY_OPTION = 'Без категории'
+export const VAT_LABEL = 'Ставка НДС'
+export const MARK_LABEL = 'Код маркировки'
+export const MARK_HINT = 'Обязателен для маркированных товаров'
 
 export const UNIT_OPTIONS = [
   { id: ProductUnit.PIECE, label: 'Штуки' },
@@ -36,4 +39,6 @@ export const EMPTY_FORM: IProductInput = {
   unit: ProductUnit.PIECE,
   costPrice: 0,
   salePrice: 0,
+  vatRate: 0,
+  markCode: '',
 }

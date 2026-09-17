@@ -1,5 +1,6 @@
 import { shiftsDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
+import { fiscalService } from './fiscal.service'
 
 const LIST_LIMIT = 50
 const ALREADY_OPEN = 'Смена уже открыта'
@@ -25,6 +26,7 @@ export const shiftsService = {
     const id = await shiftsDb.open(cashierId, openingCash)
     const shift = await shiftsDb.find(id)
     if (!shift) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
+    await fiscalService.openShift(shift.cashierName)
     return { shift, totals: await shiftsDb.totals(shift.id, shift.openingCash) }
   },
 
@@ -35,7 +37,8 @@ export const shiftsService = {
     await shiftsDb.close(shift.id, closingCash, note)
     const closed = await shiftsDb.find(shift.id)
     if (!closed) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
-    return { shift: closed, totals }
+    const report = await fiscalService.closeShift(closed.cashierName)
+    return { shift: closed, totals, report }
   },
 
   report: async (cashierId: string, shiftId: string) => {

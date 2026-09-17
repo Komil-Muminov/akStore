@@ -35,7 +35,11 @@ export type {
   ISaleInput,
   ISaleItemInput,
   ISalesParams,
+  ISaleRecord,
+  ISaleItemRecord,
   IFiscalReceipt,
+  IFiscalStamp,
+  IFiscalTaskRow,
 } from './sales'
 export { UnitType } from './org'
 export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'

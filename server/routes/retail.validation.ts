@@ -8,7 +8,10 @@ const NOTE_MAX = 200
 const MONEY_MAX = 99_999_999
 const QUANTITY_MAX = 100_000
 const ITEMS_MAX = 200
+const VAT_MAX = 100
+const MARK_MAX = 64
 const MONEY_ERROR = 'Сумма указана неверно'
+const VAT_ERROR = 'Ставка НДС указана неверно'
 const QUANTITY_ERROR = 'Количество должно быть больше нуля'
 const ITEMS_ERROR = `В чеке должно быть от 1 до ${ITEMS_MAX} позиций`
 const UNIT_ERROR = 'Неизвестная единица измерения'
@@ -32,6 +35,14 @@ const quantity = (value: unknown) => {
   return Math.round(parsed * 1000) / 1000
 }
 
+const vatRate = (value: unknown) => {
+  const parsed = Number(value ?? 0)
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > VAT_MAX) {
+    throw new HttpError(HttpStatus.BAD_REQUEST, VAT_ERROR)
+  }
+  return Math.round(parsed * 100) / 100
+}
+
 export const parseProductInput = (body: unknown): IProductInput => {
   const raw = asRecord(body)
   const unit = String(raw.unit ?? ProductUnit.PIECE)
@@ -45,6 +56,8 @@ export const parseProductInput = (body: unknown): IProductInput => {
     unit: unit as ProductUnit,
     costPrice: money(raw.costPrice, 'costPrice'),
     salePrice: money(raw.salePrice, 'salePrice'),
+    vatRate: vatRate(raw.vatRate),
+    markCode: optionalString(raw.markCode, 'markCode', MARK_MAX),
   }
 }
 

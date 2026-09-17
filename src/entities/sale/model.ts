@@ -10,6 +10,7 @@ export interface ICartLine {
   price: number
   quantity: number
   stock: number
+  vatRate: number
 }
 
 export interface ISaleItem {
@@ -19,13 +20,38 @@ export interface ISaleItem {
   quantity: number
   price: number
   total: number
+  vatRate: number
+  vatAmount: number
+  markCode: string
 }
 
 export interface IFiscalReceipt {
   number: string
   sign: string
   device: string
+  qr: string
   registeredAt: string
+}
+
+export interface IFiscalStatus {
+  mode: string
+  transport: string
+  enabled: boolean
+  online: boolean
+  device: string
+  pending: number
+  message: string
+}
+
+export interface IFiscalReport {
+  number: string
+  device: string
+  total: number
+  cashTotal: number
+  cardTotal: number
+  refundTotal: number
+  vatTotal: number
+  createdAt: string
 }
 
 export interface ISale {
@@ -38,6 +64,7 @@ export interface ISale {
   discount: number
   paid: number
   change: number
+  vatTotal: number
   refundedAt: string | null
   createdAt: string
   fiscal: IFiscalReceipt | null
@@ -68,10 +95,17 @@ export interface IShiftTotals {
 export interface IShiftState {
   shift: IShift
   totals: IShiftTotals
+  report?: IFiscalReport | null
 }
 
 export const FISCAL_LABEL = 'Фискальный'
 export const NOT_FISCAL_LABEL = 'Без фискализации'
+export const VAT_LABEL = 'в т. ч. НДС'
+export const VAT_BASE = 100
+export const FISCAL_ONLINE_LABEL = 'ККМ на связи'
+export const FISCAL_OFFLINE_LABEL = 'ККМ не отвечает'
+export const FISCAL_OFF_LABEL = 'Без ККМ'
+export const FISCAL_QUEUE_LABEL = 'В очереди'
 
 export const PAYMENT_LABELS: Record<PaymentKind, string> = {
   [PaymentKind.CASH]: 'Наличные',

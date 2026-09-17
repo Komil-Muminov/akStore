@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { moneyOf } from '@/entities/product'
-import { cartSubtotalOf, cartTotalOf } from '@/entities/sale'
+import { cartSubtotalOf, cartTotalOf, cartVatOf } from '@/entities/sale'
 import { theme } from '@/shared/config'
 import { Icon, IconButton, If, Text, TextInput, Tooltip } from '@/shared/ui'
 import {
@@ -12,6 +12,7 @@ import {
   ESTIMATED_LINE_HEIGHT,
   SUBTOTAL_LABEL,
   TOTAL_LABEL,
+  VAT_ROW_LABEL,
   type IProps,
 } from './model'
 import { discountField, empty, grandTotal, head, list, root, totalRow, totals } from './style'
@@ -62,6 +63,12 @@ export const SaleCart = ({ lines, discount, onQuantityChange, onRemove, onDiscou
             testId="cart__discount"
           />
         </div>
+        <If condition={cartVatOf(lines, discount) > 0}>
+          <div style={totalRow}>
+            <Text variant="secondary">{VAT_ROW_LABEL}</Text>
+            <Text variant="bodyStrong">{moneyOf(cartVatOf(lines, discount))}</Text>
+          </div>
+        </If>
         <div style={totalRow}>
           <Text variant="title">{TOTAL_LABEL}</Text>
           <text style={grandTotal}>{moneyOf(cartTotalOf(lines, discount))}</text>

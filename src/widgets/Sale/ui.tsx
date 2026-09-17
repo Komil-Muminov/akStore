@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { IProduct } from '@/entities/product'
 import { cartTotalOf, type ICartLine } from '@/entities/sale'
+import { FiscalBadge } from '@/features/FiscalBadge'
 import { SaleCart } from '@/features/SaleCart'
 import { SaleScanner } from '@/features/SaleScanner'
 import { ShiftBar } from '@/features/ShiftBar'
-import { useCategoriesQuery, useProductsQuery, useSaleMutations, useShiftQuery } from './hooks'
+import { useCategoriesQuery, useFiscalStatusQuery, useProductsQuery, useSaleMutations, useShiftQuery } from './hooks'
 import { addToCart, changeQuantity } from './lib'
 import { NOTICE_TIMEOUT_MS, SOLD_NOTICE } from './model'
-import { main, root } from './style'
+import { badgeRow, main, root } from './style'
 
 export const Sale = () => {
   const [query, setQuery] = useState('')
@@ -18,6 +19,7 @@ export const Sale = () => {
   const products = useProductsQuery(query, category)
   const categories = useCategoriesQuery()
   const shift = useShiftQuery()
+  const fiscal = useFiscalStatusQuery()
   const { openShift, closeShift, sell } = useSaleMutations()
 
   const items = useMemo(() => products.data?.items ?? [], [products.data?.items])
@@ -98,6 +100,9 @@ export const Sale = () => {
           onCategoryChange={setCategory}
           onPick={handlePick}
         />
+        <div style={badgeRow}>
+          <FiscalBadge status={fiscal.data ?? null} />
+        </div>
         <ShiftBar
           state={shift.data ?? null}
           cartTotal={total}

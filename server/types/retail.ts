@@ -18,6 +18,8 @@ export interface IProductInput {
   unit: ProductUnit
   costPrice: number
   salePrice: number
+  vatRate: number
+  markCode: string
 }
 
 export interface IProduct extends IProductInput {
@@ -37,6 +39,8 @@ export interface IProductRow {
   cost_price: string
   sale_price: string
   stock: string
+  vat_rate: string
+  mark_code: string
   is_active: boolean
 }
 

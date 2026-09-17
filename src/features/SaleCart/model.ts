@@ -15,6 +15,7 @@ export const EMPTY_HINT = 'Отсканируйте товар или найди
 export const SUBTOTAL_LABEL = 'Сумма'
 export const DISCOUNT_LABEL = 'Скидка'
 export const TOTAL_LABEL = 'Итого'
+export const VAT_ROW_LABEL = 'в т. ч. НДС'
 export const CLEAR_TOOLTIP = 'Очистить чек'
 export const REMOVE_TOOLTIP = 'Убрать позицию'
 export const PLUS_TOOLTIP = 'Добавить'

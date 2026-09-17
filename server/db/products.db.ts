@@ -14,12 +14,14 @@ const toProduct = (row: IProductRow): IProduct => ({
   costPrice: Number(row.cost_price),
   salePrice: Number(row.sale_price),
   stock: Number(row.stock),
+  vatRate: Number(row.vat_rate),
+  markCode: row.mark_code,
   isActive: row.is_active,
 })
 
 const BASE_SQL = `
   SELECT p.id, p.barcode, p.name, p.category_id, c.name AS category_name,
-         p.unit, p.cost_price, p.sale_price, p.stock, p.is_active
+         p.unit, p.cost_price, p.sale_price, p.stock, p.vat_rate, p.mark_code, p.is_active
   FROM products p
   LEFT JOIN product_categories c ON c.id = p.category_id`
 
@@ -27,12 +29,12 @@ const FIND_SQL = `${BASE_SQL} WHERE p.id = $1`
 const BY_BARCODE_SQL = `${BASE_SQL} WHERE p.barcode = $1 AND p.is_active = true`
 
 const CREATE_SQL = `
-  INSERT INTO products (barcode, name, category_id, unit, cost_price, sale_price)
-  VALUES (NULLIF($1, ''), $2, $3, $4, $5, $6) RETURNING id`
+  INSERT INTO products (barcode, name, category_id, unit, cost_price, sale_price, vat_rate, mark_code)
+  VALUES (NULLIF($1, ''), $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 
 const UPDATE_SQL = `
   UPDATE products SET barcode = NULLIF($2, ''), name = $3, category_id = $4,
-    unit = $5, cost_price = $6, sale_price = $7, updated_at = now()
+    unit = $5, cost_price = $6, sale_price = $7, vat_rate = $8, mark_code = $9, updated_at = now()
   WHERE id = $1 RETURNING id`
 
 const ARCHIVE_SQL = 'UPDATE products SET is_active = false, updated_at = now() WHERE id = $1 RETURNING id'
@@ -44,6 +46,8 @@ const toValues = (input: IProductInput) => [
   input.unit,
   input.costPrice,
   input.salePrice,
+  input.vatRate,
+  input.markCode,
 ]
 
 export const productsDb = {

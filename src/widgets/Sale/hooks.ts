@@ -1,5 +1,5 @@
 import type { ICategory, IProduct } from '@/entities/product'
-import type { ISale, IShiftState } from '@/entities/sale'
+import type { IFiscalStatus, ISale, IShiftState } from '@/entities/sale'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
 import type { IPagedResponse } from '@/shared/model'
@@ -11,7 +11,7 @@ interface ISaleBody {
   paid: number
 }
 
-const INVALIDATE = [QueryKeys.SHIFT, QueryKeys.PRODUCTS, QueryKeys.SALES]
+const INVALIDATE = [QueryKeys.SHIFT, QueryKeys.PRODUCTS, QueryKeys.SALES, QueryKeys.FISCAL]
 const PAGE_LIMIT = 50
 
 export const useProductsQuery = (query: string, categoryId: string | null) =>
@@ -24,6 +24,8 @@ export const useCategoriesQuery = () =>
   useGetQuery<ICategory[]>(QueryKeys.CATEGORIES, ApiRoutes.PRODUCTS_CATEGORIES)
 
 export const useShiftQuery = () => useGetQuery<IShiftState | null>(QueryKeys.SHIFT, ApiRoutes.SHIFT_CURRENT)
+
+export const useFiscalStatusQuery = () => useGetQuery<IFiscalStatus>(QueryKeys.FISCAL, ApiRoutes.FISCAL_STATUS)
 
 export const useSaleMutations = () => {
   const openShift = useMutationQuery<IShiftState, { openingCash: number }>(ApiRoutes.SHIFT_OPEN, {

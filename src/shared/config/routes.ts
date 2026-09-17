@@ -54,6 +54,7 @@ export const ApiRoutes = {
     shiftId ? `/sales/search?shift=${shiftId}&limit=${String(limit)}` : `/sales/search?limit=${String(limit)}`,
   SALES_CREATE: '/sales/create',
   SALES_REFUND: (id: string) => `/sales/refund/${id}`,
+  FISCAL_STATUS: '/fiscal/status',
   CHAT_SEARCH: '/chat/search',
   CHAT_HISTORY: (id: string, before?: string | null) =>
     before ? `/chat/history/${id}?before=${encodeURIComponent(before)}` : `/chat/history/${id}`,

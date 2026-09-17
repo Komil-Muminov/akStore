@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ProductUnit, type IProductInput } from '@/entities/product'
+import { ProductUnit, VAT_OPTIONS, type IProductInput } from '@/entities/product'
 import { Button, FormField, If, Modal, Select, Text } from '@/shared/ui'
 import {
   BARCODE_HINT,
@@ -11,12 +11,15 @@ import {
   DESCRIPTION,
   EDIT_TITLE,
   EMPTY_FORM,
+  MARK_HINT,
+  MARK_LABEL,
   NAME_LABEL,
   NO_CATEGORY_OPTION,
   PRICE_LABEL,
   SUBMIT_LABEL,
   UNIT_LABEL,
   UNIT_OPTIONS,
+  VAT_LABEL,
   type IProps,
 } from './model'
 import { actions, body, half, pair } from './style'
@@ -36,6 +39,8 @@ export const ProductForm = ({ open, initial, categories, pending, error, onSubmi
             unit: initial.unit,
             costPrice: initial.costPrice,
             salePrice: initial.salePrice,
+            vatRate: initial.vatRate,
+            markCode: initial.markCode,
           }
         : EMPTY_FORM,
     )
@@ -49,6 +54,11 @@ export const ProductForm = ({ open, initial, categories, pending, error, onSubmi
     (value: string | null) => setForm((current) => ({ ...current, unit: (value ?? ProductUnit.PIECE) as ProductUnit })),
     [],
   )
+  const setVat = useCallback(
+    (value: string | null) => setForm((current) => ({ ...current, vatRate: Number(value ?? 0) })),
+    [],
+  )
+  const setMark = useCallback((markCode: string) => setForm((current) => ({ ...current, markCode })), [])
   const setCategory = useCallback(
     (value: string | null) => setForm((current) => ({ ...current, categoryId: value })),
     [],
@@ -105,6 +115,26 @@ export const ProductForm = ({ open, initial, categories, pending, error, onSubmi
               onChange={setPrice}
               isRequired
               testId="product__price"
+            />
+          </div>
+        </div>
+        <div style={pair}>
+          <div style={half}>
+            <Text variant="label">{VAT_LABEL}</Text>
+            <Select
+              value={String(form.vatRate)}
+              options={VAT_OPTIONS}
+              onChange={setVat}
+              testId="product__vat"
+            />
+          </div>
+          <div style={half}>
+            <FormField
+              label={MARK_LABEL}
+              value={form.markCode}
+              onChange={setMark}
+              placeholder={MARK_HINT}
+              testId="product__mark"
             />
           </div>
         </div>
