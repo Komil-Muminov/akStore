@@ -5,7 +5,7 @@ import { ProductList } from '@/features/ProductList'
 import { StockDialog, type IStockSubmit } from '@/features/StockDialog'
 import { Button, ConfirmDialog, Spinner, Text, TextInput } from '@/shared/ui'
 import { If } from '@/shared/ui'
-import { useCategoriesQuery, useCategoryMutation, useProductMutations, useProductsQuery } from './hooks'
+import { useCategoriesQuery, useCategoryMutations, useProductMutations, useProductsQuery } from './hooks'
 import { ADD_LABEL, ARCHIVE_DIALOG, DESCRIPTION, SEARCH_PLACEHOLDER, TITLE } from './model'
 import { head, headText, root, search } from './style'
 
@@ -17,7 +17,7 @@ export const Products = () => {
   const [archiving, setArchiving] = useState<IProduct | null>(null)
   const products = useProductsQuery(query, null)
   const categories = useCategoriesQuery()
-  const createCategory = useCategoryMutation()
+  const category = useCategoryMutations()
   const [createdCategoryId, setCreatedCategoryId] = useState<string | null>(null)
   const { create, update, archive, move } = useProductMutations()
 
@@ -49,16 +49,25 @@ export const Products = () => {
     [editing, createMutate, updateMutate],
   )
 
-  const categoryMutate = createCategory.mutate
+  const createCategoryMutate = category.create.mutate
   const handleCreateCategory = useCallback(
     (name: string) => {
-      categoryMutate(
+      createCategoryMutate(
         { name },
         { onSuccess: (list) => setCreatedCategoryId(list.find((item) => item.name === name)?.id ?? null) },
       )
     },
-    [categoryMutate],
+    [createCategoryMutate],
   )
+
+  const renameCategoryMutate = category.rename.mutate
+  const handleRenameCategory = useCallback(
+    (id: string, name: string) => renameCategoryMutate({ id, name }),
+    [renameCategoryMutate],
+  )
+
+  const removeCategoryMutate = category.remove.mutate
+  const handleRemoveCategory = useCallback((id: string) => removeCategoryMutate(id), [removeCategoryMutate])
 
   const moveMutate = move.mutate
   const handleMove = useCallback(
@@ -91,11 +100,12 @@ export const Products = () => {
         initial={editing}
         categories={categories.data ?? []}
         pending={create.isPending || update.isPending}
-        error={create.error?.message ?? update.error?.message}
+        error={create.error?.message ?? update.error?.message ?? category.remove.error?.message ?? category.rename.error?.message}
         onSubmit={handleSubmit}
         onClose={closeForm}
         onCreateCategory={handleCreateCategory}
-        categoryPending={createCategory.isPending}
+        onRenameCategory={handleRenameCategory}
+        onRemoveCategory={handleRemoveCategory}
         createdCategoryId={createdCategoryId}
       />
       <StockDialog

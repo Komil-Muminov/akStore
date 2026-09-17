@@ -27,10 +27,20 @@ export const useProductsQuery = (query: string, categoryId: string | null) =>
 export const useCategoriesQuery = () =>
   useGetQuery<ICategory[]>(QueryKeys.CATEGORIES, ApiRoutes.PRODUCTS_CATEGORIES)
 
-export const useCategoryMutation = () =>
-  useMutationQuery<ICategory[], { name: string }>(ApiRoutes.CATEGORY_CREATE, {
-    invalidate: [QueryKeys.CATEGORIES],
+export const useCategoryMutations = () => {
+  const create = useMutationQuery<ICategory[], { name: string }>(ApiRoutes.CATEGORY_CREATE, {
+    invalidate: INVALIDATE,
   })
+  const rename = useMutationQuery<ICategory[], { id: string; name: string }>(
+    (v) => ApiRoutes.CATEGORY_UPDATE(v.id),
+    { method: 'PATCH', invalidate: INVALIDATE, body: (v) => ({ name: v.name }) },
+  )
+  const remove = useMutationQuery<ICategory[], string>(ApiRoutes.CATEGORY_DELETE, {
+    method: 'DELETE',
+    invalidate: INVALIDATE,
+  })
+  return { create, rename, remove }
+}
 
 export const useProductMutations = () => {
   const create = useMutationQuery<IProduct, IProductInput>(ApiRoutes.PRODUCTS_CREATE, { invalidate: INVALIDATE })

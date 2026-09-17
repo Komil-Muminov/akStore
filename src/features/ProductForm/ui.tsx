@@ -34,12 +34,11 @@ export const ProductForm = ({
   onSubmit,
   onClose,
   onCreateCategory,
-  categoryPending,
+  onRenameCategory,
+  onRemoveCategory,
   createdCategoryId,
 }: IProps) => {
   const [form, setForm] = useState<IProductInput>(EMPTY_FORM)
-  const [addingCategory, setAddingCategory] = useState(false)
-  const [categoryDraft, setCategoryDraft] = useState('')
 
   useEffect(() => {
     setForm(
@@ -61,14 +60,15 @@ export const ProductForm = ({
   useEffect(() => {
     if (createdCategoryId === null) return
     setForm((current) => ({ ...current, categoryId: createdCategoryId }))
-    setAddingCategory(false)
-    setCategoryDraft('')
   }, [createdCategoryId])
 
   useEffect(() => {
-    setAddingCategory(false)
-    setCategoryDraft('')
-  }, [open])
+    setForm((current) =>
+      current.categoryId !== null && !categories.some((category) => category.id === current.categoryId)
+        ? { ...current, categoryId: null }
+        : current,
+    )
+  }, [categories])
 
   const setName = useCallback((name: string) => setForm((current) => ({ ...current, name })), [])
   const setBarcode = useCallback((barcode: string) => setForm((current) => ({ ...current, barcode })), [])
@@ -87,16 +87,6 @@ export const ProductForm = ({
     (value: string | null) => setForm((current) => ({ ...current, categoryId: value })),
     [],
   )
-  const startAddCategory = useCallback(() => setAddingCategory(true), [])
-  const cancelAddCategory = useCallback(() => {
-    setAddingCategory(false)
-    setCategoryDraft('')
-  }, [])
-  const confirmAddCategory = useCallback(() => {
-    const name = categoryDraft.trim()
-    if (name.length === 0 || categoryPending) return
-    onCreateCategory(name)
-  }, [categoryDraft, categoryPending, onCreateCategory])
   const handleSubmit = useCallback(() => onSubmit(form), [form, onSubmit])
 
   return (
@@ -121,14 +111,10 @@ export const ProductForm = ({
           <CategoryField
             value={form.categoryId}
             categories={categories}
-            adding={addingCategory}
-            draft={categoryDraft}
-            pending={categoryPending}
             onChange={setCategory}
-            onDraftChange={setCategoryDraft}
-            onStartAdd={startAddCategory}
-            onCancelAdd={cancelAddCategory}
-            onConfirmAdd={confirmAddCategory}
+            onCreate={onCreateCategory}
+            onRename={onRenameCategory}
+            onRemove={onRemoveCategory}
           />
           <div style={half}>
             <Text variant="label">{UNIT_LABEL}</Text>

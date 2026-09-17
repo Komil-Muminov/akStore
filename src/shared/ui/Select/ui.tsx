@@ -14,8 +14,9 @@ import { theme } from '@/shared/config'
 import { Icon, type TIconName } from '../Icon'
 import { If } from '../If'
 import { Text } from '../Text'
-import { EMPTY_LABEL, type ISelectOption } from './model'
+import { EMPTY_LABEL, type ISelectManage, type ISelectOption } from './model'
 import { content, empty, group, input, inputTheme, item, root, trigger } from './style'
+import { ManagePanel } from './ui/ManagePanel'
 
 interface IProps {
   value: string | null
@@ -24,6 +25,7 @@ interface IProps {
   placeholder?: string
   icon?: TIconName
   autoOpen?: boolean
+  manage?: ISelectManage
   testId?: string
 }
 
@@ -31,9 +33,12 @@ const NO_GROUP = ''
 
 const AUTO_OPEN_DELAY_MS = 200
 
-export const Select = ({ value, options, onChange, placeholder, icon, autoOpen = false, testId }: IProps) => {
+export const Select = ({ value, options, onChange, placeholder, icon, autoOpen = false, manage, testId }: IProps) => {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [managing, setManaging] = useState(false)
+  const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [confirmId, setConfirmId] = useState<string | null>(null)
   const byId = useMemo(() => new Map(options.map((option) => [option.id, option])), [options])
   const ids = useMemo(() => options.map((option) => option.id), [options])
   const matches = useCallback((option: ISelectOption, needle: string) => {
@@ -79,6 +84,41 @@ export const Select = ({ value, options, onChange, placeholder, icon, autoOpen =
     (next: ComboboxValue) => onChange(typeof next === 'string' ? next : null),
     [onChange],
   )
+
+  const knownLabel = useMemo(
+    () => options.some((option) => option.label.trim().toLowerCase() === query.trim().toLowerCase()),
+    [options, query],
+  )
+  const newName = manage && !knownLabel ? query : ''
+
+  const toggleManage = useCallback(() => {
+    setManaging((current) => !current)
+    setConfirmId(null)
+  }, [])
+  const changeDraft = useCallback((id: string, text: string) => setDrafts((current) => ({ ...current, [id]: text })), [])
+  const saveDraft = useCallback(
+    (id: string) => {
+      const name = (drafts[id] ?? '').trim()
+      if (name.length === 0) return
+      manage?.onRename(id, name)
+    },
+    [drafts, manage],
+  )
+  const cancelRemove = useCallback(() => setConfirmId(null), [])
+  const confirmRemove = useCallback(
+    (id: string) => {
+      manage?.onRemove(id)
+      setConfirmId(null)
+    },
+    [manage],
+  )
+  const createOption = useCallback(() => {
+    const name = query.trim()
+    if (name.length === 0) return
+    manage?.onCreate(name)
+    setManaging(false)
+    setOpen(false)
+  }, [manage, query])
 
   return (
     <div style={root}>
@@ -127,6 +167,22 @@ export const Select = ({ value, options, onChange, placeholder, icon, autoOpen =
           <ComboboxEmpty style={empty}>
             <Text variant="secondary">{EMPTY_LABEL}</Text>
           </ComboboxEmpty>
+          <If condition={manage !== undefined}>
+            <ManagePanel
+              options={options}
+              managing={managing}
+              drafts={drafts}
+              confirmId={confirmId}
+              newName={newName}
+              onToggleManage={toggleManage}
+              onDraftChange={changeDraft}
+              onSave={saveDraft}
+              onAskRemove={setConfirmId}
+              onCancelRemove={cancelRemove}
+              onConfirmRemove={confirmRemove}
+              onCreate={createOption}
+            />
+          </If>
         </ComboboxContent>
       </Combobox>
     </div>
