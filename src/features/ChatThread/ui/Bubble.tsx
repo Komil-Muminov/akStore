@@ -23,9 +23,20 @@ interface IProps {
   onEdit: (message: IMessage) => void
   onRemove: (message: IMessage) => void
   onDownload: (message: IMessage) => void
+  maxWidth: number
 }
 
-export const Bubble = ({ message, own, showAuthor, read, showStatus, onEdit, onRemove, onDownload }: IProps) => {
+export const Bubble = ({
+  message,
+  own,
+  showAuthor,
+  read,
+  showStatus,
+  onEdit,
+  onRemove,
+  onDownload,
+  maxWidth,
+}: IProps) => {
   const [hovered, setHovered] = useState(false)
   const handleEnter = useCallback(() => setHovered(true), [])
   const handleLeave = useCallback(() => setHovered(false), [])
@@ -51,7 +62,7 @@ export const Bubble = ({ message, own, showAuthor, read, showStatus, onEdit, onR
           />
         </div>
       </If>
-      <div style={bubbleOf(own, hasFile(message))}>
+      <div style={bubbleOf(own, hasFile(message), maxWidth)}>
         <If condition={showAuthor}>
           <text style={authorLabel}>{message.authorName}</text>
         </If>

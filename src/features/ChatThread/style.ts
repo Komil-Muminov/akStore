@@ -61,9 +61,10 @@ export const rowOf = (own: boolean): StyleDesc => ({
   paddingBottom: theme.spacing.xxs,
 })
 
-export const bubbleOf = (own: boolean, wide = false): StyleDesc => ({
-  maxWidth: theme.size.bubbleMaxWidth,
-  minWidth: wide ? theme.size.fileCardMinWidth : undefined,
+export const bubbleOf = (own: boolean, wide: boolean, maxWidth: number): StyleDesc => ({
+  maxWidth,
+  minWidth: wide ? theme.size.fileCardMinWidth : theme.size.bubbleMinWidth,
+  flexShrink: 1,
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.xxs,
@@ -101,7 +102,10 @@ export const metaRow: StyleDesc = {
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'flex-end',
-  gap: theme.spacing.xxs,
+  gap: theme.spacing.xs,
+  flexShrink: 0,
+  alignSelf: 'stretch',
+  marginTop: theme.spacing.xxs,
 }
 
 export const metaOf = (own: boolean): StyleDesc => ({
@@ -110,6 +114,8 @@ export const metaOf = (own: boolean): StyleDesc => ({
   fontWeight: theme.font.weight.medium,
   color: own ? theme.colors.onAccent : theme.colors.tertiary,
   textAlign: 'right',
+  whiteSpace: 'nowrap',
+  flexShrink: 0,
 })
 
 export const daySeparator: StyleDesc = {
@@ -197,3 +203,5 @@ export const deletedBody: StyleDesc = {
   lineHeight: theme.font.lineHeight.md,
   color: theme.colors.ghost,
 }
+
+

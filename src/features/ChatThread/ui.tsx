@@ -1,5 +1,5 @@
 import { Fragment, useCallback } from 'react'
-import type { EventPayload } from '@gpuix/react'
+import { useWindowSize, type EventPayload } from '@gpuix/react'
 import {
   dayLabelOf,
   UPLOAD_HINT,
@@ -21,6 +21,7 @@ import {
 } from './model'
 import { list, loadOlderRow, root, typingRow, typingText } from './style'
 import { dropOverlay } from './style.file'
+import { bubbleWidthOf } from './lib'
 import { Bubble } from './ui/Bubble'
 import { DayChip } from './ui/DayChip'
 import { Placeholder } from './ui/Placeholder'
@@ -44,6 +45,7 @@ export const ChatThread = ({
   dropHint,
 }: IProps) => {
   const handleDrop = useCallback((event: EventPayload) => onDropFiles(event.paths ?? []), [onDropFiles])
+  const maxBubbleWidth = bubbleWidthOf(useWindowSize().width)
 
   return (
     <div style={root} testId="chat__thread" onFileDrop={handleDrop}>
@@ -101,6 +103,7 @@ export const ChatThread = ({
                           onEdit={onEditMessage}
                           onRemove={onRemoveMessage}
                           onDownload={onDownload}
+                          maxWidth={maxBubbleWidth}
                         />
                       </Fragment>
                     ))}
