@@ -14,6 +14,14 @@ export const SCHEMA = `
   ALTER TABLE passes ADD COLUMN IF NOT EXISTS host_user_id UUID;
   CREATE INDEX IF NOT EXISTS passes_status_idx ON passes (status);
 
+  CREATE SEQUENCE IF NOT EXISTS pass_code_seq;
+  ALTER TABLE passes ADD COLUMN IF NOT EXISTS code TEXT;
+  UPDATE passes SET code = 'GP-' || to_char(created_at, 'YYYY') || '-' ||
+    lpad(nextval('pass_code_seq')::text, 6, '0') WHERE code IS NULL;
+  ALTER TABLE passes ALTER COLUMN code SET DEFAULT 'GP-' || to_char(now(), 'YYYY') || '-' ||
+    lpad(nextval('pass_code_seq')::text, 6, '0');
+  CREATE UNIQUE INDEX IF NOT EXISTS passes_code_idx ON passes (code);
+
   CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     login TEXT NOT NULL UNIQUE,
@@ -83,6 +91,16 @@ export const SCHEMA = `
   ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_path TEXT NOT NULL DEFAULT '';
   ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_size BIGINT NOT NULL DEFAULT 0;
   ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_mime TEXT NOT NULL DEFAULT '';
+
+  CREATE TABLE IF NOT EXISTS pass_entries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    pass_id UUID NOT NULL REFERENCES passes(id) ON DELETE CASCADE,
+    direction TEXT NOT NULL,
+    guard_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    happened_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS pass_entries_pass_idx ON pass_entries (pass_id, happened_at DESC);
+  CREATE INDEX IF NOT EXISTS pass_entries_time_idx ON pass_entries (happened_at DESC);
 `
 
 export const SEED_LEADERSHIP = { name: 'Руководство' }

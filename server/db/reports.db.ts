@@ -6,6 +6,7 @@ const LIST_LIMIT = 2000
 
 const toPass = (row: IPassRow): IPass => ({
   id: row.id,
+  code: row.code,
   holderName: row.holder_name,
   hostUserId: row.host_user_id,
   hostName: row.host_name,

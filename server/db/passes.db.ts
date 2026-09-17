@@ -3,6 +3,7 @@ import { PassStatus, type IPass, type IPassInput, type IPassRow, type IPassSearc
 
 const toPass = (row: IPassRow): IPass => ({
   id: row.id,
+  code: row.code,
   holderName: row.holder_name,
   hostUserId: row.host_user_id,
   hostName: row.host_name,
@@ -34,6 +35,8 @@ const UPDATE_SQL = `
   WHERE id = $1 RETURNING *`
 const SET_STATUS_SQL = 'UPDATE passes SET status = $2, updated_at = now() WHERE id = $1 RETURNING *'
 const DELETE_SQL = 'DELETE FROM passes WHERE id = $1 RETURNING id'
+const FIND_BY_CODE_SQL = 'SELECT * FROM passes WHERE code = $1'
+const FIND_SQL = 'SELECT * FROM passes WHERE id = $1'
 
 const first = (rows: IPassRow[]): IPass | null => (rows[0] ? toPass(rows[0]) : null)
 
@@ -86,6 +89,8 @@ export const passesDb = {
     const result = await pool.query<IPassRow>(SET_STATUS_SQL, [id, status])
     return first(result.rows)
   },
+  find: async (id: string) => first((await pool.query<IPassRow>(FIND_SQL, [id])).rows),
+  findByCode: async (code: string) => first((await pool.query<IPassRow>(FIND_BY_CODE_SQL, [code])).rows),
   remove: async (id: string) => {
     const result = await pool.query(DELETE_SQL, [id])
     return (result.rowCount ?? 0) > 0

@@ -16,6 +16,7 @@ const withHostSnapshot = async (input: IPassInput) =>
 
 export const passesService = {
   search: async (params?: IPassSearchParams) => passesDb.search(params),
+  find: async (id: string) => orNotFound(await passesDb.find(id)),
   create: async (input: IPassInput, authorId: string) => {
     const pass = await passesDb.create(await withHostSnapshot(input))
     await notifyHost(authorId, pass)

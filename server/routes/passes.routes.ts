@@ -4,6 +4,7 @@ import { passesService } from '../services'
 import { HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
 import { parsePassInput } from './passes.validation'
+import { renderPassSheet } from '../services/passes.print'
 import { idOf, respond } from './respond'
 
 const admin = rbacMiddleware(UserRole.ADMIN)
@@ -25,3 +26,12 @@ passesRouter.patch('/update/:id', admin, respond((req) => passesService.update(i
 passesRouter.patch('/deactivate/:id', admin, respond((req) => passesService.deactivate(idOf(req))))
 passesRouter.patch('/activate/:id', admin, respond((req) => passesService.activate(idOf(req))))
 passesRouter.delete('/delete/:id', admin, respond((req) => passesService.remove(idOf(req))))
+
+passesRouter.get('/print/:id', anyRole, async (req, res, next) => {
+  try {
+    const pass = await passesService.find(idOf(req))
+    res.type('html').send(await renderPassSheet(pass))
+  } catch (error) {
+    next(error)
+  }
+})

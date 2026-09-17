@@ -15,6 +15,7 @@ export interface IPassInput {
 
 export interface IPass extends IPassInput {
   id: string
+  code: string
   status: PassStatus
   createdAt: string
   updatedAt: string
@@ -22,6 +23,7 @@ export interface IPass extends IPassInput {
 
 export interface IPassRow {
   id: string
+  code: string
   holder_name: string
   host_user_id: string | null
   host_name: string
@@ -52,6 +54,8 @@ export interface IPassSearchParams {
 export { UserRole, ROLE_RANK } from './auth'
 export type { IAuthUser, IUser, IUserRow, IUserInput, ITokenPayload, IUserSearchParams } from './auth'
 export type { IHost, IHostRow } from './hosts'
+export { EntryDirection } from './entries'
+export type { IPassEntry, IPassEntryRow, IOnSite, IOnSiteRow, IEntriesParams } from './entries'
 export { ConversationKind } from './chat'
 export type { IConversation, IConversationRow, IMessage, IMessageRow, IMember, IMemberRow, IGroupInput, IAttachment, IColleague, IColleagueRow } from './chat'
 export type { IReportPeriod, IReportDay, IReportHost, IReportSummary } from './reports'
