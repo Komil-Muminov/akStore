@@ -1,4 +1,15 @@
 export const RETAIL_SCHEMA = `
+  CREATE TABLE IF NOT EXISTS outlets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    address TEXT NOT NULL DEFAULT '',
+    phone TEXT NOT NULL DEFAULT '',
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE UNIQUE INDEX IF NOT EXISTS outlets_name_idx ON outlets (lower(name)) WHERE is_active;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS outlet_id UUID REFERENCES outlets(id) ON DELETE SET NULL;
+
   CREATE TABLE IF NOT EXISTS product_categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL UNIQUE,
@@ -36,6 +47,14 @@ export const RETAIL_SCHEMA = `
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS stock_moves_product_idx ON stock_moves (product_id, created_at DESC);
+  ALTER TABLE stock_moves ADD COLUMN IF NOT EXISTS outlet_id UUID REFERENCES outlets(id) ON DELETE SET NULL;
+
+  CREATE TABLE IF NOT EXISTS product_stocks (
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    outlet_id UUID NOT NULL REFERENCES outlets(id) ON DELETE CASCADE,
+    quantity NUMERIC(12, 3) NOT NULL DEFAULT 0,
+    PRIMARY KEY (product_id, outlet_id)
+  );
 
   CREATE SEQUENCE IF NOT EXISTS shift_number_seq;
   CREATE TABLE IF NOT EXISTS shifts (
@@ -49,6 +68,7 @@ export const RETAIL_SCHEMA = `
     note TEXT NOT NULL DEFAULT ''
   );
   CREATE UNIQUE INDEX IF NOT EXISTS shifts_open_idx ON shifts (cashier_id) WHERE closed_at IS NULL;
+  ALTER TABLE shifts ADD COLUMN IF NOT EXISTS outlet_id UUID REFERENCES outlets(id) ON DELETE SET NULL;
 
   CREATE SEQUENCE IF NOT EXISTS receipt_number_seq;
   CREATE TABLE IF NOT EXISTS sales (
@@ -73,6 +93,7 @@ export const RETAIL_SCHEMA = `
   ALTER TABLE sales ADD COLUMN IF NOT EXISTS vat_total NUMERIC(12, 2) NOT NULL DEFAULT 0;
   ALTER TABLE sales ADD COLUMN IF NOT EXISTS cash_amount NUMERIC(12, 2) NOT NULL DEFAULT 0;
   ALTER TABLE sales ADD COLUMN IF NOT EXISTS card_amount NUMERIC(12, 2) NOT NULL DEFAULT 0;
+  ALTER TABLE sales ADD COLUMN IF NOT EXISTS outlet_id UUID REFERENCES outlets(id) ON DELETE SET NULL;
   ALTER TABLE sale_items ADD COLUMN IF NOT EXISTS discount NUMERIC(12, 2) NOT NULL DEFAULT 0;
 
   CREATE TABLE IF NOT EXISTS sale_items (

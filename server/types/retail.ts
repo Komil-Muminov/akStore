@@ -96,6 +96,7 @@ export interface IProductSearchParams {
   categoryId?: string
   favorite?: boolean
   lowStock?: boolean
+  outletId?: string | null
   page?: number
   limit?: number
 }

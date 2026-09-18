@@ -1,4 +1,4 @@
-import { cashDb, reportsDb, shiftsDb } from '../db'
+import { cashDb, outletsDb, reportsDb, shiftsDb, usersDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
 import { fiscalService } from './fiscal.service'
@@ -33,7 +33,8 @@ export const shiftsService = {
 
   open: async (cashierId: string, openingCash: number) => {
     if (await shiftsDb.current(cashierId)) throw new HttpError(HttpStatus.BAD_REQUEST, ALREADY_OPEN)
-    const id = await shiftsDb.open(cashierId, openingCash)
+    const outletId = (await usersDb.outletOf(cashierId)) ?? (await outletsDb.first())
+    const id = await shiftsDb.open(cashierId, openingCash, outletId)
     const shift = await shiftsDb.find(id)
     if (!shift) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
     await fiscalService.openShift(shift.cashierName)

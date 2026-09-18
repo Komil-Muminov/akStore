@@ -1,5 +1,5 @@
 import { pool } from './pool'
-import { StockMoveKind, type IStockMove, type IStockMoveRow } from '../types'
+import { StockMoveKind, type IOutletStockRow, type IStockMove, type IStockMoveRow } from '../types'
 
 const toMove = (row: IStockMoveRow): IStockMove => ({
   id: row.id,
@@ -14,8 +14,23 @@ const toMove = (row: IStockMoveRow): IStockMove => ({
 })
 
 const CREATE_SQL = `
-  INSERT INTO stock_moves (product_id, kind, quantity, cost_price, note, author_id)
-  VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+  INSERT INTO stock_moves (product_id, kind, quantity, cost_price, note, author_id, outlet_id)
+  VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
+
+const OUTLET_STOCK_SQL = `
+  INSERT INTO product_stocks (product_id, outlet_id, quantity)
+  VALUES ($1, $2, $3)
+  ON CONFLICT (product_id, outlet_id) DO UPDATE SET quantity = product_stocks.quantity + EXCLUDED.quantity
+  RETURNING quantity`
+
+const OUTLET_LIST_SQL = `
+  SELECT s.outlet_id, o.name AS outlet_name, s.quantity::text
+  FROM product_stocks s
+  JOIN outlets o ON o.id = s.outlet_id
+  WHERE s.product_id = $1 AND o.is_active
+  ORDER BY o.name`
+
+const OUTLET_QUANTITY_SQL = 'SELECT quantity FROM product_stocks WHERE product_id = $1 AND outlet_id = $2'
 
 const APPLY_SQL = 'UPDATE products SET stock = stock + $2, updated_at = now() WHERE id = $1 RETURNING stock'
 
@@ -39,12 +54,22 @@ export const stockDb = {
     costPrice: number,
     note: string,
     authorId: string,
+    outletId: string | null = null,
   ) => {
-    await pool.query(CREATE_SQL, [productId, kind, quantity, costPrice, note, authorId])
+    await pool.query(CREATE_SQL, [productId, kind, quantity, costPrice, note, authorId, outletId])
+    if (outletId) await pool.query(OUTLET_STOCK_SQL, [productId, outletId, quantity])
     const stock = (await pool.query<{ stock: string }>(APPLY_SQL, [productId, quantity])).rows[0]?.stock
     if (kind === StockMoveKind.INCOME && costPrice > 0) await pool.query(SET_COST_SQL, [productId, costPrice])
     return Number(stock ?? 0)
   },
   history: async (productId: string | null, limit: number) =>
     (await pool.query<IStockMoveRow>(HISTORY_SQL, [productId, limit])).rows.map(toMove),
+  byOutlets: async (productId: string) =>
+    (await pool.query<IOutletStockRow>(OUTLET_LIST_SQL, [productId])).rows.map((row) => ({
+      outletId: row.outlet_id,
+      outletName: row.outlet_name,
+      quantity: Number(row.quantity),
+    })),
+  outletQuantity: async (productId: string, outletId: string) =>
+    Number((await pool.query<{ quantity: string }>(OUTLET_QUANTITY_SQL, [productId, outletId])).rows[0]?.quantity ?? 0),
 }

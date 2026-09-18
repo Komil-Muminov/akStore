@@ -79,6 +79,7 @@ export const salesService = {
     const saleId = await salesDb.create({
       shiftId: shift.id,
       cashierId,
+      outletId: shift.outletId,
       payment: paymentOf(input.cashPaid, input.cardPaid),
       total,
       discount,
@@ -89,7 +90,7 @@ export const salesService = {
     })
     for (const record of records) {
       await salesDb.addItem(saleId, record)
-      await stockDb.register(record.productId, StockMoveKind.SALE, -record.quantity, 0, '', cashierId)
+      await stockDb.register(record.productId, StockMoveKind.SALE, -record.quantity, 0, '', cashierId, shift.outletId)
     }
 
     const sale = await salesDb.find(saleId)
@@ -101,10 +102,18 @@ export const salesService = {
     const sale = await salesDb.find(saleId)
     if (!sale) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
     if (sale.refundedAt !== null) throw new HttpError(HttpStatus.BAD_REQUEST, ALREADY_REFUNDED)
-    await shiftsService.requireOpen(cashierId)
+    const shift = await shiftsService.requireOpen(cashierId)
     await salesDb.refund(saleId)
     for (const item of sale.items) {
-      await stockDb.register(item.productId, StockMoveKind.REFUND, item.quantity, 0, REFUND_NOTE, cashierId)
+      await stockDb.register(
+        item.productId,
+        StockMoveKind.REFUND,
+        item.quantity,
+        0,
+        REFUND_NOTE,
+        cashierId,
+        shift.outletId,
+      )
     }
     const refunded = await salesDb.find(saleId)
     if (!refunded) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)

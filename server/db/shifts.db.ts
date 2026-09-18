@@ -11,19 +11,22 @@ const toShift = (row: IShiftRow): IShift => ({
   openingCash: Number(row.opening_cash),
   closingCash: row.closing_cash === null ? null : Number(row.closing_cash),
   note: row.note,
+  outletId: row.outlet_id,
+  outletName: row.outlet_name ?? '',
 })
 
 const BASE_SQL = `
   SELECT s.id, s.number, s.cashier_id, u.full_name AS cashier_name, s.opened_at, s.closed_at,
-         s.opening_cash, s.closing_cash, s.note
+         s.opening_cash, s.closing_cash, s.note, s.outlet_id, o.name AS outlet_name
   FROM shifts s
-  JOIN users u ON u.id = s.cashier_id`
+  JOIN users u ON u.id = s.cashier_id
+  LEFT JOIN outlets o ON o.id = s.outlet_id`
 
 const CURRENT_SQL = `${BASE_SQL} WHERE s.cashier_id = $1 AND s.closed_at IS NULL LIMIT 1`
 const FIND_SQL = `${BASE_SQL} WHERE s.id = $1`
 const LIST_SQL = `${BASE_SQL} ORDER BY s.opened_at DESC LIMIT $1`
 
-const OPEN_SQL = 'INSERT INTO shifts (cashier_id, opening_cash) VALUES ($1, $2) RETURNING id'
+const OPEN_SQL = 'INSERT INTO shifts (cashier_id, opening_cash, outlet_id) VALUES ($1, $2, $3) RETURNING id'
 const CLOSE_SQL = `
   UPDATE shifts SET closed_at = now(), closing_cash = $2, note = $3
   WHERE id = $1 AND closed_at IS NULL RETURNING id`
@@ -46,8 +49,8 @@ export const shiftsDb = {
     return row ? toShift(row) : null
   },
   list: async (limit: number) => (await pool.query<IShiftRow>(LIST_SQL, [limit])).rows.map(toShift),
-  open: async (cashierId: string, openingCash: number) =>
-    (await pool.query<{ id: string }>(OPEN_SQL, [cashierId, openingCash])).rows[0]?.id ?? '',
+  open: async (cashierId: string, openingCash: number, outletId: string | null) =>
+    (await pool.query<{ id: string }>(OPEN_SQL, [cashierId, openingCash, outletId])).rows[0]?.id ?? '',
   close: async (id: string, closingCash: number, note: string) =>
     ((await pool.query(CLOSE_SQL, [id, closingCash, note])).rowCount ?? 0) > 0,
   totals: async (shiftId: string, openingCash: number) => {

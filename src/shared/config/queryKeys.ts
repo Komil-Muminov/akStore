@@ -8,6 +8,8 @@ export enum QueryKeys {
   SALES = 'sales',
   FISCAL = 'fiscal',
   PARKED = 'parked',
+  OUTLETS = 'outlets',
+  OUTLET_STOCKS = 'outlet-stocks',
   CASH = 'cash',
   DEBTS = 'debts',
   DEBTOR = 'debtor',

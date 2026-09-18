@@ -37,6 +37,7 @@ productsRouter.get('/search', anyRole, respond((req) => productsService.search({
   categoryId: typeof req.query.category === 'string' ? req.query.category : undefined,
   favorite: req.query.favorite === 'true',
   lowStock: req.query.low === 'true',
+  outletId: typeof req.query.outlet === 'string' ? req.query.outlet : null,
   page: typeof req.query.page === 'string' ? Number(req.query.page) : undefined,
   limit: typeof req.query.limit === 'string' ? Number(req.query.limit) : undefined,
 })))

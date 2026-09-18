@@ -80,8 +80,9 @@ const ITEMS_SQL = `
   FROM sale_items WHERE sale_id = ANY($1)`
 
 const CREATE_SALE_SQL = `
-  INSERT INTO sales (shift_id, cashier_id, payment, total, discount, paid, cash_amount, card_amount, vat_total)
-  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`
+  INSERT INTO sales
+    (shift_id, cashier_id, outlet_id, payment, total, discount, paid, cash_amount, card_amount, vat_total)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`
 
 const CREATE_ITEM_SQL = `
   INSERT INTO sale_items
@@ -112,6 +113,7 @@ export const salesDb = {
       await pool.query<{ id: string }>(CREATE_SALE_SQL, [
         record.shiftId,
         record.cashierId,
+        record.outletId,
         record.payment,
         record.total,
         record.discount,

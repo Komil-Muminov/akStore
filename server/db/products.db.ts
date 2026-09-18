@@ -21,12 +21,16 @@ const toProduct = (row: IProductRow): IProduct => ({
   isActive: row.is_active,
 })
 
-const BASE_SQL = `
+const baseSql = (outletId: string | null) => `
   SELECT p.id, p.barcode, p.name, p.category_id, c.name AS category_name,
-         p.unit, p.cost_price, p.sale_price, p.stock, p.vat_rate, p.mark_code,
-         p.is_favorite, p.min_stock, p.is_active
+         p.unit, p.cost_price, p.sale_price,
+         ${outletId ? 'coalesce(os.quantity, 0)' : 'p.stock'} AS stock,
+         p.vat_rate, p.mark_code, p.is_favorite, p.min_stock, p.is_active
   FROM products p
-  LEFT JOIN product_categories c ON c.id = p.category_id`
+  LEFT JOIN product_categories c ON c.id = p.category_id
+  ${outletId ? 'LEFT JOIN product_stocks os ON os.product_id = p.id AND os.outlet_id = $OUTLET$' : ''}`
+
+const BASE_SQL = baseSql(null)
 
 const FIND_SQL = `${BASE_SQL} WHERE p.id = $1`
 const BY_BARCODE_SQL = `${BASE_SQL} WHERE p.barcode = $1 AND p.is_active = true`
@@ -77,12 +81,18 @@ export const productsDb = {
       (await pool.query<{ total: string }>(`SELECT count(*)::text AS total FROM products p ${where}`, values))
         .rows[0]?.total ?? 0,
     )
+    const listValues = [...values]
+    let listSql = BASE_SQL
+    if (params.outletId) {
+      listValues.push(params.outletId)
+      listSql = baseSql(params.outletId).replace('$OUTLET$', `$${listValues.length}`)
+    }
     const page = Math.max(params.page ?? DEFAULT_PAGE, DEFAULT_PAGE)
     const limit = Math.max(params.limit ?? DEFAULT_LIMIT, 1)
     const rows = (
       await pool.query<IProductRow>(
-        `${BASE_SQL} ${where} ORDER BY p.name LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
-        [...values, limit, (page - 1) * limit],
+        `${listSql} ${where} ORDER BY p.name LIMIT $${listValues.length + 1} OFFSET $${listValues.length + 2}`,
+        [...listValues, limit, (page - 1) * limit],
       )
     ).rows
     return { items: rows.map(toProduct), total, page, limit, totalPages: Math.ceil(total / limit) }

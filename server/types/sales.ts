@@ -9,6 +9,8 @@ export interface IShift {
   number: number
   cashierId: string
   cashierName: string
+  outletId: string | null
+  outletName: string
   openedAt: string
   closedAt: string | null
   openingCash: number
@@ -21,6 +23,8 @@ export interface IShiftRow {
   number: number
   cashier_id: string
   cashier_name: string
+  outlet_id: string | null
+  outlet_name: string | null
   opened_at: Date
   closed_at: Date | null
   opening_cash: string
@@ -89,6 +93,7 @@ export interface IFiscalStamp {
 export interface ISaleRecord {
   shiftId: string
   cashierId: string
+  outletId: string | null
   payment: PaymentKind
   total: number
   discount: number

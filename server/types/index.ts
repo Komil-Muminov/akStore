@@ -67,6 +67,14 @@ export type {
 } from './reports'
 export { ImportAction } from './import'
 export type { IImportRow, IImportValues, IImportPreview, IImportResult } from './import'
+export type {
+  IOutlet,
+  IOutletRow,
+  IOutletInput,
+  ITransferInput,
+  IOutletStock,
+  IOutletStockRow,
+} from './outlets'
 export { UnitType } from './org'
 export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'
 

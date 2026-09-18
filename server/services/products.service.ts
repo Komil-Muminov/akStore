@@ -1,4 +1,4 @@
-import { categoriesDb, productsDb, stockDb } from '../db'
+import { categoriesDb, outletsDb, productsDb, stockDb, usersDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
 import { StockMoveKind, type IProduct, type IProductInput, type IProductSearchParams, type IStockInput } from '../types'
 import { labelsHtml } from './labels.print'
@@ -67,19 +67,30 @@ export const productsService = {
 
   income: async (authorId: string, input: IStockInput) => {
     await orNotFound(input.productId)
-    await stockDb.register(input.productId, StockMoveKind.INCOME, input.quantity, input.costPrice, input.note, authorId)
+    const outletId = (await usersDb.outletOf(authorId)) ?? (await outletsDb.first())
+    await stockDb.register(
+      input.productId,
+      StockMoveKind.INCOME,
+      input.quantity,
+      input.costPrice,
+      input.note,
+      authorId,
+      outletId,
+    )
     return orNotFound(input.productId)
   },
   writeOff: async (authorId: string, input: IStockInput) => {
     const product = await orNotFound(input.productId)
     if (product.stock < input.quantity) throw new HttpError(HttpStatus.BAD_REQUEST, NEGATIVE_STOCK)
-    await stockDb.register(input.productId, StockMoveKind.WRITE_OFF, -input.quantity, 0, input.note, authorId)
+    const outletId = (await usersDb.outletOf(authorId)) ?? (await outletsDb.first())
+    await stockDb.register(input.productId, StockMoveKind.WRITE_OFF, -input.quantity, 0, input.note, authorId, outletId)
     return orNotFound(input.productId)
   },
   inventory: async (authorId: string, input: IStockInput) => {
     const product = await orNotFound(input.productId)
     const delta = input.quantity - product.stock
-    await stockDb.register(input.productId, StockMoveKind.INVENTORY, delta, 0, input.note, authorId)
+    const outletId = (await usersDb.outletOf(authorId)) ?? (await outletsDb.first())
+    await stockDb.register(input.productId, StockMoveKind.INVENTORY, delta, 0, input.note, authorId, outletId)
     return orNotFound(input.productId)
   },
   labels: async (ids: string[]) => {

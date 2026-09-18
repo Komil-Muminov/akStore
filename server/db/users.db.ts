@@ -20,7 +20,14 @@ const DELETE_SQL = 'DELETE FROM users WHERE id = $1 RETURNING id'
 
 const LIST_SQL = 'SELECT * FROM users WHERE is_active = true ORDER BY role, full_name'
 
+const OUTLET_SQL = 'SELECT outlet_id FROM users WHERE id = $1'
+const SET_OUTLET_SQL = 'UPDATE users SET outlet_id = $2 WHERE id = $1 RETURNING id'
+
 export const usersDb = {
+  outletOf: async (id: string) =>
+    (await pool.query<{ outlet_id: string | null }>(OUTLET_SQL, [id])).rows[0]?.outlet_id ?? null,
+  setOutlet: async (id: string, outletId: string | null) =>
+    ((await pool.query(SET_OUTLET_SQL, [id, outletId])).rowCount ?? 0) > 0,
   list: async () => (await pool.query<IUserRow>(LIST_SQL)).rows.map(toUser),
   searchPaged: async (params: IUserSearchParams = {}, allowedRoles?: UserRole[]) => {
     const conditions: string[] = []
