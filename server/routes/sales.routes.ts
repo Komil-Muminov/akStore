@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import { rbacMiddleware } from '../middleware'
-import { fiscalService, salesService, shiftsService } from '../services'
+import { fiscalService, parkedService, salesService, shiftsService } from '../services'
 import { HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
 import { parsePageParams, parseReportParams } from './reports.validation'
-import { parseCash, parseNote, parseSaleInput } from './retail.validation'
+import { parseCash, parseNote, parseParkedLines, parseSaleInput } from './retail.validation'
 import { idOf, respond } from './respond'
 
 const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
@@ -53,6 +53,16 @@ salesRouter.get('/search', anyRole, respond((req) =>
 salesRouter.get('/find/:id', anyRole, respond((req) => salesService.find(idOf(req))))
 salesRouter.post('/create', anyRole, respond((req) => salesService.create(actorOf(req), parseSaleInput(req.body)), HttpStatus.CREATED))
 salesRouter.post('/refund/:id', anyRole, respond((req) => salesService.refund(actorOf(req), idOf(req))))
+
+export const parkedRouter = Router()
+
+parkedRouter.get('/list', anyRole, respond((req) => parkedService.list(actorOf(req))))
+parkedRouter.post('/park', anyRole, respond(
+  (req) => parkedService.park(actorOf(req), parseNote(req.body), parseParkedLines(req.body)),
+  HttpStatus.CREATED,
+))
+parkedRouter.post('/restore/:id', anyRole, respond((req) => parkedService.restore(actorOf(req), idOf(req))))
+parkedRouter.delete('/delete/:id', anyRole, respond((req) => parkedService.remove(actorOf(req), idOf(req))))
 
 export const fiscalRouter = Router()
 

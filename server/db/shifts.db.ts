@@ -31,8 +31,8 @@ const CLOSE_SQL = `
 const TOTALS_SQL = `
   SELECT
     count(*) FILTER (WHERE refunded_at IS NULL)::text AS sales_count,
-    coalesce(sum(total) FILTER (WHERE refunded_at IS NULL AND payment = 'cash'), 0)::text AS cash_total,
-    coalesce(sum(total) FILTER (WHERE refunded_at IS NULL AND payment = 'card'), 0)::text AS card_total,
+    coalesce(sum(least(cash_amount, total)) FILTER (WHERE refunded_at IS NULL), 0)::text AS cash_total,
+    coalesce(sum(card_amount) FILTER (WHERE refunded_at IS NULL), 0)::text AS card_total,
     coalesce(sum(total) FILTER (WHERE refunded_at IS NOT NULL), 0)::text AS refund_total
   FROM sales WHERE shift_id = $1`
 

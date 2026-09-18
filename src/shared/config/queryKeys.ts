@@ -6,6 +6,7 @@ export enum QueryKeys {
   SHIFTS = 'shifts',
   SALES = 'sales',
   FISCAL = 'fiscal',
+  PARKED = 'parked',
   REPORT_SUMMARY = 'report-summary',
   REPORT_CASHIERS = 'report-cashiers',
   REPORT_DAILY = 'report-daily',

@@ -1,6 +1,12 @@
 export enum PaymentKind {
   CASH = 'cash',
   CARD = 'card',
+  MIXED = 'mixed',
+}
+
+export enum DiscountKind {
+  AMOUNT = 'amount',
+  PERCENT = 'percent',
 }
 
 export interface ICartLine {
@@ -11,6 +17,7 @@ export interface ICartLine {
   quantity: number
   stock: number
   vatRate: number
+  discount: number
 }
 
 export interface ISaleItem {
@@ -19,6 +26,7 @@ export interface ISaleItem {
   name: string
   quantity: number
   price: number
+  discount: number
   total: number
   vatRate: number
   vatAmount: number
@@ -63,6 +71,8 @@ export interface ISale {
   total: number
   discount: number
   paid: number
+  cashAmount: number
+  cardAmount: number
   change: number
   vatTotal: number
   refundedAt: string | null
@@ -92,6 +102,15 @@ export interface IShiftTotals {
   expectedCash: number
 }
 
+export interface IParkedSale {
+  id: string
+  cashierName: string
+  note: string
+  total: number
+  lines: ICartLine[]
+  createdAt: string
+}
+
 export interface IShiftState {
   shift: IShift
   totals: IShiftTotals
@@ -110,4 +129,10 @@ export const FISCAL_QUEUE_LABEL = 'В очереди'
 export const PAYMENT_LABELS: Record<PaymentKind, string> = {
   [PaymentKind.CASH]: 'Наличные',
   [PaymentKind.CARD]: 'Карта',
+  [PaymentKind.MIXED]: 'Смешанная',
 }
+
+export const DISCOUNT_OPTIONS = [
+  { id: DiscountKind.AMOUNT, label: 'сумма' },
+  { id: DiscountKind.PERCENT, label: '%' },
+]

@@ -5,6 +5,7 @@ import { PaymentKind } from '../types'
 const PAYMENT_TITLES: Record<PaymentKind, string> = {
   [PaymentKind.CASH]: 'Наличные',
   [PaymentKind.CARD]: 'Карта',
+  [PaymentKind.MIXED]: 'Смешанная',
 }
 
 const LABELS = {

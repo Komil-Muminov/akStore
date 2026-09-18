@@ -15,6 +15,7 @@ export const addToCart = (lines: ICartLine[], product: IProduct): ICartLine[] =>
         quantity: 1,
         stock: product.stock,
         vatRate: product.vatRate,
+        discount: 0,
       },
     ]
   }
@@ -31,3 +32,10 @@ export const changeQuantity = (lines: ICartLine[], productId: string, quantity: 
       line.productId === productId ? { ...line, quantity: Math.min(Math.max(quantity, 0), line.stock) } : line,
     )
     .filter((line) => line.quantity > 0)
+
+export const changeLineDiscount = (lines: ICartLine[], productId: string, discount: number): ICartLine[] =>
+  lines.map((line) =>
+    line.productId === productId
+      ? { ...line, discount: Math.min(Math.max(discount, 0), line.price * line.quantity) }
+      : line,
+  )

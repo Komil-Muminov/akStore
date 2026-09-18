@@ -1,6 +1,7 @@
 export enum PaymentKind {
   CASH = 'cash',
   CARD = 'card',
+  MIXED = 'mixed',
 }
 
 export interface IShift {
@@ -46,13 +47,14 @@ export interface IShiftTotalsRow {
 export interface ISaleItemInput {
   productId: string
   quantity: number
+  discount: number
 }
 
 export interface ISaleInput {
   items: ISaleItemInput[]
-  payment: PaymentKind
   discount: number
-  paid: number
+  cashPaid: number
+  cardPaid: number
 }
 
 export interface ISaleItem {
@@ -61,6 +63,7 @@ export interface ISaleItem {
   name: string
   quantity: number
   price: number
+  discount: number
   total: number
   vatRate: number
   vatAmount: number
@@ -82,6 +85,35 @@ export interface IFiscalStamp {
   qr: string
 }
 
+export interface IParkedLine {
+  productId: string
+  name: string
+  unit: string
+  price: number
+  quantity: number
+  stock: number
+  vatRate: number
+  discount: number
+}
+
+export interface IParkedSale {
+  id: string
+  cashierName: string
+  note: string
+  total: number
+  lines: IParkedLine[]
+  createdAt: string
+}
+
+export interface IParkedSaleRow {
+  id: string
+  cashier_name: string
+  note: string
+  total: string
+  lines: IParkedLine[]
+  created_at: Date
+}
+
 export interface ISaleRecord {
   shiftId: string
   cashierId: string
@@ -89,6 +121,8 @@ export interface ISaleRecord {
   total: number
   discount: number
   paid: number
+  cashAmount: number
+  cardAmount: number
   vatTotal: number
 }
 
@@ -97,6 +131,7 @@ export interface ISaleItemRecord {
   name: string
   quantity: number
   price: number
+  discount: number
   costPrice: number
   vatRate: number
   vatAmount: number
@@ -120,6 +155,8 @@ export interface ISale {
   total: number
   discount: number
   paid: number
+  cashAmount: number
+  cardAmount: number
   change: number
   vatTotal: number
   refundedAt: string | null
@@ -137,6 +174,8 @@ export interface ISaleRow {
   total: string
   discount: string
   paid: string
+  cash_amount: string
+  card_amount: string
   vat_total: string
   refunded_at: Date | null
   created_at: Date
@@ -154,6 +193,7 @@ export interface ISaleItemRow {
   name: string
   quantity: string
   price: string
+  discount: string
   vat_rate: string
   vat_amount: string
   mark_code: string

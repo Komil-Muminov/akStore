@@ -1,5 +1,5 @@
 import { HttpError, HttpStatus, optionalString, requireString, requireUuid } from '../shared/utils'
-import { PaymentKind, ProductUnit, type IProductInput, type ISaleInput, type IStockInput } from '../types'
+import { ProductUnit, type IParkedLine, type IProductInput, type ISaleInput, type IStockInput } from '../types'
 
 const NAME_MIN = 2
 const NAME_MAX = 120
@@ -14,8 +14,8 @@ const MONEY_ERROR = 'Сумма указана неверно'
 const VAT_ERROR = 'Ставка НДС указана неверно'
 const QUANTITY_ERROR = 'Количество должно быть больше нуля'
 const ITEMS_ERROR = `В чеке должно быть от 1 до ${ITEMS_MAX} позиций`
+const PAID_ERROR = 'Укажите полученную сумму'
 const UNIT_ERROR = 'Неизвестная единица измерения'
-const PAYMENT_ERROR = 'Неизвестный способ оплаты'
 
 const asRecord = (value: unknown) => (value ?? {}) as Record<string, unknown>
 
@@ -90,19 +90,35 @@ export const parseSaleInput = (body: unknown): ISaleInput => {
   const raw = asRecord(body)
   const items = Array.isArray(raw.items) ? raw.items : []
   if (items.length === 0 || items.length > ITEMS_MAX) throw new HttpError(HttpStatus.BAD_REQUEST, ITEMS_ERROR)
-  const payment = String(raw.payment ?? PaymentKind.CASH)
-  if (!Object.values(PaymentKind).includes(payment as PaymentKind)) {
-    throw new HttpError(HttpStatus.BAD_REQUEST, PAYMENT_ERROR)
-  }
+  const cashPaid = money(raw.cashPaid, 'cashPaid')
+  const cardPaid = money(raw.cardPaid, 'cardPaid')
+  if (cashPaid + cardPaid <= 0) throw new HttpError(HttpStatus.BAD_REQUEST, PAID_ERROR)
   return {
     items: (items as Record<string, unknown>[]).map((item) => ({
       productId: requireUuid(item.productId, 'productId'),
       quantity: quantity(item.quantity),
+      discount: money(item.discount, 'discount'),
     })),
-    payment: payment as PaymentKind,
     discount: money(raw.discount, 'discount'),
-    paid: money(raw.paid, 'paid'),
+    cashPaid,
+    cardPaid,
   }
+}
+
+export const parseParkedLines = (body: unknown): IParkedLine[] => {
+  const raw = asRecord(body)
+  const lines = Array.isArray(raw.lines) ? raw.lines : []
+  if (lines.length === 0 || lines.length > ITEMS_MAX) throw new HttpError(HttpStatus.BAD_REQUEST, ITEMS_ERROR)
+  return (lines as Record<string, unknown>[]).map((line) => ({
+    productId: requireUuid(line.productId, 'productId'),
+    name: requireString(line.name, 'name', 1, NAME_MAX),
+    unit: optionalString(line.unit, 'unit', BARCODE_MAX),
+    price: money(line.price, 'price'),
+    quantity: quantity(line.quantity),
+    stock: money(line.stock, 'stock'),
+    vatRate: money(line.vatRate, 'vatRate'),
+    discount: money(line.discount, 'discount'),
+  }))
 }
 
 export const parseCash = (body: unknown, field: string) => money(asRecord(body)[field], field)

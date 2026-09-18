@@ -1,7 +1,14 @@
 import { productsDb, salesDb, stockDb } from '../db'
 import { vatAmountOf } from '../fiscal'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { StockMoveKind, type IPageParams, type IProduct, type IReportParams, type ISaleInput } from '../types'
+import {
+  PaymentKind,
+  StockMoveKind,
+  type IPageParams,
+  type IProduct,
+  type IReportParams,
+  type ISaleInput,
+} from '../types'
 import QRCode from 'qrcode'
 import { fiscalService } from './fiscal.service'
 import { receiptHtml } from './receipt.print'
@@ -19,18 +26,24 @@ const QR_WIDTH = 120
 
 const roundMoney = (value: number) => Math.round(value * 100) / 100
 
-const itemRecordOf = (product: IProduct, quantity: number, discountShare: number) => {
-  const total = roundMoney(product.salePrice * quantity - discountShare)
+const itemRecordOf = (product: IProduct, quantity: number, discount: number) => {
+  const total = roundMoney(product.salePrice * quantity - discount)
   return {
     productId: product.id,
     name: product.name,
     quantity,
     price: product.salePrice,
+    discount,
     costPrice: product.costPrice,
     vatRate: product.vatRate,
     vatAmount: vatAmountOf(total, product.vatRate),
     markCode: product.markCode,
   }
+}
+
+const paymentOf = (cashPaid: number, cardPaid: number) => {
+  if (cashPaid > 0 && cardPaid > 0) return PaymentKind.MIXED
+  return cardPaid > 0 ? PaymentKind.CARD : PaymentKind.CASH
 }
 
 export const salesService = {
@@ -46,28 +59,32 @@ export const salesService = {
       if (product.stock < item.quantity) {
         throw new HttpError(HttpStatus.BAD_REQUEST, `${NOT_ENOUGH}: ${product.name}`)
       }
-      subtotal += product.salePrice * item.quantity
-      prepared.push({ product, quantity: item.quantity })
+      const lineDiscount = Math.min(item.discount, product.salePrice * item.quantity)
+      subtotal += product.salePrice * item.quantity - lineDiscount
+      prepared.push({ product, quantity: item.quantity, lineDiscount })
     }
 
     const discount = Math.min(roundMoney(input.discount), subtotal)
     const total = roundMoney(subtotal - discount)
-    if (input.paid < total) throw new HttpError(HttpStatus.BAD_REQUEST, NOT_PAID)
+    const paid = roundMoney(input.cashPaid + input.cardPaid)
+    if (paid < total) throw new HttpError(HttpStatus.BAD_REQUEST, NOT_PAID)
 
     const records = prepared.map((line) => {
-      const lineTotal = line.product.salePrice * line.quantity
+      const lineTotal = line.product.salePrice * line.quantity - line.lineDiscount
       const share = subtotal > 0 ? roundMoney((discount * lineTotal) / subtotal) : 0
-      return itemRecordOf(line.product, line.quantity, share)
+      return itemRecordOf(line.product, line.quantity, roundMoney(line.lineDiscount + share))
     })
     const vatTotal = roundMoney(records.reduce((sum, record) => sum + record.vatAmount, 0))
 
     const saleId = await salesDb.create({
       shiftId: shift.id,
       cashierId,
-      payment: input.payment,
+      payment: paymentOf(input.cashPaid, input.cardPaid),
       total,
       discount,
-      paid: input.paid,
+      paid,
+      cashAmount: input.cashPaid,
+      cardAmount: input.cardPaid,
       vatTotal,
     })
     for (const record of records) {

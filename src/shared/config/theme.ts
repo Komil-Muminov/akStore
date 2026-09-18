@@ -57,6 +57,8 @@ export const theme = {
     dot: 8,
     manageField: 186,
     importBody: 220,
+    cartQuantity: 76,
+    cartDiscount: 70,
     importList: 240,
     manageInput: 34,
     filterField: 168,

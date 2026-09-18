@@ -4,7 +4,11 @@ const LOCALE = 'ru-RU'
 const TIME_OPTIONS: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
 const STAMP_OPTIONS: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }
 
-export const lineTotalOf = (line: ICartLine) => Math.round(line.price * line.quantity * 100) / 100
+export const lineTotalOf = (line: ICartLine) =>
+  Math.max(0, Math.round((line.price * line.quantity - line.discount) * 100) / 100)
+
+export const discountAmountOf = (kind: string, value: number, subtotal: number) =>
+  kind === 'percent' ? Math.round(((subtotal * Math.min(value, VAT_BASE)) / VAT_BASE) * 100) / 100 : value
 
 export const cartSubtotalOf = (lines: ICartLine[]) =>
   Math.round(lines.reduce((sum, line) => sum + lineTotalOf(line), 0) * 100) / 100

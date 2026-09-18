@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { IProduct } from '@/entities/product'
-import { cartTotalOf, type ICartLine } from '@/entities/sale'
+import { cartSubtotalOf, cartTotalOf, discountAmountOf, DiscountKind, type ICartLine } from '@/entities/sale'
 import { FiscalBadge } from '@/features/FiscalBadge'
+import { ParkedSales } from '@/features/ParkedSales'
 import { SaleCart } from '@/features/SaleCart'
 import { SaleScanner } from '@/features/SaleScanner'
 import { ShiftBar } from '@/features/ShiftBar'
 import { ApiRoutes } from '@/shared/config'
 import { openPrintable } from '@/shared/lib'
 import { useCategoriesQuery, useFiscalStatusQuery, useProductsQuery, useSaleMutations, useShiftQuery } from './hooks'
-import { addToCart, changeQuantity } from './lib'
+import { addToCart, changeLineDiscount, changeQuantity } from './lib'
+import { useParked } from './parked'
 import { NOTICE_TIMEOUT_MS, RECEIPT_FILE, SOLD_NOTICE } from './model'
 import { badgeRow, main, root } from './style'
 
@@ -17,6 +19,7 @@ export const Sale = () => {
   const [category, setCategory] = useState<string | null>(null)
   const [lines, setLines] = useState<ICartLine[]>([])
   const [discount, setDiscount] = useState(0)
+  const [discountKind, setDiscountKind] = useState<string>(DiscountKind.AMOUNT)
   const [notice, setNotice] = useState<string | undefined>(undefined)
   const [lastSaleId, setLastSaleId] = useState<string | null>(null)
   const products = useProductsQuery(query, category)
@@ -26,7 +29,11 @@ export const Sale = () => {
   const { openShift, closeShift, sell } = useSaleMutations()
 
   const items = useMemo(() => products.data?.items ?? [], [products.data?.items])
-  const total = useMemo(() => cartTotalOf(lines, discount), [lines, discount])
+  const discountAmount = useMemo(
+    () => discountAmountOf(discountKind, discount, cartSubtotalOf(lines)),
+    [discountKind, discount, lines],
+  )
+  const total = useMemo(() => cartTotalOf(lines, discountAmount), [lines, discountAmount])
 
   useEffect(() => {
     if (notice === undefined) return
@@ -48,6 +55,10 @@ export const Sale = () => {
     setLines((current) => changeQuantity(current, productId, quantity))
   }, [])
 
+  const handleLineDiscount = useCallback((productId: string, value: number) => {
+    setLines((current) => changeLineDiscount(current, productId, value))
+  }, [])
+
   const handleRemove = useCallback((productId: string) => {
     setLines((current) => current.filter((line) => line.productId !== productId))
   }, [])
@@ -56,6 +67,16 @@ export const Sale = () => {
     setLines([])
     setDiscount(0)
   }, [])
+
+  const handleDiscountKind = useCallback((value: string | null) => setDiscountKind(value ?? DiscountKind.AMOUNT), [])
+
+  const handleRestored = useCallback((restored: ICartLine[]) => {
+    setLines(restored)
+    setDiscount(0)
+  }, [])
+  const parked = useParked(handleRestored)
+  const parkCart = parked.handlePark
+  const handlePark = useCallback(() => parkCart(lines, handleClear), [parkCart, lines, handleClear])
 
   const openMutate = openShift.mutate
   const handleOpenShift = useCallback((openingCash: number) => openMutate({ openingCash }), [openMutate])
@@ -68,13 +89,17 @@ export const Sale = () => {
 
   const sellMutate = sell.mutate
   const handlePay = useCallback(
-    (payment: string, paid: number) => {
+    (cashPaid: number, cardPaid: number) => {
       sellMutate(
         {
-          items: lines.map((line) => ({ productId: line.productId, quantity: line.quantity })),
-          payment,
-          discount,
-          paid,
+          items: lines.map((line) => ({
+            productId: line.productId,
+            quantity: line.quantity,
+            discount: line.discount,
+          })),
+          discount: discountAmount,
+          cashPaid,
+          cardPaid,
         },
         {
           onSuccess: (sale) => {
@@ -86,7 +111,7 @@ export const Sale = () => {
         },
       )
     },
-    [lines, discount, sellMutate],
+    [lines, discountAmount, sellMutate],
   )
 
   const handlePrintReceipt = useCallback(() => {
@@ -123,14 +148,30 @@ export const Sale = () => {
           onPay={handlePay}
           lastSaleId={lastSaleId}
           onPrintReceipt={handlePrintReceipt}
+          parkedCount={parked.count}
+          canPark={lines.length > 0}
+          onPark={handlePark}
+          onOpenParked={parked.openDialog}
         />
       </div>
+      <ParkedSales
+        open={parked.open}
+        parked={parked.parked}
+        pending={parked.pending}
+        error={parked.error}
+        onRestore={parked.handleRestore}
+        onRemove={parked.handleRemove}
+        onClose={parked.closeDialog}
+      />
       <SaleCart
         lines={lines}
         discount={discount}
+        discountKind={discountKind}
         onQuantityChange={handleQuantity}
+        onLineDiscountChange={handleLineDiscount}
         onRemove={handleRemove}
         onDiscountChange={setDiscount}
+        onDiscountKindChange={handleDiscountKind}
         onClear={handleClear}
       />
     </div>

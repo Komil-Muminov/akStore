@@ -12,6 +12,7 @@ const FILE_PREFIX = 'otchet-prodazh'
 const PAYMENT_TITLES: Record<PaymentKind, string> = {
   [PaymentKind.CASH]: 'Наличные',
   [PaymentKind.CARD]: 'Карта',
+  [PaymentKind.MIXED]: 'Смешанная',
 }
 
 const cell = (value: string | number) => {

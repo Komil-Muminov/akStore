@@ -5,10 +5,10 @@ import { useGetQuery, useMutationQuery } from '@/shared/hooks'
 import type { IPagedResponse } from '@/shared/model'
 
 interface ISaleBody {
-  items: { productId: string; quantity: number }[]
-  payment: string
+  items: { productId: string; quantity: number; discount: number }[]
   discount: number
-  paid: number
+  cashPaid: number
+  cardPaid: number
 }
 
 const INVALIDATE = [QueryKeys.SHIFT, QueryKeys.PRODUCTS, QueryKeys.SALES, QueryKeys.FISCAL]

@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { moneyOf } from '@/entities/product'
-import { cartSubtotalOf, cartTotalOf, cartVatOf } from '@/entities/sale'
+import { cartSubtotalOf, cartTotalOf, cartVatOf, DISCOUNT_OPTIONS } from '@/entities/sale'
 import { theme } from '@/shared/config'
-import { Icon, IconButton, If, Text, TextInput, Tooltip } from '@/shared/ui'
+import { Icon, IconButton, If, Select, Text, TextInput, Tooltip } from '@/shared/ui'
 import {
   CART_TITLE,
   CLEAR_TOOLTIP,
@@ -15,10 +15,31 @@ import {
   VAT_ROW_LABEL,
   type IProps,
 } from './model'
-import { discountField, empty, grandTotal, head, list, root, totalRow, totals } from './style'
+import {
+  discountBox,
+  discountField,
+  discountKindBox,
+  empty,
+  grandTotal,
+  head,
+  list,
+  root,
+  totalRow,
+  totals,
+} from './style'
 import { CartLine } from './ui/CartLine'
 
-export const SaleCart = ({ lines, discount, onQuantityChange, onRemove, onDiscountChange, onClear }: IProps) => {
+export const SaleCart = ({
+  lines,
+  discount,
+  discountKind,
+  onQuantityChange,
+  onLineDiscountChange,
+  onRemove,
+  onDiscountChange,
+  onDiscountKindChange,
+  onClear,
+}: IProps) => {
   const handleDiscount = useCallback(
     (value: string) => onDiscountChange(Number(value.replace(',', '.')) || 0),
     [onDiscountChange],
@@ -44,7 +65,13 @@ export const SaleCart = ({ lines, discount, onQuantityChange, onRemove, onDiscou
       >
         <virtual-list estimatedItemHeight={ESTIMATED_LINE_HEIGHT} style={list} testId="cart__lines">
           {lines.map((entry) => (
-            <CartLine key={entry.productId} entry={entry} onQuantityChange={onQuantityChange} onRemove={onRemove} />
+            <CartLine
+              key={entry.productId}
+              entry={entry}
+              onQuantityChange={onQuantityChange}
+              onLineDiscountChange={onLineDiscountChange}
+              onRemove={onRemove}
+            />
           ))}
         </virtual-list>
       </If>
@@ -55,13 +82,23 @@ export const SaleCart = ({ lines, discount, onQuantityChange, onRemove, onDiscou
         </div>
         <div style={totalRow}>
           <Text variant="secondary">{DISCOUNT_LABEL}</Text>
-          <TextInput
-            value={discount > 0 ? String(discount) : ''}
-            onChange={handleDiscount}
-            placeholder="0"
-            style={discountField}
-            testId="cart__discount"
-          />
+          <div style={discountBox}>
+            <TextInput
+              value={discount > 0 ? String(discount) : ''}
+              onChange={handleDiscount}
+              placeholder="0"
+              style={discountField}
+              testId="cart__discount"
+            />
+            <div style={discountKindBox}>
+              <Select
+                value={discountKind}
+                options={DISCOUNT_OPTIONS}
+                onChange={onDiscountKindChange}
+                testId="cart__discount-kind"
+              />
+            </div>
+          </div>
         </div>
         <If condition={cartVatOf(lines, discount) > 0}>
           <div style={totalRow}>

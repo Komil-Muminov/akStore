@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { moneyOf } from '@/entities/product'
-import { changeOf, PaymentKind } from '@/entities/sale'
-import { Button, If, Text, TextInput, Tooltip } from '@/shared/ui'
+import { changeOf } from '@/entities/sale'
+import { Button, IconButton, If, Text, TextInput, Tooltip } from '@/shared/ui'
 import {
   CARD_LABEL,
   CASH_LABEL,
@@ -15,8 +15,13 @@ import {
   OPENING_LABEL,
   OPEN_LABEL,
   PAID_LABEL,
-  PAY_CARD_LABEL,
-  PAY_CASH_LABEL,
+  PAY_LABEL,
+  CASH_FIELD_LABEL,
+  CARD_FIELD_LABEL,
+  EXACT_TOOLTIP,
+  PARK_LABEL,
+  PARK_TOOLTIP,
+  PARKED_TOOLTIP,
   REVENUE_LABEL,
   SALES_LABEL,
   SHIFT_LABEL,
@@ -48,9 +53,16 @@ export const ShiftBar = ({
   onPay,
   lastSaleId,
   onPrintReceipt,
+  parkedCount,
+  canPark,
+  onPark,
+  onOpenParked,
 }: IProps) => {
   const [cash, setCash] = useState('')
+  const [card, setCard] = useState('')
   const paid = toNumber(cash)
+  const cardPaid = toNumber(card)
+  const received = paid + cardPaid
 
   const handleOpen = useCallback(() => {
     onOpen(paid)
@@ -60,14 +72,14 @@ export const ShiftBar = ({
     onClose(paid, '')
     setCash('')
   }, [onClose, paid])
-  const handleCash = useCallback(() => {
-    onPay(PaymentKind.CASH, paid)
+  const handlePay = useCallback(() => {
+    onPay(paid, cardPaid)
     setCash('')
-  }, [onPay, paid])
-  const handleCard = useCallback(() => {
-    onPay(PaymentKind.CARD, cartTotal)
-    setCash('')
-  }, [onPay, cartTotal])
+    setCard('')
+  }, [onPay, paid, cardPaid])
+  const handleExact = useCallback(() => {
+    setCash(String(Math.max(cartTotal - cardPaid, 0)))
+  }, [cartTotal, cardPaid])
 
   return (
     <div style={root} testId="shift__bar">
@@ -113,24 +125,42 @@ export const ShiftBar = ({
               </div>
             </div>
             <div style={payRow}>
+              <Text variant="secondary">{CASH_FIELD_LABEL}</Text>
               <TextInput value={cash} onChange={setCash} placeholder={PAID_LABEL} style={cashField} testId="shift__paid" />
+              <Text variant="secondary">{CARD_FIELD_LABEL}</Text>
+              <TextInput value={card} onChange={setCard} placeholder={PAID_LABEL} style={cashField} testId="shift__card" />
+              <Tooltip title={EXACT_TOOLTIP}>
+                <IconButton icon="check" onClick={handleExact} testId="shift__exact" />
+              </Tooltip>
               <Text variant="secondary">{CHANGE_LABEL}</Text>
-              <text style={changeText}>{moneyOf(changeOf(cartTotal, paid))}</text>
+              <text style={changeText}>{moneyOf(changeOf(cartTotal, received))}</text>
               <Button
-                label={PAY_CASH_LABEL}
+                label={PAY_LABEL}
                 icon="check"
-                onClick={handleCash}
-                disabled={pending || cartTotal <= 0 || paid < cartTotal}
-                testId="shift__pay-cash"
+                onClick={handlePay}
+                disabled={pending || cartTotal <= 0 || received < cartTotal}
+                testId="shift__pay"
               />
-              <Button
-                label={PAY_CARD_LABEL}
-                variant="secondary"
-                icon="check"
-                onClick={handleCard}
-                disabled={pending || cartTotal <= 0}
-                testId="shift__pay-card"
-              />
+              <Tooltip title={PARK_TOOLTIP}>
+                <Button
+                  label={PARK_LABEL}
+                  variant="secondary"
+                  icon="inbox"
+                  onClick={onPark}
+                  disabled={pending || !canPark}
+                  testId="shift__park"
+                />
+              </Tooltip>
+              <Tooltip title={PARKED_TOOLTIP}>
+                <Button
+                  label={String(parkedCount)}
+                  variant="secondary"
+                  icon="rotate"
+                  onClick={onOpenParked}
+                  disabled={pending}
+                  testId="shift__parked"
+                />
+              </Tooltip>
               <If condition={lastSaleId !== null}>
                 <Tooltip title={RECEIPT_TOOLTIP}>
                   <Button

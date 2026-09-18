@@ -13,13 +13,18 @@ import type {
   ISaleRow,
 } from '../types'
 
+const ROUND = 100
+
+const round = (value: number) => Math.round(value * ROUND) / ROUND
+
 const toItem = (row: ISaleItemRow): ISaleItem => ({
   id: row.id,
   productId: row.product_id,
   name: row.name,
   quantity: Number(row.quantity),
   price: Number(row.price),
-  total: Number(row.quantity) * Number(row.price),
+  discount: Number(row.discount),
+  total: round(Number(row.quantity) * Number(row.price) - Number(row.discount)),
   vatRate: Number(row.vat_rate),
   vatAmount: Number(row.vat_amount),
   markCode: row.mark_code,
@@ -45,7 +50,9 @@ const toSale = (row: ISaleRow, items: ISaleItem[]): ISale => ({
   total: Number(row.total),
   discount: Number(row.discount),
   paid: Number(row.paid),
-  change: Math.max(0, Number(row.paid) - Number(row.total)),
+  cashAmount: Number(row.cash_amount),
+  cardAmount: Number(row.card_amount),
+  change: Math.max(0, round(Number(row.paid) - Number(row.total))),
   vatTotal: Number(row.vat_total),
   refundedAt: row.refunded_at ? row.refunded_at.toISOString() : null,
   createdAt: row.created_at.toISOString(),
@@ -55,7 +62,7 @@ const toSale = (row: ISaleRow, items: ISaleItem[]): ISale => ({
 
 const BASE_SQL = `
   SELECT s.id, s.number, s.shift_id, u.full_name AS cashier_name, s.payment,
-         s.total, s.discount, s.paid, s.vat_total, s.refunded_at, s.created_at,
+         s.total, s.discount, s.paid, s.cash_amount, s.card_amount, s.vat_total, s.refunded_at, s.created_at,
          s.fiscal_number, s.fiscal_sign, s.fiscal_device, s.fiscal_qr, s.fiscal_at
   FROM sales s
   JOIN users u ON u.id = s.cashier_id`
@@ -69,16 +76,17 @@ const countSql = (where: string) =>
   `SELECT count(*)::text AS total FROM sales s JOIN users u ON u.id = s.cashier_id ${where}`
 
 const ITEMS_SQL = `
-  SELECT id, sale_id, product_id, name, quantity, price, vat_rate, vat_amount, mark_code
+  SELECT id, sale_id, product_id, name, quantity, price, discount, vat_rate, vat_amount, mark_code
   FROM sale_items WHERE sale_id = ANY($1)`
 
 const CREATE_SALE_SQL = `
-  INSERT INTO sales (shift_id, cashier_id, payment, total, discount, paid, vat_total)
-  VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
+  INSERT INTO sales (shift_id, cashier_id, payment, total, discount, paid, cash_amount, card_amount, vat_total)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`
 
 const CREATE_ITEM_SQL = `
-  INSERT INTO sale_items (sale_id, product_id, name, quantity, price, cost_price, vat_rate, vat_amount, mark_code)
-  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+  INSERT INTO sale_items
+    (sale_id, product_id, name, quantity, price, discount, cost_price, vat_rate, vat_amount, mark_code)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 
 const FISCAL_SQL = `
   UPDATE sales SET fiscal_number = $2, fiscal_sign = $3, fiscal_device = $4, fiscal_qr = $5, fiscal_at = now()
@@ -108,6 +116,8 @@ export const salesDb = {
         record.total,
         record.discount,
         record.paid,
+        record.cashAmount,
+        record.cardAmount,
         record.vatTotal,
       ])
     ).rows[0]?.id ?? '',
@@ -118,6 +128,7 @@ export const salesDb = {
       item.name,
       item.quantity,
       item.price,
+      item.discount,
       item.costPrice,
       item.vatRate,
       item.vatAmount,

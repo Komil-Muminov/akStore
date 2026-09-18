@@ -101,7 +101,16 @@ export const grandTotal: StyleDesc = {
   color: theme.colors.accent,
 }
 
-export const discountField: StyleDesc = { width: theme.size.sidebar / 2 }
+export const discountField: StyleDesc = { width: theme.size.cartDiscount + theme.spacing.xxl }
+
+export const discountBox: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+}
+
+export const discountKindBox: StyleDesc = { width: theme.size.cartQuantity + theme.spacing.xl }
 
 export const empty: StyleDesc = {
   flexGrow: 1,
@@ -111,3 +120,7 @@ export const empty: StyleDesc = {
   justifyContent: 'center',
   gap: theme.spacing.sm,
 }
+
+export const quantityField: StyleDesc = { width: theme.size.cartQuantity, height: theme.size.control }
+
+export const lineDiscountField: StyleDesc = { width: theme.size.cartDiscount, height: theme.size.control }
