@@ -56,6 +56,8 @@ export const theme = {
     bubbleMinWidth: 132,
     dot: 8,
     manageField: 186,
+    importBody: 220,
+    importList: 240,
     manageInput: 34,
     filterField: 168,
     chartBar: 28,

@@ -1,12 +1,14 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { IProduct, IProductInput } from '@/entities/product'
+import { ImportDialog } from '@/features/ImportDialog'
 import { ProductForm } from '@/features/ProductForm'
 import { ProductList } from '@/features/ProductList'
 import { StockDialog, type IStockSubmit } from '@/features/StockDialog'
-import { Button, ConfirmDialog, Spinner, Text, TextInput } from '@/shared/ui'
+import { Button, ConfirmDialog, Spinner, Text, TextInput, Tooltip } from '@/shared/ui'
 import { If } from '@/shared/ui'
 import { useCategoriesQuery, useCategoryMutations, useProductMutations, useProductsQuery } from './hooks'
-import { ADD_LABEL, ARCHIVE_DIALOG, DESCRIPTION, SEARCH_PLACEHOLDER, TITLE } from './model'
+import { useImport } from './import'
+import { ADD_LABEL, ARCHIVE_DIALOG, DESCRIPTION, IMPORT_LABEL, IMPORT_TOOLTIP, SEARCH_PLACEHOLDER, TITLE } from './model'
 import { head, headText, root, search } from './style'
 
 export const Products = () => {
@@ -15,6 +17,8 @@ export const Products = () => {
   const [editing, setEditing] = useState<IProduct | null>(null)
   const [moving, setMoving] = useState<IProduct | null>(null)
   const [archiving, setArchiving] = useState<IProduct | null>(null)
+  const [importOpen, setImportOpen] = useState(false)
+  const importer = useImport()
   const products = useProductsQuery(query, null)
   const categories = useCategoriesQuery()
   const category = useCategoryMutations()
@@ -37,6 +41,16 @@ export const Products = () => {
   }, [])
   const closeStock = useCallback(() => setMoving(null), [])
   const cancelArchive = useCallback(() => setArchiving(null), [])
+
+  const resetImport = importer.reset
+  const openImport = useCallback(() => {
+    resetImport()
+    setImportOpen(true)
+  }, [resetImport])
+  const closeImport = useCallback(() => {
+    setImportOpen(false)
+    resetImport()
+  }, [resetImport])
 
   const createMutate = create.mutate
   const updateMutate = update.mutate
@@ -88,6 +102,9 @@ export const Products = () => {
           <Text variant="secondary">{DESCRIPTION}</Text>
         </div>
         <TextInput value={query} onChange={setQuery} placeholder={SEARCH_PLACEHOLDER} icon="search" style={search} testId="products__search" />
+        <Tooltip title={IMPORT_TOOLTIP}>
+          <Button label={IMPORT_LABEL} icon="download" variant="secondary" onClick={openImport} testId="products__import" />
+        </Tooltip>
         <Button label={ADD_LABEL} icon="plus" onClick={openCreate} testId="products__add" />
       </div>
       <If condition={products.isPending} fallback={
@@ -107,6 +124,17 @@ export const Products = () => {
         onRenameCategory={handleRenameCategory}
         onRemoveCategory={handleRemoveCategory}
         createdCategoryId={createdCategoryId}
+      />
+      <ImportDialog
+        open={importOpen}
+        preview={importer.preview}
+        result={importer.result}
+        pending={importer.pending}
+        error={importer.error}
+        onDrop={importer.handleDrop}
+        onApply={importer.handleApply}
+        onTemplate={importer.handleTemplate}
+        onClose={closeImport}
       />
       <StockDialog
         product={moving}

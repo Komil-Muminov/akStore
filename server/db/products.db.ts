@@ -27,6 +27,7 @@ const BASE_SQL = `
 
 const FIND_SQL = `${BASE_SQL} WHERE p.id = $1`
 const BY_BARCODE_SQL = `${BASE_SQL} WHERE p.barcode = $1 AND p.is_active = true`
+const BY_NAME_SQL = `${BASE_SQL} WHERE lower(p.name) = lower($1) AND p.is_active = true LIMIT 1`
 
 const CREATE_SQL = `
   INSERT INTO products (barcode, name, category_id, unit, cost_price, sale_price, vat_rate, mark_code)
@@ -83,6 +84,10 @@ export const productsDb = {
   },
   findByBarcode: async (barcode: string) => {
     const row = (await pool.query<IProductRow>(BY_BARCODE_SQL, [barcode])).rows[0]
+    return row ? toProduct(row) : null
+  },
+  findByName: async (name: string) => {
+    const row = (await pool.query<IProductRow>(BY_NAME_SQL, [name])).rows[0]
     return row ? toProduct(row) : null
   },
   create: async (input: IProductInput) =>

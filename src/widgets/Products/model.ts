@@ -1,5 +1,7 @@
 export const TITLE = 'Товары'
 export const DESCRIPTION = 'Справочник, цены и остатки'
+export const IMPORT_LABEL = 'Импорт'
+export const IMPORT_TOOLTIP = 'Загрузить товары из Excel или CSV'
 export const ADD_LABEL = 'Добавить товар'
 export const SEARCH_PLACEHOLDER = 'Поиск по названию или штрихкоду'
 export const ARCHIVE_DIALOG = {

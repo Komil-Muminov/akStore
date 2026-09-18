@@ -60,6 +60,9 @@ export const ApiRoutes = {
   REPORTS_TOP: (filters: string) => `/reports/top-search?${filters}`,
   REPORTS_SALES: (filters: string) => `/reports/sales-search?${filters}`,
   REPORTS_EXPORT: (filters: string) => `/reports/export?${filters}`,
+  IMPORT_TEMPLATE: '/import/template',
+  IMPORT_PREVIEW: '/import/preview',
+  IMPORT_APPLY: '/import/apply',
   CHAT_SEARCH: '/chat/search',
   CHAT_HISTORY: (id: string, before?: string | null) =>
     before ? `/chat/history/${id}?before=${encodeURIComponent(before)}` : `/chat/history/${id}`,

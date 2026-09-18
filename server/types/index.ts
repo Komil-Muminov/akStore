@@ -54,6 +54,8 @@ export type {
   IExportFile,
   IZReport,
 } from './reports'
+export { ImportAction } from './import'
+export type { IImportRow, IImportValues, IImportPreview, IImportResult } from './import'
 export { UnitType } from './org'
 export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'
 
