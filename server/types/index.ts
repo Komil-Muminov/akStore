@@ -75,6 +75,17 @@ export type {
   IOutletStock,
   IOutletStockRow,
 } from './outlets'
+export type {
+  ISupplier,
+  ISupplierRow,
+  ISupplierInput,
+  IInvoice,
+  IInvoiceRow,
+  IInvoiceItem,
+  IInvoiceItemRow,
+  IInvoiceInput,
+  IInvoiceItemInput,
+} from './suppliers'
 export { UnitType } from './org'
 export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'
 
