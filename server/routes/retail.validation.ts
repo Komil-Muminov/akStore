@@ -1,5 +1,12 @@
 import { HttpError, HttpStatus, optionalString, requireString, requireUuid } from '../shared/utils'
-import { ProductUnit, type IParkedLine, type IProductInput, type ISaleInput, type IStockInput } from '../types'
+import {
+  ProductUnit,
+  type IParkedLine,
+  type IProductInput,
+  type IRefundInput,
+  type ISaleInput,
+  type IStockInput,
+} from '../types'
 
 const NAME_MIN = 2
 const NAME_MAX = 120
@@ -121,6 +128,18 @@ export const parseParkedLines = (body: unknown): IParkedLine[] => {
     vatRate: money(line.vatRate, 'vatRate'),
     discount: money(line.discount, 'discount'),
   }))
+}
+
+export const parseRefundInput = (body: unknown): IRefundInput => {
+  const raw = asRecord(body)
+  const items = Array.isArray(raw.items) ? raw.items : []
+  if (items.length === 0 || items.length > ITEMS_MAX) throw new HttpError(HttpStatus.BAD_REQUEST, ITEMS_ERROR)
+  return {
+    items: (items as Record<string, unknown>[]).map((item) => ({
+      itemId: requireUuid(item.itemId, 'itemId'),
+      quantity: quantity(item.quantity),
+    })),
+  }
 }
 
 export const parseCash = (body: unknown, field: string) => money(asRecord(body)[field], field)

@@ -61,6 +61,7 @@ export const ApiRoutes = {
   SALES_PRINT: (id: string) => `/sales/print/${id}`,
   PRODUCTS_LABELS: (ids: string[]) => `/products/labels?ids=${ids.join(',')}`,
   SALES_REFUND: (id: string) => `/sales/refund/${id}`,
+  SALES_REFUND_ITEMS: (id: string) => `/sales/refund-items/${id}`,
   FISCAL_STATUS: '/fiscal/status',
   AUDIT_SEARCH: (filters: string) => `/audit/search?${filters}`,
   AUDIT_BACKUPS: '/audit/backups',

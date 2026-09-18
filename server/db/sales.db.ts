@@ -28,6 +28,7 @@ const toItem = (row: ISaleItemRow): ISaleItem => ({
   vatRate: Number(row.vat_rate),
   vatAmount: Number(row.vat_amount),
   markCode: row.mark_code,
+  refunded: Number(row.refunded),
 })
 
 const toFiscal = (row: ISaleRow): IFiscalReceipt | null =>
@@ -54,6 +55,7 @@ const toSale = (row: ISaleRow, items: ISaleItem[]): ISale => ({
   cardAmount: Number(row.card_amount),
   change: Math.max(0, round(Number(row.paid) - Number(row.total))),
   vatTotal: Number(row.vat_total),
+  refundTotal: Number(row.refund_total),
   refundedAt: row.refunded_at ? row.refunded_at.toISOString() : null,
   createdAt: row.created_at.toISOString(),
   fiscal: toFiscal(row),
@@ -62,7 +64,8 @@ const toSale = (row: ISaleRow, items: ISaleItem[]): ISale => ({
 
 const BASE_SQL = `
   SELECT s.id, s.number, s.shift_id, u.full_name AS cashier_name, s.payment,
-         s.total, s.discount, s.paid, s.cash_amount, s.card_amount, s.vat_total, s.refunded_at, s.created_at,
+         s.total, s.discount, s.paid, s.cash_amount, s.card_amount, s.vat_total, s.refund_total,
+         s.refunded_at, s.created_at,
          s.fiscal_number, s.fiscal_sign, s.fiscal_device, s.fiscal_qr, s.fiscal_at
   FROM sales s
   JOIN users u ON u.id = s.cashier_id`
@@ -76,7 +79,7 @@ const countSql = (where: string) =>
   `SELECT count(*)::text AS total FROM sales s JOIN users u ON u.id = s.cashier_id ${where}`
 
 const ITEMS_SQL = `
-  SELECT id, sale_id, product_id, name, quantity, price, discount, vat_rate, vat_amount, mark_code
+  SELECT id, sale_id, product_id, name, quantity, price, discount, vat_rate, vat_amount, mark_code, refunded
   FROM sale_items WHERE sale_id = ANY($1)`
 
 const CREATE_SALE_SQL = `
@@ -94,6 +97,18 @@ const FISCAL_SQL = `
   WHERE id = $1 RETURNING id`
 
 const REFUND_SQL = 'UPDATE sales SET refunded_at = now() WHERE id = $1 AND refunded_at IS NULL RETURNING id'
+
+const REFUND_ITEM_SQL = `
+  UPDATE sale_items SET refunded = refunded + $2
+  WHERE id = $1 AND refunded + $2 <= quantity RETURNING id`
+
+const REFUND_TOTAL_SQL = `
+  UPDATE sales SET refund_total = refund_total + $2,
+    refunded_at = CASE
+      WHEN (SELECT sum(i.quantity - i.refunded) FROM sale_items i WHERE i.sale_id = sales.id) <= 0 THEN now()
+      ELSE refunded_at
+    END
+  WHERE id = $1 RETURNING id`
 
 const itemsOf = async (saleIds: string[]) => {
   if (saleIds.length === 0) return new Map<string, ISaleItem[]>()
@@ -166,4 +181,9 @@ export const salesDb = {
     await pool.query(FISCAL_SQL, [id, stamp.number, stamp.sign, stamp.device, stamp.qr])
   },
   refund: async (id: string) => ((await pool.query(REFUND_SQL, [id])).rowCount ?? 0) > 0,
+  refundItem: async (itemId: string, quantity: number) =>
+    ((await pool.query(REFUND_ITEM_SQL, [itemId, quantity])).rowCount ?? 0) > 0,
+  addRefundTotal: async (id: string, amount: number) => {
+    await pool.query(REFUND_TOTAL_SQL, [id, amount])
+  },
 }

@@ -31,6 +31,7 @@ export interface ISaleItem {
   vatRate: number
   vatAmount: number
   markCode: string
+  refunded: number
 }
 
 export interface IFiscalReceipt {
@@ -75,6 +76,7 @@ export interface ISale {
   cardAmount: number
   change: number
   vatTotal: number
+  refundTotal: number
   refundedAt: string | null
   createdAt: string
   fiscal: IFiscalReceipt | null

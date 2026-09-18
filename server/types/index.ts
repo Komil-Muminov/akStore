@@ -34,6 +34,8 @@ export type {
   ISaleItemRow,
   ISaleInput,
   ISaleItemInput,
+  IRefundInput,
+  IRefundItemInput,
   ISaleRecord,
   ISaleItemRecord,
   IFiscalReceipt,

@@ -4,6 +4,7 @@ import { CashierStats } from '@/features/CashierStats'
 import { DailyChart } from '@/features/DailyChart'
 import { ReportFilters } from '@/features/ReportFilters'
 import { ReportSummary } from '@/features/ReportSummary'
+import { RefundDialog } from '@/features/RefundDialog'
 import { SalesTable } from '@/features/SalesTable'
 import { TopProducts } from '@/features/TopProducts'
 import { ApiRoutes } from '@/shared/config'
@@ -11,6 +12,7 @@ import { downloadFile, openPrintable } from '@/shared/lib'
 import { If, Text } from '@/shared/ui'
 import { useCashiersQuery, useDailyQuery, useOutletsQuery, useSalesQuery, useSummaryQuery, useTopQuery } from './hooks'
 import { queryOf } from './lib'
+import { useRefund } from './refund'
 import {
   DESCRIPTION,
   EXPORT_DONE,
@@ -36,6 +38,7 @@ export const SalesReport = () => {
   const salesQueryString = useMemo(() => queryOf(filters, salesPage, SALES_LIMIT), [filters, salesPage])
 
   const outlets = useOutletsQuery()
+  const refund = useRefund()
   const summary = useSummaryQuery(baseQuery)
   const cashiers = useCashiersQuery(baseQuery)
   const daily = useDailyQuery(baseQuery)
@@ -118,6 +121,16 @@ export const SalesReport = () => {
         loading={sales.isPending}
         onPageChange={setSalesPage}
         onPrint={handlePrintReceipt}
+        onRefund={refund.open}
+      />
+      <RefundDialog
+        sale={refund.sale}
+        picked={refund.picked}
+        pending={refund.pending}
+        error={refund.error}
+        onPick={refund.pick}
+        onSubmit={refund.submit}
+        onClose={refund.close}
       />
     </div>
   )

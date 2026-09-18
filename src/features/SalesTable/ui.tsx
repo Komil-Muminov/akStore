@@ -6,15 +6,26 @@ import {
   EMPTY_HINT,
   EMPTY_TITLE,
   ESTIMATED_ROW_HEIGHT,
+  PARTIAL_LABEL,
   POSITIONS_LABEL,
   PRINT_TOOLTIP,
+  REFUND_TOOLTIP,
   REFUNDED_LABEL,
   TITLE,
   type IProps,
 } from './model'
 import { empty, list, root, row, rowText, total } from './style'
 
-export const SalesTable = ({ sales, page, totalPages, total: count, loading, onPageChange, onPrint }: IProps) => (
+export const SalesTable = ({
+  sales,
+  page,
+  totalPages,
+  total: count,
+  loading,
+  onPageChange,
+  onPrint,
+  onRefund,
+}: IProps) => (
   <div style={root} testId="report__sales">
     <Text variant="title">{`${TITLE} · ${String(count)}`}</Text>
     <If
@@ -45,7 +56,15 @@ export const SalesTable = ({ sales, page, totalPages, total: count, loading, onP
                 <If condition={sale.refundedAt !== null}>
                   <Badge tone="danger" label={REFUNDED_LABEL} />
                 </If>
+                <If condition={sale.refundedAt === null && sale.refundTotal > 0}>
+                  <Badge tone="muted" label={PARTIAL_LABEL} />
+                </If>
                 <text style={total}>{moneyOf(sale.total)}</text>
+                <If condition={sale.refundedAt === null}>
+                  <Tooltip title={REFUND_TOOLTIP}>
+                    <IconButton icon="rotate" onClick={() => onRefund(sale)} testId={`report__refund-${sale.id}`} />
+                  </Tooltip>
+                </If>
                 <Tooltip title={PRINT_TOOLTIP}>
                   <IconButton icon="printer" onClick={() => onPrint(sale)} testId={`report__print-${sale.id}`} />
                 </Tooltip>

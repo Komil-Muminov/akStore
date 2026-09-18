@@ -4,7 +4,7 @@ import { fiscalService, parkedService, salesService, shiftsService } from '../se
 import { HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
 import { parsePageParams, parseReportParams } from './reports.validation'
-import { parseCash, parseNote, parseParkedLines, parseSaleInput } from './retail.validation'
+import { parseCash, parseNote, parseParkedLines, parseRefundInput, parseSaleInput } from './retail.validation'
 import { idOf, respond } from './respond'
 
 const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
@@ -53,6 +53,9 @@ salesRouter.get('/search', anyRole, respond((req) =>
 salesRouter.get('/find/:id', anyRole, respond((req) => salesService.find(idOf(req))))
 salesRouter.post('/create', anyRole, respond((req) => salesService.create(actorOf(req), parseSaleInput(req.body)), HttpStatus.CREATED))
 salesRouter.post('/refund/:id', anyRole, respond((req) => salesService.refund(actorOf(req), idOf(req))))
+salesRouter.post('/refund-items/:id', anyRole, respond((req) =>
+  salesService.refundItems(actorOf(req), idOf(req), parseRefundInput(req.body)),
+))
 
 export const parkedRouter = Router()
 

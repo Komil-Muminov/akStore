@@ -8,6 +8,7 @@ export interface IProps {
   loading: boolean
   onPageChange: (page: number) => void
   onPrint: (sale: ISale) => void
+  onRefund: (sale: ISale) => void
 }
 
 export const TITLE = 'Чеки'
@@ -16,4 +17,6 @@ export const EMPTY_HINT = 'Измените период или условия �
 export const REFUNDED_LABEL = 'Возврат'
 export const POSITIONS_LABEL = 'поз.'
 export const PRINT_TOOLTIP = 'Печать чека'
+export const REFUND_TOOLTIP = 'Возврат позиций'
+export const PARTIAL_LABEL = 'Частичный возврат'
 export const ESTIMATED_ROW_HEIGHT = 64

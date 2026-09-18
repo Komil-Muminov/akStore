@@ -55,6 +55,15 @@ export interface ISaleItemInput {
   discount: number
 }
 
+export interface IRefundItemInput {
+  itemId: string
+  quantity: number
+}
+
+export interface IRefundInput {
+  items: IRefundItemInput[]
+}
+
 export interface ISaleInput {
   items: ISaleItemInput[]
   discount: number
@@ -73,6 +82,7 @@ export interface ISaleItem {
   vatRate: number
   vatAmount: number
   markCode: string
+  refunded: number
 }
 
 export interface IFiscalTaskRow {
@@ -136,6 +146,7 @@ export interface ISale {
   cardAmount: number
   change: number
   vatTotal: number
+  refundTotal: number
   refundedAt: string | null
   createdAt: string
   fiscal: IFiscalReceipt | null
@@ -154,6 +165,7 @@ export interface ISaleRow {
   cash_amount: string
   card_amount: string
   vat_total: string
+  refund_total: string
   refunded_at: Date | null
   created_at: Date
   fiscal_number: string
@@ -174,5 +186,6 @@ export interface ISaleItemRow {
   vat_rate: string
   vat_amount: string
   mark_code: string
+  refunded: string
 }
 

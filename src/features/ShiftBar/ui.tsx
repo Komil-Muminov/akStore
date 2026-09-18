@@ -1,27 +1,15 @@
 import { useCallback, useState } from 'react'
 import { moneyOf } from '@/entities/product'
-import { changeOf } from '@/entities/sale'
-import { Button, IconButton, If, Text, TextInput, Tooltip } from '@/shared/ui'
+import { Button, If, Text, TextInput } from '@/shared/ui'
+import { PayRow } from './ui/PayRow'
 import {
   CARD_LABEL,
   CASH_LABEL,
-  CHANGE_LABEL,
   CLOSED_HINT,
   CLOSED_TITLE,
-  CLOSE_LABEL,
-  RECEIPT_LABEL,
-  RECEIPT_TOOLTIP,
   EXPECTED_LABEL,
   OPENING_LABEL,
   OPEN_LABEL,
-  PAY_LABEL,
-  CASH_FIELD_LABEL,
-  CARD_FIELD_LABEL,
-  EXACT_TOOLTIP,
-  CASH_TOOLTIP,
-  PARK_LABEL,
-  PARK_TOOLTIP,
-  PARKED_TOOLTIP,
   REVENUE_LABEL,
   SALES_LABEL,
   SHIFT_LABEL,
@@ -29,11 +17,9 @@ import {
 } from './model'
 import {
   cashField,
-  changeText,
   closedBox,
   closedText,
   noticeText,
-  payRow,
   root,
   stat,
   statValue,
@@ -125,78 +111,25 @@ export const ShiftBar = ({
                 <text style={statValue}>{moneyOf(state?.totals.expectedCash ?? 0)}</text>
               </div>
             </div>
-            <div style={payRow}>
-              <TextInput
-                value={cash}
-                onChange={setCash}
-                placeholder={CASH_FIELD_LABEL}
-                icon="briefcase"
-                style={cashField}
-                testId="shift__paid"
-              />
-              <TextInput
-                value={card}
-                onChange={setCard}
-                placeholder={CARD_FIELD_LABEL}
-                icon="key"
-                style={cashField}
-                testId="shift__card"
-              />
-              <Tooltip title={EXACT_TOOLTIP}>
-                <IconButton icon="check" onClick={handleExact} testId="shift__exact" />
-              </Tooltip>
-              <Text variant="secondary">{CHANGE_LABEL}</Text>
-              <text style={changeText}>{moneyOf(changeOf(cartTotal, received))}</text>
-              <Button
-                label={PAY_LABEL}
-                icon="check"
-                onClick={handlePay}
-                disabled={pending || cartTotal <= 0 || received < cartTotal}
-                testId="shift__pay"
-              />
-              <Tooltip title={CASH_TOOLTIP}>
-                <IconButton icon="briefcase" onClick={onOpenCash} testId="shift__cash" />
-              </Tooltip>
-              <Tooltip title={PARK_TOOLTIP}>
-                <Button
-                  label={PARK_LABEL}
-                  variant="secondary"
-                  icon="inbox"
-                  onClick={onPark}
-                  disabled={pending || !canPark}
-                  testId="shift__park"
-                />
-              </Tooltip>
-              <Tooltip title={PARKED_TOOLTIP}>
-                <Button
-                  label={String(parkedCount)}
-                  variant="secondary"
-                  icon="rotate"
-                  onClick={onOpenParked}
-                  disabled={pending}
-                  testId="shift__parked"
-                />
-              </Tooltip>
-              <If condition={lastSaleId !== null}>
-                <Tooltip title={RECEIPT_TOOLTIP}>
-                  <Button
-                    label={RECEIPT_LABEL}
-                    variant="secondary"
-                    icon="printer"
-                    onClick={onPrintReceipt}
-                    testId="shift__receipt"
-                  />
-                </Tooltip>
-              </If>
-              <Button
-                label={CLOSE_LABEL}
-                variant="secondary"
-                icon="logOut"
-                onClick={handleClose}
-                disabled={pending}
-                testId="shift__close"
-              />
-            </div>
+            <PayRow
+              cash={cash}
+              card={card}
+              cartTotal={cartTotal}
+              received={received}
+              pending={pending}
+              parkedCount={parkedCount}
+              canPark={canPark}
+              lastSaleId={lastSaleId}
+              onCashChange={setCash}
+              onCardChange={setCard}
+              onExact={handleExact}
+              onPay={handlePay}
+              onOpenCash={onOpenCash}
+              onPark={onPark}
+              onOpenParked={onOpenParked}
+              onPrintReceipt={onPrintReceipt}
+              onClose={handleClose}
+            />
             <If condition={error !== undefined}>
               <Text variant="danger">{error ?? ''}</Text>
             </If>
