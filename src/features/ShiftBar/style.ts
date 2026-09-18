@@ -32,10 +32,11 @@ export const payRow: StyleDesc = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: theme.spacing.md,
+  flexWrap: 'wrap',
+  gap: theme.spacing.sm,
 }
 
-export const cashField: StyleDesc = { width: theme.size.sidebar / 1.2 }
+export const cashField: StyleDesc = { width: theme.size.payField, flexShrink: 0 }
 
 export const changeText: StyleDesc = {
   fontFamily: theme.font.family,

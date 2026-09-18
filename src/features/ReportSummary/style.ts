@@ -22,6 +22,7 @@ export const card: StyleDesc = {
   borderWidth: 1,
   borderColor: theme.colors.border,
   minWidth: theme.size.filterField,
+  maxWidth: theme.size.summaryCard,
   flexGrow: 1,
 }
 

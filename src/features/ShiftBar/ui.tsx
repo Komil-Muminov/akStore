@@ -14,7 +14,6 @@ import {
   EXPECTED_LABEL,
   OPENING_LABEL,
   OPEN_LABEL,
-  PAID_LABEL,
   PAY_LABEL,
   CASH_FIELD_LABEL,
   CARD_FIELD_LABEL,
@@ -127,10 +126,22 @@ export const ShiftBar = ({
               </div>
             </div>
             <div style={payRow}>
-              <Text variant="secondary">{CASH_FIELD_LABEL}</Text>
-              <TextInput value={cash} onChange={setCash} placeholder={PAID_LABEL} style={cashField} testId="shift__paid" />
-              <Text variant="secondary">{CARD_FIELD_LABEL}</Text>
-              <TextInput value={card} onChange={setCard} placeholder={PAID_LABEL} style={cashField} testId="shift__card" />
+              <TextInput
+                value={cash}
+                onChange={setCash}
+                placeholder={CASH_FIELD_LABEL}
+                icon="briefcase"
+                style={cashField}
+                testId="shift__paid"
+              />
+              <TextInput
+                value={card}
+                onChange={setCard}
+                placeholder={CARD_FIELD_LABEL}
+                icon="key"
+                style={cashField}
+                testId="shift__card"
+              />
               <Tooltip title={EXACT_TOOLTIP}>
                 <IconButton icon="check" onClick={handleExact} testId="shift__exact" />
               </Tooltip>
