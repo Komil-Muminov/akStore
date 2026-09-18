@@ -2,13 +2,26 @@ import { MOVE_LABELS, moneyOf, quantityOf, type IStockMove } from '@/entities/pr
 import { saleStampOf } from '@/entities/sale'
 import { ApiRoutes, QueryKeys, theme } from '@/shared/config'
 import { useGetQuery } from '@/shared/hooks'
-import { Icon, If, Spinner, Text } from '@/shared/ui'
-import { DESCRIPTION, EMPTY_HINT, EMPTY_TITLE, ESTIMATED_ROW_HEIGHT, TITLE, iconOf, toneOf } from './model'
+import { StocktakeDialog } from '@/features/StocktakeDialog'
+import { Button, Icon, If, Spinner, Text, Tooltip } from '@/shared/ui'
+import { useStocktake } from './stocktake'
+import {
+  COUNT_LABEL,
+  COUNT_TOOLTIP,
+  DESCRIPTION,
+  EMPTY_HINT,
+  EMPTY_TITLE,
+  ESTIMATED_ROW_HEIGHT,
+  TITLE,
+  iconOf,
+  toneOf,
+} from './model'
 import { empty, head, headText, list, mark, root, row, rowText, quantity } from './style'
 
 export const StockHistory = () => {
   const moves = useGetQuery<IStockMove[]>(QueryKeys.STOCK_HISTORY, ApiRoutes.PRODUCTS_HISTORY())
   const items = moves.data ?? []
+  const stocktake = useStocktake()
 
   return (
     <div style={root} testId="stock__layout">
@@ -17,7 +30,24 @@ export const StockHistory = () => {
           <Text variant="heading">{TITLE}</Text>
           <Text variant="secondary">{DESCRIPTION}</Text>
         </div>
+        <Tooltip title={COUNT_TOOLTIP}>
+          <Button label={COUNT_LABEL} icon="listChecks" onClick={stocktake.openDialog} testId="stock__count" />
+        </Tooltip>
       </div>
+      <StocktakeDialog
+        open={stocktake.open}
+        lines={stocktake.lines}
+        counted={stocktake.counted}
+        note={stocktake.note}
+        result={stocktake.result}
+        pending={stocktake.pending}
+        error={stocktake.error}
+        onCount={stocktake.count}
+        onNoteChange={stocktake.setNote}
+        onPrint={stocktake.print}
+        onSubmit={stocktake.submit}
+        onClose={stocktake.closeDialog}
+      />
       <If condition={moves.isPending} fallback={
         <If
           condition={items.length > 0}

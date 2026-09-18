@@ -1,6 +1,7 @@
 import { HttpError, HttpStatus, optionalString, requireString, requireUuid } from '../shared/utils'
 import {
   ProductUnit,
+  type ICountInput,
   type IParkedLine,
   type IProductInput,
   type IRefundInput,
@@ -15,6 +16,7 @@ const NOTE_MAX = 200
 const MONEY_MAX = 99_999_999
 const QUANTITY_MAX = 100_000
 const ITEMS_MAX = 200
+const COUNT_MAX = 2000
 const VAT_MAX = 100
 const MARK_MAX = 64
 const MONEY_ERROR = 'Сумма указана неверно'
@@ -139,6 +141,20 @@ export const parseRefundInput = (body: unknown): IRefundInput => {
       itemId: requireUuid(item.itemId, 'itemId'),
       quantity: quantity(item.quantity),
     })),
+  }
+}
+
+export const parseCountInput = (body: unknown): ICountInput => {
+  const raw = asRecord(body)
+  const lines = Array.isArray(raw.lines) ? raw.lines : []
+  if (lines.length === 0 || lines.length > COUNT_MAX) throw new HttpError(HttpStatus.BAD_REQUEST, ITEMS_ERROR)
+  return {
+    note: optionalString(raw.note, 'note', NOTE_MAX),
+    lines: (lines as Record<string, unknown>[]).map((line) => {
+      const counted = Number(line.counted)
+      if (!Number.isFinite(counted) || counted < 0) throw new HttpError(HttpStatus.BAD_REQUEST, QUANTITY_ERROR)
+      return { productId: requireUuid(line.productId, 'productId'), counted: Math.round(counted * 1000) / 1000 }
+    }),
   }
 }
 

@@ -69,6 +69,7 @@ export type {
 } from './reports'
 export { ImportAction } from './import'
 export type { IImportRow, IImportValues, IImportPreview, IImportResult } from './import'
+export type { ICountLine, ICountInput, ICountResult } from './retail'
 export type {
   IOutlet,
   IOutletRow,

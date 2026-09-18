@@ -9,6 +9,7 @@ export enum AuditAction {
   DEBTOR_ARCHIVE = 'debtor-archive',
   IMPORT_APPLY = 'import-apply',
   SHIFT_CLOSE = 'shift-close',
+  STOCKTAKE = 'stocktake',
 }
 
 export interface IAuditEntry {

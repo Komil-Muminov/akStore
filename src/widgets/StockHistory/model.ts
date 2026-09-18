@@ -2,6 +2,8 @@ import { StockMoveKind } from '@/entities/product'
 import { theme } from '@/shared/config'
 import type { TIconName } from '@/shared/ui'
 
+export const COUNT_LABEL = 'Инвентаризация'
+export const COUNT_TOOLTIP = 'Пересчёт остатков ведомостью'
 export const TITLE = 'Склад'
 export const DESCRIPTION = 'Приход, списания и продажи'
 export const EMPTY_TITLE = 'Движений пока нет'

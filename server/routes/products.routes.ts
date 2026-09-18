@@ -1,10 +1,11 @@
 import { Router } from 'express'
 import { rbacMiddleware } from '../middleware'
-import { productsService } from '../services'
+import { productsService, stocktakeService } from '../services'
 import { HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
 import {
   parseCategoryName,
+  parseCountInput,
   parseInventoryInput,
   parseProductInput,
   parseStockInput,
@@ -20,6 +21,29 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 const IDS_MAX = 200
 
 export const productsRouter = Router()
+
+const outletOf = (req: { query: Record<string, unknown> }) =>
+  typeof req.query.outlet === 'string' && UUID_PATTERN.test(req.query.outlet) ? req.query.outlet : null
+
+const categoryOf = (req: { query: Record<string, unknown> }) =>
+  typeof req.query.category === 'string' && UUID_PATTERN.test(req.query.category) ? req.query.category : null
+
+productsRouter.get('/count-sheet', manager, respond((req) =>
+  stocktakeService.sheet(actorOf(req), outletOf(req), categoryOf(req)),
+))
+
+productsRouter.post('/count-apply', manager, respond((req) =>
+  stocktakeService.apply(actorOf(req), parseCountInput(req.body), outletOf(req)),
+))
+
+productsRouter.get('/count-print', manager, async (req, res, next) => {
+  try {
+    res.setHeader('Content-Type', HTML_TYPE)
+    res.send(await stocktakeService.printable(actorOf(req), outletOf(req), categoryOf(req)))
+  } catch (error) {
+    next(error)
+  }
+})
 
 productsRouter.get('/labels', manager, async (req, res, next) => {
   try {

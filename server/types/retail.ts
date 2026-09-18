@@ -91,6 +91,23 @@ export interface IStockInput {
   note: string
 }
 
+export interface ICountLine {
+  productId: string
+  counted: number
+}
+
+export interface ICountInput {
+  note: string
+  lines: ICountLine[]
+}
+
+export interface ICountResult {
+  checked: number
+  changed: number
+  shortage: number
+  surplus: number
+}
+
 export interface IProductSearchParams {
   query?: string
   categoryId?: string

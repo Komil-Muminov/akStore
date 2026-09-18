@@ -3,6 +3,7 @@ export enum QueryKeys {
   PRODUCTS_FAVORITE = 'products-favorite',
   CATEGORIES = 'categories',
   STOCK_HISTORY = 'stock-history',
+  COUNT_SHEET = 'count-sheet',
   SHIFT = 'shift',
   SHIFTS = 'shifts',
   SALES = 'sales',
