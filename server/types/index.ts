@@ -86,6 +86,8 @@ export type {
   IInvoiceInput,
   IInvoiceItemInput,
 } from './suppliers'
+export { AuditAction } from './audit'
+export type { IAuditEntry, IAuditRow, IAuditParams } from './audit'
 export { UnitType } from './org'
 export type { IPosition, IPositionRow, IPositionInput, IUnit, IUnitRow, IUnitInput } from './org'
 

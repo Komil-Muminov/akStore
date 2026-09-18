@@ -5,3 +5,4 @@ screenshots/
 node_modules/
 .env
 uploads/
+backups/

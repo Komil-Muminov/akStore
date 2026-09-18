@@ -4,6 +4,7 @@ import { config } from './config'
 import { initDb } from './db'
 import { fiscalDriver, startFiscalQueue } from './fiscal'
 import { authMiddleware, errorMiddleware } from './middleware'
+import { startBackups } from './services'
 import { startRealtime } from './realtime'
 import { apiRouter } from './routes'
 import { HttpError, HttpStatus } from './shared/utils'
@@ -25,6 +26,7 @@ startRealtime()
 
 await fiscalDriver.connect()
 startFiscalQueue(fiscalDriver)
+startBackups()
 
 app.listen(config.port, () => {
   console.log(`server: http://localhost:${config.port}`)

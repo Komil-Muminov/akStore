@@ -1,6 +1,7 @@
 import { cashDb, outletsDb, reportsDb, shiftsDb, usersDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { UserRole, type IAuthUser } from '../types'
+import { AuditAction, UserRole, type IAuthUser } from '../types'
+import { auditService } from './audit.service'
 import { fiscalService } from './fiscal.service'
 import { zReportHtml } from './shifts.report'
 
@@ -48,6 +49,13 @@ export const shiftsService = {
     await shiftsDb.close(shift.id, closingCash, note)
     const closed = await shiftsDb.find(shift.id)
     if (!closed) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
+    await auditService.record(
+      cashierId,
+      AuditAction.SHIFT_CLOSE,
+      `Смена №${String(closed.number)}`,
+      closed.id,
+      `в кассе ${String(closingCash)}, ожидалось ${String(totals.expectedCash)}`,
+    )
     const report = await fiscalService.closeShift(closed.cashierName)
     return { shift: closed, totals, report }
   },

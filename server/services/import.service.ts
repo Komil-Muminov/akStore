@@ -1,7 +1,8 @@
 import { categoriesDb, productsDb, stockDb } from '../db'
 import { removeUpload, uploadsPathOf } from '../shared/uploads'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { ImportAction, StockMoveKind, type IImportRow, type IImportValues } from '../types'
+import { AuditAction, ImportAction, StockMoveKind, type IImportRow, type IImportValues } from '../types'
+import { auditService } from './audit.service'
 import { tableOf } from './import.parse'
 import { rowsOf } from './import.rows'
 
@@ -95,6 +96,13 @@ export const importService = {
       }
     }
     removeUpload(fileName)
+    await auditService.record(
+      authorId,
+      AuditAction.IMPORT_APPLY,
+      fileName,
+      '',
+      `создано ${String(created)}, обновлено ${String(updated)}`,
+    )
     return { created, updated, failed: rows.filter((row) => row.action === ImportAction.FAILED).length, stocked }
   },
 }

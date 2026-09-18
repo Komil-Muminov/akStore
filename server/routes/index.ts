@@ -3,6 +3,7 @@ import { authRouter } from './auth.routes'
 import { chatRouter } from './chat.routes'
 import { positionsRouter } from './positions.routes'
 import { productsRouter } from './products.routes'
+import { auditRouter } from './audit.routes'
 import { cashRouter, debtsRouter } from './cash.routes'
 import { importRouter } from './import.routes'
 import { outletsRouter } from './outlets.routes'
@@ -26,6 +27,7 @@ apiRouter.use('/cash', cashRouter)
 apiRouter.use('/debts', debtsRouter)
 apiRouter.use('/outlets', outletsRouter)
 apiRouter.use('/suppliers', suppliersRouter)
+apiRouter.use('/audit', auditRouter)
 apiRouter.use('/reports', reportsRouter)
 apiRouter.use('/import', importRouter)
 apiRouter.use('/positions', positionsRouter)

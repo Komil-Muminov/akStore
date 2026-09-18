@@ -1,6 +1,7 @@
 import { cashDb, shiftsDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { CashMoveKind } from '../types'
+import { AuditAction, CashMoveKind } from '../types'
+import { auditService } from './audit.service'
 
 const LIST_LIMIT = 50
 const NOT_OPEN = 'Открытой смены нет'
@@ -28,6 +29,9 @@ export const cashService = {
       if (totals.expectedCash + adjustment < amount) throw new HttpError(HttpStatus.BAD_REQUEST, NOT_ENOUGH)
     }
     await cashDb.create(shift.id, cashierId, kind, amount, note)
+    if (kind === CashMoveKind.OUT) {
+      await auditService.record(cashierId, AuditAction.CASH_OUT, note, shift.id, String(amount))
+    }
     return cashDb.list(shift.id, LIST_LIMIT)
   },
 }

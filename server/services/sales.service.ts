@@ -2,6 +2,7 @@ import { productsDb, salesDb, stockDb } from '../db'
 import { vatAmountOf } from '../fiscal'
 import { HttpError, HttpStatus } from '../shared/utils'
 import {
+  AuditAction,
   PaymentKind,
   StockMoveKind,
   type IPageParams,
@@ -10,6 +11,7 @@ import {
   type ISaleInput,
 } from '../types'
 import QRCode from 'qrcode'
+import { auditService } from './audit.service'
 import { fiscalService } from './fiscal.service'
 import { receiptHtml } from './receipt.print'
 import { shiftsService } from './shifts.service'
@@ -117,6 +119,13 @@ export const salesService = {
     }
     const refunded = await salesDb.find(saleId)
     if (!refunded) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
+    await auditService.record(
+      cashierId,
+      AuditAction.SALE_REFUND,
+      `Чек №${String(refunded.number)}`,
+      saleId,
+      String(refunded.total),
+    )
     return fiscalService.registerRefund(refunded)
   },
 

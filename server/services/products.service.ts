@@ -1,6 +1,14 @@
 import { categoriesDb, outletsDb, productsDb, stockDb, usersDb } from '../db'
+import { auditService } from './audit.service'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { StockMoveKind, type IProduct, type IProductInput, type IProductSearchParams, type IStockInput } from '../types'
+import {
+  AuditAction,
+  StockMoveKind,
+  type IProduct,
+  type IProductInput,
+  type IProductSearchParams,
+  type IStockInput,
+} from '../types'
 import { labelsHtml } from './labels.print'
 
 const HISTORY_LIMIT = 200
@@ -34,15 +42,25 @@ export const productsService = {
     await requireFreeBarcode(input.barcode)
     return orNotFound(await productsDb.create(input))
   },
-  update: async (id: string, input: IProductInput) => {
-    await orNotFound(id)
+  update: async (id: string, input: IProductInput, actorId?: string) => {
+    const before = await orNotFound(id)
     await requireFreeBarcode(input.barcode, id)
     await productsDb.update(id, input)
+    if (before.salePrice !== input.salePrice) {
+      await auditService.record(
+        actorId ?? null,
+        AuditAction.PRODUCT_PRICE,
+        before.name,
+        id,
+        `${before.salePrice} → ${input.salePrice}`,
+      )
+    }
     return orNotFound(id)
   },
-  archive: async (id: string) => {
-    await orNotFound(id)
+  archive: async (id: string, actorId?: string) => {
+    const product = await orNotFound(id)
     await productsDb.archive(id)
+    await auditService.record(actorId ?? null, AuditAction.PRODUCT_ARCHIVE, product.name, id, '')
     return { id }
   },
 
@@ -58,10 +76,11 @@ export const productsService = {
     await categoriesDb.rename(id, name)
     return categoriesDb.list()
   },
-  removeCategory: async (id: string) => {
+  removeCategory: async (id: string, actorId?: string) => {
     const category = (await categoriesDb.list()).find((item) => item.id === id)
     if (category && category.productCount > 0) throw new HttpError(HttpStatus.BAD_REQUEST, CATEGORY_NOT_EMPTY)
     await categoriesDb.remove(id)
+    await auditService.record(actorId ?? null, AuditAction.CATEGORY_DELETE, category?.name ?? '', id, '')
     return categoriesDb.list()
   },
 

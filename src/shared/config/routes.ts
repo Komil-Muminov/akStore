@@ -3,6 +3,7 @@ export enum AppRoutes {
   DEBTS = 'debts',
   OUTLETS = 'outlets',
   SUPPLIERS = 'suppliers',
+  AUDIT = 'audit',
   PRODUCTS = 'products',
   STOCK = 'stock',
   SHIFTS = 'shifts',
@@ -60,6 +61,9 @@ export const ApiRoutes = {
   PRODUCTS_LABELS: (ids: string[]) => `/products/labels?ids=${ids.join(',')}`,
   SALES_REFUND: (id: string) => `/sales/refund/${id}`,
   FISCAL_STATUS: '/fiscal/status',
+  AUDIT_SEARCH: (filters: string) => `/audit/search?${filters}`,
+  AUDIT_BACKUPS: '/audit/backups',
+  AUDIT_BACKUP_CREATE: '/audit/backup-create',
   SUPPLIERS_SEARCH: (query?: string) =>
     query?.trim() ? `/suppliers/search?q=${encodeURIComponent(query.trim())}` : '/suppliers/search',
   SUPPLIERS_INVOICES: (supplierId?: string | null) =>

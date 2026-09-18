@@ -31,3 +31,17 @@ export const MONEY_SCHEMA = `
   );
   CREATE INDEX IF NOT EXISTS debt_moves_debtor_idx ON debt_moves (debtor_id, created_at DESC);
 `
+
+export const AUDIT_SCHEMA = `
+  CREATE TABLE IF NOT EXISTS audit_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    actor_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    action TEXT NOT NULL,
+    entity TEXT NOT NULL DEFAULT '',
+    entity_id TEXT NOT NULL DEFAULT '',
+    details TEXT NOT NULL DEFAULT '',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS audit_log_time_idx ON audit_log (created_at DESC);
+  CREATE INDEX IF NOT EXISTS audit_log_actor_idx ON audit_log (actor_id, created_at DESC);
+`

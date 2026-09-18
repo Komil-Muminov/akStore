@@ -47,11 +47,15 @@ productsRouter.get('/history', manager, respond((req) =>
   productsService.history(typeof req.query.product === 'string' ? req.query.product : null),
 ))
 productsRouter.post('/create', manager, respond((req) => productsService.create(parseProductInput(req.body)), HttpStatus.CREATED))
-productsRouter.patch('/update/:id', manager, respond((req) => productsService.update(idOf(req), parseProductInput(req.body))))
-productsRouter.delete('/delete/:id', manager, respond((req) => productsService.archive(idOf(req))))
+productsRouter.patch('/update/:id', manager, respond((req) =>
+  productsService.update(idOf(req), parseProductInput(req.body), actorOf(req)),
+))
+productsRouter.delete('/delete/:id', manager, respond((req) => productsService.archive(idOf(req), actorOf(req))))
 productsRouter.post('/category-create', manager, respond((req) => productsService.createCategory(parseCategoryName(req.body)), HttpStatus.CREATED))
 productsRouter.patch('/category-update/:id', manager, respond((req) => productsService.renameCategory(idOf(req), parseCategoryName(req.body))))
-productsRouter.delete('/category-delete/:id', manager, respond((req) => productsService.removeCategory(idOf(req))))
+productsRouter.delete('/category-delete/:id', manager, respond((req) =>
+  productsService.removeCategory(idOf(req), actorOf(req)),
+))
 productsRouter.post('/income', manager, respond((req) => productsService.income(actorOf(req), parseStockInput(req.body)), HttpStatus.CREATED))
 productsRouter.post('/write-off', manager, respond((req) => productsService.writeOff(actorOf(req), parseStockInput(req.body)), HttpStatus.CREATED))
 productsRouter.post('/inventory', manager, respond((req) => productsService.inventory(actorOf(req), parseInventoryInput(req.body)), HttpStatus.CREATED))

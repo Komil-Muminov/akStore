@@ -12,6 +12,7 @@ export const PAGES: Record<AppRoutes, LazyExoticComponent<() => JSX.Element>> = 
   [AppRoutes.DEBTS]: lazy(() => import('@/pages/DebtsPage')),
   [AppRoutes.OUTLETS]: lazy(() => import('@/pages/OutletsPage')),
   [AppRoutes.SUPPLIERS]: lazy(() => import('@/pages/SuppliersPage')),
+  [AppRoutes.AUDIT]: lazy(() => import('@/pages/AuditPage')),
   [AppRoutes.CHAT]: lazy(() => import('@/pages/ChatPage')),
   [AppRoutes.STRUCTURE]: lazy(() => import('@/pages/StructurePage')),
   [AppRoutes.USERS]: lazy(() => import('@/pages/UsersPage')),

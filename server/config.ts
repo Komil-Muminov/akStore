@@ -33,6 +33,11 @@ export const config = {
   isProduction: process.env.NODE_ENV === 'production',
   jwtSecret: required('JWT_SECRET'),
   tokenTtl: process.env.TOKEN_TTL ?? DEFAULT_TOKEN_TTL,
+  backup: {
+    dir: process.env.BACKUP_DIR ?? 'backups',
+    intervalHours: Number(process.env.BACKUP_INTERVAL_HOURS ?? 24),
+    keep: Number(process.env.BACKUP_KEEP ?? 14),
+  },
   shop: {
     name: process.env.SHOP_NAME ?? 'Магазин',
     address: process.env.SHOP_ADDRESS ?? '',
