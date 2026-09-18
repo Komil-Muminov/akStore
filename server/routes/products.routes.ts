@@ -35,6 +35,8 @@ productsRouter.get('/labels', manager, async (req, res, next) => {
 productsRouter.get('/search', anyRole, respond((req) => productsService.search({
   query: typeof req.query.q === 'string' ? req.query.q : undefined,
   categoryId: typeof req.query.category === 'string' ? req.query.category : undefined,
+  favorite: req.query.favorite === 'true',
+  lowStock: req.query.low === 'true',
   page: typeof req.query.page === 'string' ? Number(req.query.page) : undefined,
   limit: typeof req.query.limit === 'string' ? Number(req.query.limit) : undefined,
 })))

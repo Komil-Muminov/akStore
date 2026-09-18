@@ -16,12 +16,15 @@ const toProduct = (row: IProductRow): IProduct => ({
   stock: Number(row.stock),
   vatRate: Number(row.vat_rate),
   markCode: row.mark_code,
+  isFavorite: row.is_favorite,
+  minStock: Number(row.min_stock),
   isActive: row.is_active,
 })
 
 const BASE_SQL = `
   SELECT p.id, p.barcode, p.name, p.category_id, c.name AS category_name,
-         p.unit, p.cost_price, p.sale_price, p.stock, p.vat_rate, p.mark_code, p.is_active
+         p.unit, p.cost_price, p.sale_price, p.stock, p.vat_rate, p.mark_code,
+         p.is_favorite, p.min_stock, p.is_active
   FROM products p
   LEFT JOIN product_categories c ON c.id = p.category_id`
 
@@ -30,12 +33,14 @@ const BY_BARCODE_SQL = `${BASE_SQL} WHERE p.barcode = $1 AND p.is_active = true`
 const BY_NAME_SQL = `${BASE_SQL} WHERE lower(p.name) = lower($1) AND p.is_active = true LIMIT 1`
 
 const CREATE_SQL = `
-  INSERT INTO products (barcode, name, category_id, unit, cost_price, sale_price, vat_rate, mark_code)
-  VALUES (NULLIF($1, ''), $2, $3, $4, $5, $6, $7, $8) RETURNING id`
+  INSERT INTO products (barcode, name, category_id, unit, cost_price, sale_price, vat_rate, mark_code,
+    is_favorite, min_stock)
+  VALUES (NULLIF($1, ''), $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`
 
 const UPDATE_SQL = `
   UPDATE products SET barcode = NULLIF($2, ''), name = $3, category_id = $4,
-    unit = $5, cost_price = $6, sale_price = $7, vat_rate = $8, mark_code = $9, updated_at = now()
+    unit = $5, cost_price = $6, sale_price = $7, vat_rate = $8, mark_code = $9,
+    is_favorite = $10, min_stock = $11, updated_at = now()
   WHERE id = $1 RETURNING id`
 
 const ARCHIVE_SQL = 'UPDATE products SET is_active = false, updated_at = now() WHERE id = $1 RETURNING id'
@@ -49,6 +54,8 @@ const toValues = (input: IProductInput) => [
   input.salePrice,
   input.vatRate,
   input.markCode,
+  input.isFavorite,
+  input.minStock,
 ]
 
 export const productsDb = {
@@ -63,6 +70,8 @@ export const productsDb = {
       values.push(params.categoryId)
       conditions.push(`p.category_id = $${values.length}`)
     }
+    if (params.favorite) conditions.push('p.is_favorite = true')
+    if (params.lowStock) conditions.push('p.stock <= p.min_stock AND p.min_stock > 0')
     const where = `WHERE ${conditions.join(' AND ')}`
     const total = Number(
       (await pool.query<{ total: string }>(`SELECT count(*)::text AS total FROM products p ${where}`, values))

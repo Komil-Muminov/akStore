@@ -11,13 +11,19 @@ interface ISaleBody {
   cardPaid: number
 }
 
-const INVALIDATE = [QueryKeys.SHIFT, QueryKeys.PRODUCTS, QueryKeys.SALES, QueryKeys.FISCAL]
+const INVALIDATE = [QueryKeys.SHIFT, QueryKeys.PRODUCTS, QueryKeys.PRODUCTS_FAVORITE, QueryKeys.SALES, QueryKeys.FISCAL]
 const PAGE_LIMIT = 50
 
 export const useProductsQuery = (query: string, categoryId: string | null) =>
   useGetQuery<IPagedResponse<IProduct>>(
     QueryKeys.PRODUCTS,
     ApiRoutes.PRODUCTS_SEARCH(query, categoryId ?? undefined, 1, PAGE_LIMIT),
+  )
+
+export const useFavoritesQuery = () =>
+  useGetQuery<IPagedResponse<IProduct>>(
+    QueryKeys.PRODUCTS_FAVORITE,
+    ApiRoutes.PRODUCTS_SEARCH('', undefined, 1, PAGE_LIMIT, 'favorite'),
   )
 
 export const useCategoriesQuery = () =>

@@ -20,6 +20,8 @@ export interface IProductInput {
   salePrice: number
   vatRate: number
   markCode: string
+  isFavorite: boolean
+  minStock: number
 }
 
 export interface IProduct extends IProductInput {
@@ -67,5 +69,7 @@ export const VAT_OPTIONS = [
   { id: '18', label: '18%' },
 ]
 
+export const FAVORITE_LABEL = 'Быстрая кнопка'
+export const MIN_STOCK_LABEL = 'Минимальный остаток'
 export const LOW_STOCK_LIMIT = 5
 export const NO_CATEGORY = 'Без категории'

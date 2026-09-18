@@ -4,11 +4,19 @@ import { cartSubtotalOf, cartTotalOf, discountAmountOf, DiscountKind, type ICart
 import { FiscalBadge } from '@/features/FiscalBadge'
 import { ParkedSales } from '@/features/ParkedSales'
 import { SaleCart } from '@/features/SaleCart'
+import { QuickPicks } from '@/features/QuickPicks'
 import { SaleScanner } from '@/features/SaleScanner'
 import { ShiftBar } from '@/features/ShiftBar'
 import { ApiRoutes } from '@/shared/config'
 import { openPrintable } from '@/shared/lib'
-import { useCategoriesQuery, useFiscalStatusQuery, useProductsQuery, useSaleMutations, useShiftQuery } from './hooks'
+import {
+  useCategoriesQuery,
+  useFavoritesQuery,
+  useFiscalStatusQuery,
+  useProductsQuery,
+  useSaleMutations,
+  useShiftQuery,
+} from './hooks'
 import { addToCart, changeLineDiscount, changeQuantity } from './lib'
 import { useParked } from './parked'
 import { NOTICE_TIMEOUT_MS, RECEIPT_FILE, SOLD_NOTICE } from './model'
@@ -24,6 +32,7 @@ export const Sale = () => {
   const [lastSaleId, setLastSaleId] = useState<string | null>(null)
   const products = useProductsQuery(query, category)
   const categories = useCategoriesQuery()
+  const favorites = useFavoritesQuery()
   const shift = useShiftQuery()
   const fiscal = useFiscalStatusQuery()
   const { openShift, closeShift, sell } = useSaleMutations()
@@ -134,6 +143,7 @@ export const Sale = () => {
           onCategoryChange={setCategory}
           onPick={handlePick}
         />
+        <QuickPicks products={favorites.data?.items ?? []} onPick={handlePick} />
         <div style={badgeRow}>
           <FiscalBadge status={fiscal.data ?? null} />
         </div>

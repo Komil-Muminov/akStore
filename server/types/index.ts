@@ -39,10 +39,8 @@ export type {
   IFiscalReceipt,
   IFiscalStamp,
   IFiscalTaskRow,
-  IParkedLine,
-  IParkedSale,
-  IParkedSaleRow,
 } from './sales'
+export type { IParkedLine, IParkedSale, IParkedSaleRow } from './parked'
 export type {
   IReportParams,
   IPageParams,

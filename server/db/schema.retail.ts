@@ -22,6 +22,8 @@ export const RETAIL_SCHEMA = `
   );
   CREATE INDEX IF NOT EXISTS products_name_idx ON products (name);
   CREATE INDEX IF NOT EXISTS products_active_idx ON products (is_active);
+  ALTER TABLE products ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN NOT NULL DEFAULT false;
+  ALTER TABLE products ADD COLUMN IF NOT EXISTS min_stock NUMERIC(12, 3) NOT NULL DEFAULT 0;
 
   CREATE TABLE IF NOT EXISTS stock_moves (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

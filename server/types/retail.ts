@@ -20,6 +20,8 @@ export interface IProductInput {
   salePrice: number
   vatRate: number
   markCode: string
+  isFavorite: boolean
+  minStock: number
 }
 
 export interface IProduct extends IProductInput {
@@ -41,6 +43,8 @@ export interface IProductRow {
   stock: string
   vat_rate: string
   mark_code: string
+  is_favorite: boolean
+  min_stock: string
   is_active: boolean
 }
 
@@ -90,6 +94,8 @@ export interface IStockInput {
 export interface IProductSearchParams {
   query?: string
   categoryId?: string
+  favorite?: boolean
+  lowStock?: boolean
   page?: number
   limit?: number
 }

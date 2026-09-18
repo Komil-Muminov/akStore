@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ProductUnit, VAT_OPTIONS, type IProductInput } from '@/entities/product'
+import { ProductUnit, type IProductInput } from '@/entities/product'
 import { Button, FormField, If, Modal, Select, Text } from '@/shared/ui'
 import { CategoryField } from './ui/CategoryField'
+import { ExtraFields } from './ui/ExtraFields'
 import {
   BARCODE_HINT,
   BARCODE_LABEL,
@@ -11,14 +12,11 @@ import {
   DESCRIPTION,
   EDIT_TITLE,
   EMPTY_FORM,
-  MARK_HINT,
-  MARK_LABEL,
   NAME_LABEL,
   PRICE_LABEL,
   SUBMIT_LABEL,
   UNIT_LABEL,
   UNIT_OPTIONS,
-  VAT_LABEL,
   type IProps,
 } from './model'
 import { actions, body, half, pair } from './style'
@@ -52,6 +50,8 @@ export const ProductForm = ({
             salePrice: initial.salePrice,
             vatRate: initial.vatRate,
             markCode: initial.markCode,
+            isFavorite: initial.isFavorite,
+            minStock: initial.minStock,
           }
         : EMPTY_FORM,
     )
@@ -76,6 +76,14 @@ export const ProductForm = ({
     [],
   )
   const setMark = useCallback((markCode: string) => setForm((current) => ({ ...current, markCode })), [])
+  const setMinStock = useCallback(
+    (value: string) => setForm((current) => ({ ...current, minStock: toMoney(value) })),
+    [],
+  )
+  const toggleFavorite = useCallback(
+    () => setForm((current) => ({ ...current, isFavorite: !current.isFavorite })),
+    [],
+  )
   const setCategory = useCallback(
     (value: string | null) => setForm((current) => ({ ...current, categoryId: value })),
     [],
@@ -140,26 +148,16 @@ export const ProductForm = ({
             />
           </div>
         </div>
-        <div style={pair}>
-          <div style={half}>
-            <Text variant="label">{VAT_LABEL}</Text>
-            <Select
-              value={String(form.vatRate)}
-              options={VAT_OPTIONS}
-              onChange={setVat}
-              testId="product__vat"
-            />
-          </div>
-          <div style={half}>
-            <FormField
-              label={MARK_LABEL}
-              value={form.markCode}
-              onChange={setMark}
-              placeholder={MARK_HINT}
-              testId="product__mark"
-            />
-          </div>
-        </div>
+        <ExtraFields
+          vatRate={form.vatRate}
+          markCode={form.markCode}
+          minStock={form.minStock}
+          isFavorite={form.isFavorite}
+          onVatChange={setVat}
+          onMarkChange={setMark}
+          onMinStockChange={setMinStock}
+          onFavoriteToggle={toggleFavorite}
+        />
         <If condition={error !== undefined}>
           <Text variant="danger">{error ?? ''}</Text>
         </If>

@@ -1,5 +1,6 @@
 export enum QueryKeys {
   PRODUCTS = 'products',
+  PRODUCTS_FAVORITE = 'products-favorite',
   CATEGORIES = 'categories',
   STOCK_HISTORY = 'stock-history',
   SHIFT = 'shift',

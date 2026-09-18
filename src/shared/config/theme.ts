@@ -58,6 +58,7 @@ export const theme = {
     manageField: 186,
     importBody: 220,
     cartQuantity: 76,
+    quickTile: 132,
     cartDiscount: 70,
     importList: 240,
     manageInput: 34,

@@ -58,6 +58,8 @@ export const parseProductInput = (body: unknown): IProductInput => {
     salePrice: money(raw.salePrice, 'salePrice'),
     vatRate: vatRate(raw.vatRate),
     markCode: optionalString(raw.markCode, 'markCode', MARK_MAX),
+    isFavorite: raw.isFavorite === true,
+    minStock: money(raw.minStock, 'minStock'),
   }
 }
 

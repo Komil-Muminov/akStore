@@ -29,6 +29,8 @@ export const NO_CATEGORY_OPTION = 'Без категории'
 export const VAT_LABEL = 'Ставка НДС'
 export const MARK_LABEL = 'Код маркировки'
 export const MARK_HINT = 'Обязателен для маркированных товаров'
+export const FAVORITE_HINT = 'Показывать на кассе быстрой кнопкой'
+export const MIN_STOCK_HINT = 'Подсветить, когда остаток ниже'
 export const CATEGORY_LABEL = 'Категория'
 
 export const UNIT_OPTIONS = [
@@ -45,4 +47,6 @@ export const EMPTY_FORM: IProductInput = {
   salePrice: 0,
   vatRate: 0,
   markCode: '',
+  isFavorite: false,
+  minStock: 0,
 }

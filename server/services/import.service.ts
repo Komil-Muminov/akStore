@@ -48,6 +48,8 @@ const inputOf = (values: IImportValues, categoryId: string | null) => ({
   salePrice: values.salePrice,
   vatRate: values.vatRate,
   markCode: values.markCode,
+  isFavorite: false,
+  minStock: 0,
 })
 
 export const importService = {

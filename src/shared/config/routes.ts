@@ -25,10 +25,11 @@ export const ApiRoutes = {
   USERS_UPDATE: (id: string) => `/users/update/${id}`,
   USERS_RESET_PASSWORD: (id: string) => `/users/reset-password/${id}`,
   USERS_DELETE: (id: string) => `/users/delete/${id}`,
-  PRODUCTS_SEARCH: (query?: string, category?: string, page = 1, limit = 20) => {
+  PRODUCTS_SEARCH: (query?: string, category?: string, page = 1, limit = 20, extra?: string) => {
     const params = new URLSearchParams()
     if (query?.trim()) params.set('q', query.trim())
     if (category) params.set('category', category)
+    if (extra) params.set(extra, 'true')
     params.set('page', String(page))
     params.set('limit', String(limit))
     return `/products/search?${params.toString()}`
