@@ -1,6 +1,7 @@
 import { categoriesDb, productsDb, stockDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
-import { StockMoveKind, type IProductInput, type IProductSearchParams, type IStockInput } from '../types'
+import { StockMoveKind, type IProduct, type IProductInput, type IProductSearchParams, type IStockInput } from '../types'
+import { labelsHtml } from './labels.print'
 
 const HISTORY_LIMIT = 200
 const NOT_FOUND = 'Товар не найден'
@@ -81,5 +82,15 @@ export const productsService = {
     await stockDb.register(input.productId, StockMoveKind.INVENTORY, delta, 0, input.note, authorId)
     return orNotFound(input.productId)
   },
+  labels: async (ids: string[]) => {
+    const products: IProduct[] = []
+    for (const id of ids) {
+      const product = await productsDb.find(id)
+      if (product) products.push(product)
+    }
+    if (products.length === 0) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
+    return labelsHtml(products)
+  },
+
   history: async (productId: string | null) => stockDb.history(productId, HISTORY_LIMIT),
 }

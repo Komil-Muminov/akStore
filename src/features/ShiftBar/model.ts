@@ -9,8 +9,12 @@ export interface IProps {
   onOpen: (openingCash: number) => void
   onClose: (closingCash: number, note: string) => void
   onPay: (payment: string, paid: number) => void
+  lastSaleId: string | null
+  onPrintReceipt: () => void
 }
 
+export const RECEIPT_LABEL = 'Чек'
+export const RECEIPT_TOOLTIP = 'Печать чека последней продажи'
 export const CLOSED_TITLE = 'Смена закрыта'
 export const CLOSED_HINT = 'Внесите наличные в кассу и откройте смену'
 export const OPEN_LABEL = 'Открыть смену'

@@ -5,9 +5,11 @@ import { FiscalBadge } from '@/features/FiscalBadge'
 import { SaleCart } from '@/features/SaleCart'
 import { SaleScanner } from '@/features/SaleScanner'
 import { ShiftBar } from '@/features/ShiftBar'
+import { ApiRoutes } from '@/shared/config'
+import { openPrintable } from '@/shared/lib'
 import { useCategoriesQuery, useFiscalStatusQuery, useProductsQuery, useSaleMutations, useShiftQuery } from './hooks'
 import { addToCart, changeQuantity } from './lib'
-import { NOTICE_TIMEOUT_MS, SOLD_NOTICE } from './model'
+import { NOTICE_TIMEOUT_MS, RECEIPT_FILE, SOLD_NOTICE } from './model'
 import { badgeRow, main, root } from './style'
 
 export const Sale = () => {
@@ -16,6 +18,7 @@ export const Sale = () => {
   const [lines, setLines] = useState<ICartLine[]>([])
   const [discount, setDiscount] = useState(0)
   const [notice, setNotice] = useState<string | undefined>(undefined)
+  const [lastSaleId, setLastSaleId] = useState<string | null>(null)
   const products = useProductsQuery(query, category)
   const categories = useCategoriesQuery()
   const shift = useShiftQuery()
@@ -74,16 +77,22 @@ export const Sale = () => {
           paid,
         },
         {
-          onSuccess: () => {
+          onSuccess: (sale) => {
             setLines([])
             setDiscount(0)
             setNotice(SOLD_NOTICE)
+            setLastSaleId(sale.id)
           },
         },
       )
     },
     [lines, discount, sellMutate],
   )
+
+  const handlePrintReceipt = useCallback(() => {
+    if (lastSaleId === null) return
+    void openPrintable(ApiRoutes.SALES_PRINT(lastSaleId), RECEIPT_FILE)
+  }, [lastSaleId])
 
   return (
     <div style={root} testId="sale__layout">
@@ -112,6 +121,8 @@ export const Sale = () => {
           onOpen={handleOpenShift}
           onClose={handleCloseShift}
           onPay={handlePay}
+          lastSaleId={lastSaleId}
+          onPrintReceipt={handlePrintReceipt}
         />
       </div>
       <SaleCart

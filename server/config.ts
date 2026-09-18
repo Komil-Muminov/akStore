@@ -33,6 +33,12 @@ export const config = {
   isProduction: process.env.NODE_ENV === 'production',
   jwtSecret: required('JWT_SECRET'),
   tokenTtl: process.env.TOKEN_TTL ?? DEFAULT_TOKEN_TTL,
+  shop: {
+    name: process.env.SHOP_NAME ?? 'Магазин',
+    address: process.env.SHOP_ADDRESS ?? '',
+    tin: process.env.SHOP_TIN ?? '',
+    phone: process.env.SHOP_PHONE ?? '',
+  },
   fiscal: {
     mode: process.env.FISCAL_MODE ?? DEFAULT_FISCAL_MODE,
     transport: process.env.FISCAL_TRANSPORT ?? DEFAULT_FISCAL_TRANSPORT,

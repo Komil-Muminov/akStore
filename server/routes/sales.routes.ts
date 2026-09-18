@@ -38,6 +38,15 @@ shiftsRouter.get('/print/:id', anyRole, async (req, res, next) => {
 
 export const salesRouter = Router()
 
+salesRouter.get('/print/:id', anyRole, async (req, res, next) => {
+  try {
+    res.setHeader('Content-Type', HTML_TYPE)
+    res.send(await salesService.printable(idOf(req)))
+  } catch (error) {
+    next(error)
+  }
+})
+
 salesRouter.get('/search', anyRole, respond((req) =>
   salesService.search(parseReportParams(req.query), parsePageParams(req.query)),
 ))

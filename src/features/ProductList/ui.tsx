@@ -4,7 +4,7 @@ import { EMPTY_HINT, EMPTY_TITLE, ESTIMATED_ROW_HEIGHT, type IProps } from './mo
 import { empty, list } from './style'
 import { ProductRow } from './ui/ProductRow'
 
-export const ProductList = ({ products, onEdit, onStock, onArchive }: IProps) => (
+export const ProductList = ({ products, onEdit, onStock, onArchive, onLabel }: IProps) => (
   <If
     condition={products.length > 0}
     fallback={
@@ -17,7 +17,7 @@ export const ProductList = ({ products, onEdit, onStock, onArchive }: IProps) =>
   >
     <virtual-list estimatedItemHeight={ESTIMATED_ROW_HEIGHT} style={list} testId="product__list">
       {products.map((product) => (
-        <ProductRow key={product.id} product={product} onEdit={onEdit} onStock={onStock} onArchive={onArchive} />
+        <ProductRow key={product.id} product={product} onEdit={onEdit} onStock={onStock} onArchive={onArchive} onLabel={onLabel} />
       ))}
     </virtual-list>
   </If>

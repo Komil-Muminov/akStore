@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { moneyOf } from '@/entities/product'
 import { changeOf, PaymentKind } from '@/entities/sale'
-import { Button, If, Text, TextInput } from '@/shared/ui'
+import { Button, If, Text, TextInput, Tooltip } from '@/shared/ui'
 import {
   CARD_LABEL,
   CASH_LABEL,
@@ -9,6 +9,8 @@ import {
   CLOSED_HINT,
   CLOSED_TITLE,
   CLOSE_LABEL,
+  RECEIPT_LABEL,
+  RECEIPT_TOOLTIP,
   EXPECTED_LABEL,
   OPENING_LABEL,
   OPEN_LABEL,
@@ -35,7 +37,18 @@ import {
 
 const toNumber = (value: string) => Number(value.replace(',', '.')) || 0
 
-export const ShiftBar = ({ state, cartTotal, pending, error, notice, onOpen, onClose, onPay }: IProps) => {
+export const ShiftBar = ({
+  state,
+  cartTotal,
+  pending,
+  error,
+  notice,
+  onOpen,
+  onClose,
+  onPay,
+  lastSaleId,
+  onPrintReceipt,
+}: IProps) => {
   const [cash, setCash] = useState('')
   const paid = toNumber(cash)
 
@@ -118,6 +131,17 @@ export const ShiftBar = ({ state, cartTotal, pending, error, notice, onOpen, onC
                 disabled={pending || cartTotal <= 0}
                 testId="shift__pay-card"
               />
+              <If condition={lastSaleId !== null}>
+                <Tooltip title={RECEIPT_TOOLTIP}>
+                  <Button
+                    label={RECEIPT_LABEL}
+                    variant="secondary"
+                    icon="printer"
+                    onClick={onPrintReceipt}
+                    testId="shift__receipt"
+                  />
+                </Tooltip>
+              </If>
               <Button
                 label={CLOSE_LABEL}
                 variant="secondary"

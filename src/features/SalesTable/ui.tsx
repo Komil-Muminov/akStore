@@ -1,19 +1,20 @@
 import { moneyOf } from '@/entities/product'
 import { FISCAL_LABEL, PAYMENT_LABELS, saleStampOf } from '@/entities/sale'
 import { theme } from '@/shared/config'
-import { Badge, Icon, If, Pagination, Spinner, Text } from '@/shared/ui'
+import { Badge, Icon, IconButton, If, Pagination, Spinner, Text, Tooltip } from '@/shared/ui'
 import {
   EMPTY_HINT,
   EMPTY_TITLE,
   ESTIMATED_ROW_HEIGHT,
   POSITIONS_LABEL,
+  PRINT_TOOLTIP,
   REFUNDED_LABEL,
   TITLE,
   type IProps,
 } from './model'
 import { empty, list, root, row, rowText, total } from './style'
 
-export const SalesTable = ({ sales, page, totalPages, total: count, loading, onPageChange }: IProps) => (
+export const SalesTable = ({ sales, page, totalPages, total: count, loading, onPageChange, onPrint }: IProps) => (
   <div style={root} testId="report__sales">
     <Text variant="title">{`${TITLE} · ${String(count)}`}</Text>
     <If
@@ -45,6 +46,9 @@ export const SalesTable = ({ sales, page, totalPages, total: count, loading, onP
                   <Badge tone="danger" label={REFUNDED_LABEL} />
                 </If>
                 <text style={total}>{moneyOf(sale.total)}</text>
+                <Tooltip title={PRINT_TOOLTIP}>
+                  <IconButton icon="printer" onClick={() => onPrint(sale)} testId={`report__print-${sale.id}`} />
+                </Tooltip>
               </div>
             ))}
           </virtual-list>

@@ -15,7 +15,22 @@ const manager = rbacMiddleware(UserRole.ADMIN)
 const anyRole = rbacMiddleware(UserRole.EMPLOYEE)
 const actorOf = (req: { user?: IAuthUser }) => (req.user as IAuthUser).id
 
+const HTML_TYPE = 'text/html; charset=utf-8'
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const IDS_MAX = 200
+
 export const productsRouter = Router()
+
+productsRouter.get('/labels', manager, async (req, res, next) => {
+  try {
+    const raw = typeof req.query.ids === 'string' ? req.query.ids : ''
+    const ids = raw.split(',').filter((id) => UUID_PATTERN.test(id)).slice(0, IDS_MAX)
+    res.setHeader('Content-Type', HTML_TYPE)
+    res.send(await productsService.labels(ids))
+  } catch (error) {
+    next(error)
+  }
+})
 
 productsRouter.get('/search', anyRole, respond((req) => productsService.search({
   query: typeof req.query.q === 'string' ? req.query.q : undefined,

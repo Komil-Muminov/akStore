@@ -1,5 +1,6 @@
 export const TITLE = 'Товары'
 export const DESCRIPTION = 'Справочник, цены и остатки'
+export const LABEL_FILE = 'cennik.html'
 export const IMPORT_LABEL = 'Импорт'
 export const IMPORT_TOOLTIP = 'Загрузить товары из Excel или CSV'
 export const ADD_LABEL = 'Добавить товар'

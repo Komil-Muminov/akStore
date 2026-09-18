@@ -4,11 +4,22 @@ import { ImportDialog } from '@/features/ImportDialog'
 import { ProductForm } from '@/features/ProductForm'
 import { ProductList } from '@/features/ProductList'
 import { StockDialog, type IStockSubmit } from '@/features/StockDialog'
+import { ApiRoutes } from '@/shared/config'
+import { openPrintable } from '@/shared/lib'
 import { Button, ConfirmDialog, Spinner, Text, TextInput, Tooltip } from '@/shared/ui'
 import { If } from '@/shared/ui'
 import { useCategoriesQuery, useCategoryMutations, useProductMutations, useProductsQuery } from './hooks'
 import { useImport } from './import'
-import { ADD_LABEL, ARCHIVE_DIALOG, DESCRIPTION, IMPORT_LABEL, IMPORT_TOOLTIP, SEARCH_PLACEHOLDER, TITLE } from './model'
+import {
+  ADD_LABEL,
+  ARCHIVE_DIALOG,
+  DESCRIPTION,
+  IMPORT_LABEL,
+  IMPORT_TOOLTIP,
+  LABEL_FILE,
+  SEARCH_PLACEHOLDER,
+  TITLE,
+} from './model'
 import { head, headText, root, search } from './style'
 
 export const Products = () => {
@@ -41,6 +52,10 @@ export const Products = () => {
   }, [])
   const closeStock = useCallback(() => setMoving(null), [])
   const cancelArchive = useCallback(() => setArchiving(null), [])
+
+  const handleLabel = useCallback((product: IProduct) => {
+    void openPrintable(ApiRoutes.PRODUCTS_LABELS([product.id]), LABEL_FILE)
+  }, [])
 
   const resetImport = importer.reset
   const openImport = useCallback(() => {
@@ -108,7 +123,13 @@ export const Products = () => {
         <Button label={ADD_LABEL} icon="plus" onClick={openCreate} testId="products__add" />
       </div>
       <If condition={products.isPending} fallback={
-        <ProductList products={items} onEdit={openEdit} onStock={setMoving} onArchive={setArchiving} />
+        <ProductList
+          products={items}
+          onEdit={openEdit}
+          onStock={setMoving}
+          onArchive={setArchiving}
+          onLabel={handleLabel}
+        />
       }>
         <Spinner />
       </If>

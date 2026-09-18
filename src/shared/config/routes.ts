@@ -52,6 +52,8 @@ export const ApiRoutes = {
   SHIFT_OPEN: '/shifts/open',
   SHIFT_CLOSE: '/shifts/close',
   SALES_CREATE: '/sales/create',
+  SALES_PRINT: (id: string) => `/sales/print/${id}`,
+  PRODUCTS_LABELS: (ids: string[]) => `/products/labels?ids=${ids.join(',')}`,
   SALES_REFUND: (id: string) => `/sales/refund/${id}`,
   FISCAL_STATUS: '/fiscal/status',
   REPORTS_SUMMARY: (filters: string) => `/reports/summary?${filters}`,

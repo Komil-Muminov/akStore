@@ -2,7 +2,9 @@ import { productsDb, salesDb, stockDb } from '../db'
 import { vatAmountOf } from '../fiscal'
 import { HttpError, HttpStatus } from '../shared/utils'
 import { StockMoveKind, type IPageParams, type IProduct, type IReportParams, type ISaleInput } from '../types'
+import QRCode from 'qrcode'
 import { fiscalService } from './fiscal.service'
+import { receiptHtml } from './receipt.print'
 import { shiftsService } from './shifts.service'
 
 const SALES_LIMIT = 200
@@ -13,6 +15,7 @@ const NOT_PAID = 'Внесённая сумма меньше итога'
 const SALE_MISSING = 'Чек не найден'
 const ALREADY_REFUNDED = 'Чек уже возвращён'
 const REFUND_NOTE = 'Возврат по чеку'
+const QR_WIDTH = 120
 
 const roundMoney = (value: number) => Math.round(value * 100) / 100
 
@@ -89,6 +92,16 @@ export const salesService = {
     const refunded = await salesDb.find(saleId)
     if (!refunded) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
     return fiscalService.registerRefund(refunded)
+  },
+
+  printable: async (id: string) => {
+    const sale = await salesDb.find(id)
+    if (!sale) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
+    const qr =
+      sale.fiscal && sale.fiscal.qr.length > 0
+        ? await QRCode.toString(sale.fiscal.qr, { type: 'svg', width: QR_WIDTH, margin: 0 })
+        : ''
+    return receiptHtml(sale, qr)
   },
 
   find: async (id: string) => {

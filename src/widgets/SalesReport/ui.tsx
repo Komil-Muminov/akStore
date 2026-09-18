@@ -7,7 +7,7 @@ import { ReportSummary } from '@/features/ReportSummary'
 import { SalesTable } from '@/features/SalesTable'
 import { TopProducts } from '@/features/TopProducts'
 import { ApiRoutes } from '@/shared/config'
-import { downloadFile } from '@/shared/lib'
+import { downloadFile, openPrintable } from '@/shared/lib'
 import { If, Text } from '@/shared/ui'
 import { useCashiersQuery, useDailyQuery, useSalesQuery, useSummaryQuery, useTopQuery } from './hooks'
 import { queryOf } from './lib'
@@ -17,6 +17,7 @@ import {
   EXPORT_FAILED,
   EXPORT_FILE,
   NOTICE_TIMEOUT_MS,
+  RECEIPT_FILE,
   SALES_LIMIT,
   TITLE,
   TOP_LIMIT,
@@ -63,6 +64,10 @@ export const SalesReport = () => {
     setExporting(false)
   }, [baseQuery])
 
+  const handlePrintReceipt = useCallback((sale: { id: string }) => {
+    void openPrintable(ApiRoutes.SALES_PRINT(sale.id), RECEIPT_FILE)
+  }, [])
+
   const cashierOptions = useMemo(
     () => (cashiers.data ?? []).map((entry) => ({ id: entry.cashierId, label: entry.name })),
     [cashiers.data],
@@ -105,6 +110,7 @@ export const SalesReport = () => {
         total={sales.data?.total ?? 0}
         loading={sales.isPending}
         onPageChange={setSalesPage}
+        onPrint={handlePrintReceipt}
       />
     </div>
   )
