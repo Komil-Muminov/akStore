@@ -9,6 +9,7 @@ const LABELS = {
   openingCash: 'Наличные на начало',
   closingCash: 'Наличные на конец',
   expectedCash: 'Ожидаемые наличные',
+  adjustment: 'Внесения и изъятия',
   salesCount: 'Чеков',
   cash: 'Оплата наличными',
   card: 'Оплата картой',
@@ -55,6 +56,7 @@ export const zReportHtml = (
     ${line(LABELS.vat, money(summary.vatTotal))}
     ${line(LABELS.openingCash, money(shift.openingCash))}
     ${line(LABELS.closingCash, shift.closingCash === null ? '—' : money(shift.closingCash))}
+    ${line(LABELS.adjustment, money(totals.cashAdjustment ?? 0))}
     ${line(LABELS.expectedCash, money(totals.expectedCash))}
     ${fiscal === null ? '' : line(LABELS.fiscalNumber, fiscal.number)}
     ${fiscal === null ? '' : line(LABELS.fiscalDevice, fiscal.device)}

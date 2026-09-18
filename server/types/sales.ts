@@ -35,6 +35,7 @@ export interface IShiftTotals {
   refundTotal: number
   revenue: number
   expectedCash: number
+  cashAdjustment?: number
 }
 
 export interface IShiftTotalsRow {

@@ -41,6 +41,16 @@ export type {
   IFiscalTaskRow,
 } from './sales'
 export type { IParkedLine, IParkedSale, IParkedSaleRow } from './parked'
+export { CashMoveKind } from './cash'
+export type {
+  ICashMove,
+  ICashMoveRow,
+  IDebtor,
+  IDebtorRow,
+  IDebtMove,
+  IDebtMoveRow,
+  IDebtorInput,
+} from './cash'
 export type {
   IReportParams,
   IPageParams,

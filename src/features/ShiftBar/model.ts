@@ -15,12 +15,14 @@ export interface IProps {
   canPark: boolean
   onPark: () => void
   onOpenParked: () => void
+  onOpenCash: () => void
 }
 
 export const CASH_FIELD_LABEL = 'Наличные'
 export const CARD_FIELD_LABEL = 'Карта'
 export const PAY_LABEL = 'Оплатить'
 export const EXACT_TOOLTIP = 'Без сдачи'
+export const CASH_TOOLTIP = 'Внесение и изъятие наличных'
 export const PARK_LABEL = 'Отложить'
 export const PARK_TOOLTIP = 'Отложить чек и обслужить следующего'
 export const PARKED_TOOLTIP = 'Отложенные чеки'

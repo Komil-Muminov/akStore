@@ -32,6 +32,7 @@ export const NAV_ITEMS: INavItem[] = [
   { id: AppRoutes.STOCK, label: 'Склад', hint: 'Приход и движения', icon: 'download', minRole: UserRole.ADMIN },
   { id: AppRoutes.SHIFTS, label: 'Смены', hint: 'Отчёты по сменам', icon: 'calendar', minRole: UserRole.ADMIN },
   { id: AppRoutes.REPORTS, label: 'Отчёты', hint: 'Выручка, прибыль, товары', icon: 'chart', minRole: UserRole.ADMIN },
+  { id: AppRoutes.DEBTS, label: 'Долги', hint: 'Покупатели под запись', icon: 'users', minRole: UserRole.EMPLOYEE },
   { id: AppRoutes.CHAT, label: 'Сообщения', hint: 'Переписка с коллегами', icon: 'message', minRole: UserRole.EMPLOYEE },
   { id: AppRoutes.STRUCTURE, label: 'Структура', hint: 'Точки и должности', icon: 'building', minRole: UserRole.ADMIN },
   { id: AppRoutes.USERS, label: 'Сотрудники', hint: 'Учётные записи и роли', icon: 'userCog', minRole: UserRole.ADMIN },

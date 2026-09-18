@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { IProduct } from '@/entities/product'
 import { cartSubtotalOf, cartTotalOf, discountAmountOf, DiscountKind, type ICartLine } from '@/entities/sale'
 import { FiscalBadge } from '@/features/FiscalBadge'
-import { ParkedSales } from '@/features/ParkedSales'
 import { SaleCart } from '@/features/SaleCart'
 import { QuickPicks } from '@/features/QuickPicks'
 import { SaleScanner } from '@/features/SaleScanner'
@@ -18,6 +17,8 @@ import {
   useShiftQuery,
 } from './hooks'
 import { addToCart, changeLineDiscount, changeQuantity } from './lib'
+import { useCashMoves } from './cash'
+import { SaleDialogs } from './ui/SaleDialogs'
 import { useParked } from './parked'
 import { NOTICE_TIMEOUT_MS, RECEIPT_FILE, SOLD_NOTICE } from './model'
 import { badgeRow, main, root } from './style'
@@ -84,6 +85,7 @@ export const Sale = () => {
     setDiscount(0)
   }, [])
   const parked = useParked(handleRestored)
+  const cash = useCashMoves()
   const parkCart = parked.handlePark
   const handlePark = useCallback(() => parkCart(lines, handleClear), [parkCart, lines, handleClear])
 
@@ -162,17 +164,10 @@ export const Sale = () => {
           canPark={lines.length > 0}
           onPark={handlePark}
           onOpenParked={parked.openDialog}
+          onOpenCash={cash.openDialog}
         />
       </div>
-      <ParkedSales
-        open={parked.open}
-        parked={parked.parked}
-        pending={parked.pending}
-        error={parked.error}
-        onRestore={parked.handleRestore}
-        onRemove={parked.handleRemove}
-        onClose={parked.closeDialog}
-      />
+      <SaleDialogs cash={cash} parked={parked} />
       <SaleCart
         lines={lines}
         discount={discount}

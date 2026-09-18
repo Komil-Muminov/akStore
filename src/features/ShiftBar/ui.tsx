@@ -19,6 +19,7 @@ import {
   CASH_FIELD_LABEL,
   CARD_FIELD_LABEL,
   EXACT_TOOLTIP,
+  CASH_TOOLTIP,
   PARK_LABEL,
   PARK_TOOLTIP,
   PARKED_TOOLTIP,
@@ -57,6 +58,7 @@ export const ShiftBar = ({
   canPark,
   onPark,
   onOpenParked,
+  onOpenCash,
 }: IProps) => {
   const [cash, setCash] = useState('')
   const [card, setCard] = useState('')
@@ -141,6 +143,9 @@ export const ShiftBar = ({
                 disabled={pending || cartTotal <= 0 || received < cartTotal}
                 testId="shift__pay"
               />
+              <Tooltip title={CASH_TOOLTIP}>
+                <IconButton icon="briefcase" onClick={onOpenCash} testId="shift__cash" />
+              </Tooltip>
               <Tooltip title={PARK_TOOLTIP}>
                 <Button
                   label={PARK_LABEL}

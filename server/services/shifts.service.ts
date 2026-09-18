@@ -1,4 +1,4 @@
-import { reportsDb, shiftsDb } from '../db'
+import { cashDb, reportsDb, shiftsDb } from '../db'
 import { HttpError, HttpStatus } from '../shared/utils'
 import { UserRole, type IAuthUser } from '../types'
 import { fiscalService } from './fiscal.service'
@@ -12,11 +12,17 @@ const FOREIGN_SHIFT = 'Это смена другого кассира'
 
 const EMPTY_FILTERS = { from: null, to: null, cashierId: null, payment: null, query: '' }
 
+const totalsOf = async (shiftId: string, openingCash: number) => {
+  const totals = await shiftsDb.totals(shiftId, openingCash)
+  const adjustment = await cashDb.balance(shiftId)
+  return { ...totals, cashAdjustment: adjustment, expectedCash: totals.expectedCash + adjustment }
+}
+
 export const shiftsService = {
   current: async (cashierId: string) => {
     const shift = await shiftsDb.current(cashierId)
     if (!shift) return null
-    return { shift, totals: await shiftsDb.totals(shift.id, shift.openingCash) }
+    return { shift, totals: await totalsOf(shift.id, shift.openingCash) }
   },
 
   requireOpen: async (cashierId: string) => {
@@ -31,13 +37,13 @@ export const shiftsService = {
     const shift = await shiftsDb.find(id)
     if (!shift) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
     await fiscalService.openShift(shift.cashierName)
-    return { shift, totals: await shiftsDb.totals(shift.id, shift.openingCash) }
+    return { shift, totals: await totalsOf(shift.id, shift.openingCash) }
   },
 
   close: async (cashierId: string, closingCash: number, note: string) => {
     const shift = await shiftsDb.current(cashierId)
     if (!shift) throw new HttpError(HttpStatus.BAD_REQUEST, NOT_OPEN)
-    const totals = await shiftsDb.totals(shift.id, shift.openingCash)
+    const totals = await totalsOf(shift.id, shift.openingCash)
     await shiftsDb.close(shift.id, closingCash, note)
     const closed = await shiftsDb.find(shift.id)
     if (!closed) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
@@ -49,7 +55,7 @@ export const shiftsService = {
     const shift = await shiftsDb.find(shiftId)
     if (!shift) throw new HttpError(HttpStatus.NOT_FOUND, NOT_FOUND)
     if (shift.cashierId !== cashierId) throw new HttpError(HttpStatus.FORBIDDEN, FOREIGN_SHIFT)
-    return { shift, totals: await shiftsDb.totals(shift.id, shift.openingCash) }
+    return { shift, totals: await totalsOf(shift.id, shift.openingCash) }
   },
 
   printable: async (actor: IAuthUser, shiftId: string) => {
@@ -58,7 +64,7 @@ export const shiftsService = {
     if (shift.cashierId !== actor.id && actor.role !== UserRole.SUPERADMIN && actor.role !== UserRole.ADMIN) {
       throw new HttpError(HttpStatus.FORBIDDEN, FOREIGN_SHIFT)
     }
-    const totals = await shiftsDb.totals(shift.id, shift.openingCash)
+    const totals = await totalsOf(shift.id, shift.openingCash)
     const summary = await reportsDb.summary({ ...EMPTY_FILTERS, shiftId })
     return zReportHtml(shift, totals, summary, null)
   },
