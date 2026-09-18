@@ -5,7 +5,7 @@ import { ProductForm } from '@/features/ProductForm'
 import { ProductList } from '@/features/ProductList'
 import { StockDialog, type IStockSubmit } from '@/features/StockDialog'
 import { ApiRoutes } from '@/shared/config'
-import { openPrintable } from '@/shared/lib'
+import { openPrintable, useOutletScope } from '@/shared/lib'
 import { Button, ConfirmDialog, Spinner, Text, TextInput, Tooltip } from '@/shared/ui'
 import { If } from '@/shared/ui'
 import { useCategoriesQuery, useCategoryMutations, useProductMutations, useProductsQuery } from './hooks'
@@ -30,7 +30,8 @@ export const Products = () => {
   const [archiving, setArchiving] = useState<IProduct | null>(null)
   const [importOpen, setImportOpen] = useState(false)
   const importer = useImport()
-  const products = useProductsQuery(query, null)
+  const outletId = useOutletScope()
+  const products = useProductsQuery(query, null, outletId)
   const categories = useCategoriesQuery()
   const category = useCategoryMutations()
   const [createdCategoryId, setCreatedCategoryId] = useState<string | null>(null)

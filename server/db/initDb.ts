@@ -6,6 +6,7 @@ import { SCHEMA, SEED_LEADERSHIP } from './schema'
 import { RETAIL_SCHEMA } from './schema.retail'
 import { SUPPLY_SCHEMA } from './schema.supply'
 import { AUDIT_SCHEMA, MONEY_SCHEMA } from './schema.money'
+import { migrateOutlets } from './migrate'
 import { usersDb } from './users.db'
 
 const MAINTENANCE_DB = 'postgres'
@@ -49,6 +50,7 @@ export const initDb = async () => {
   await pool.query(SUPPLY_SCHEMA)
   await pool.query(MONEY_SCHEMA)
   await pool.query(AUDIT_SCHEMA)
+  await migrateOutlets()
   await seedLeadership()
   await seedSuperadmin()
 }

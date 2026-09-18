@@ -4,8 +4,8 @@ import { PasswordDialog, type IPasswordSubmit, type TPasswordMode } from '@/feat
 import { atLeast, toRole, type IAuthUser } from '@/entities/user'
 import { ApiRoutes, type AppRoutes } from '@/shared/config'
 import { useMutationQuery } from '@/shared/hooks'
-import { session, useSession } from '@/shared/lib'
-import { useUnreadTotal } from './hooks'
+import { outletScope, session, useOutletScope, useSession } from '@/shared/lib'
+import { useOutletList, useUnreadTotal } from './hooks'
 import { content, root } from './style'
 
 interface IProps {
@@ -24,6 +24,16 @@ export const Layout = ({ active, onNavigate, children }: IProps) => {
   )
   const items = useMemo(() => NAV_ITEMS.filter((item) => atLeast(user.role, item.minRole)), [user.role])
   const unread = useUnreadTotal(current !== null)
+  const outletId = useOutletScope()
+  const outlets = useOutletList(current !== null)
+  const outletOptions = useMemo(
+    () => (outlets.data ?? []).map((outlet) => ({ id: outlet.id, label: outlet.name })),
+    [outlets.data],
+  )
+
+  useEffect(() => {
+    void outletScope.restore()
+  }, [])
 
   useEffect(() => {
     const first = items[0]
@@ -41,7 +51,18 @@ export const Layout = ({ active, onNavigate, children }: IProps) => {
 
   return (
     <div style={root} testId="layout">
-      <NavSidebar active={active} items={items} unread={unread} user={user} onNavigate={onNavigate} onChangePassword={openChange} onLogout={logout} />
+      <NavSidebar
+        active={active}
+        items={items}
+        unread={unread}
+        user={user}
+        outlets={outletOptions}
+        outletId={outletId}
+        onOutletChange={outletScope.set}
+        onNavigate={onNavigate}
+        onChangePassword={openChange}
+        onLogout={logout}
+      />
       <div style={content}>{children}</div>
       <PasswordDialog
         mode={passwordMode}

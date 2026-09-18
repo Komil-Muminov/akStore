@@ -3,6 +3,7 @@ import type { IUserInput, UserRole } from '@/entities/user'
 export interface IProps {
   open: boolean
   roles: UserRole[]
+  outlets: { id: string; label: string }[]
   pending: boolean
   error?: string
   onSubmit: (input: IUserInput) => void
@@ -12,6 +13,8 @@ export interface IProps {
 export const TITLE = 'Новый пользователь'
 export const DESCRIPTION = 'Логин и пароль передайте пользователю — он сможет сменить пароль после входа.'
 export const ROLE_LABEL = 'Роль'
+export const OUTLET_LABEL = 'Торговая точка'
+export const OUTLET_HINT = 'Без привязки'
 export const NAME_LABEL = 'ФИО'
 export const NAME_PLACEHOLDER = 'Иванов Иван Иванович'
 export const LOGIN_LABEL = 'Логин'

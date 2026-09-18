@@ -15,11 +15,15 @@ export interface IProps {
   items: INavItem[]
   unread: number
   user: IAuthUser
+  outlets: { id: string; label: string }[]
+  outletId: string | null
+  onOutletChange: (id: string | null) => void
   onNavigate: (route: AppRoutes) => void
   onChangePassword: () => void
   onLogout: () => void
 }
 
+export const OUTLET_ALL = 'Вся сеть'
 export const APP_NAME = 'Касса'
 export const APP_TAGLINE = 'Торговля и склад'
 export const NAV_SECTION = 'Разделы'

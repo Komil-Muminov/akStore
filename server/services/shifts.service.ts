@@ -11,7 +11,7 @@ const NOT_OPEN = 'Открытой смены нет'
 const NOT_FOUND = 'Смена не найдена'
 const FOREIGN_SHIFT = 'Это смена другого кассира'
 
-const EMPTY_FILTERS = { from: null, to: null, cashierId: null, payment: null, query: '' }
+const EMPTY_FILTERS = { from: null, to: null, outletId: null, cashierId: null, payment: null, query: '' }
 
 const totalsOf = async (shiftId: string, openingCash: number) => {
   const totals = await shiftsDb.totals(shiftId, openingCash)

@@ -31,14 +31,14 @@ export const usersService = {
       throw new HttpError(HttpStatus.BAD_REQUEST, ADMIN_EXISTS)
     }
     const hash = await Bun.password.hash(input.password)
-    return usersDb.create(input.login, hash, input.role, input.fullName)
+    return usersDb.create(input.login, hash, input.role, input.fullName, input.outletId)
   },
-  update: async (actor: IAuthUser, id: string, fullName: string, isActive: boolean) => {
+  update: async (actor: IAuthUser, id: string, fullName: string, isActive: boolean, outletId: string | null) => {
     const user = await assertManageable(actor, id)
     if (isActive && !user.isActive && user.role === UserRole.ADMIN && (await usersDb.countActiveByRole(UserRole.ADMIN)) > 0) {
       throw new HttpError(HttpStatus.BAD_REQUEST, ADMIN_EXISTS)
     }
-    return (await usersDb.update(id, fullName, isActive)) ?? user
+    return (await usersDb.update(id, fullName, isActive, outletId)) ?? user
   },
   resetPassword: async (actor: IAuthUser, id: string, password: string) => {
     await assertManageable(actor, id)

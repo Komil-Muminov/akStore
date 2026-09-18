@@ -20,8 +20,8 @@ usersRouter.get('/search', admin, respond((req) => usersService.search(actorOf(r
 })))
 usersRouter.post('/create', admin, respond((req) => usersService.create(actorOf(req), parseUserInput(req.body)), HttpStatus.CREATED))
 usersRouter.patch('/update/:id', admin, respond((req) => {
-  const { fullName, isActive } = parseUserUpdate(req.body)
-  return usersService.update(actorOf(req), idOf(req), fullName, isActive)
+  const { fullName, isActive, outletId } = parseUserUpdate(req.body)
+  return usersService.update(actorOf(req), idOf(req), fullName, isActive, outletId)
 }))
 usersRouter.patch('/reset-password/:id', admin, respond((req) =>
   usersService.resetPassword(actorOf(req), idOf(req), parsePassword((req.body as { password?: unknown })?.password)),

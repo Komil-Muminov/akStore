@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
+import type { IOutlet } from '@/entities/outlet'
 import { useGetQuery, useSocketEvent } from '@/shared/hooks'
 import { ChatEventType, type IChatEvent } from '@/shared/model'
 
@@ -21,3 +22,6 @@ export const useUnreadTotal = (enabled: boolean) => {
 
   return query.data?.total ?? 0
 }
+
+export const useOutletList = (enabled: boolean) =>
+  useGetQuery<IOutlet[]>(QueryKeys.OUTLETS, ApiRoutes.OUTLETS_LIST, enabled)

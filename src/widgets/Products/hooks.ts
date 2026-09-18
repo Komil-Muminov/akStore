@@ -18,10 +18,10 @@ const STOCK_ROUTES: Record<StockAction, string> = {
   [StockAction.INVENTORY]: ApiRoutes.STOCK_INVENTORY,
 }
 
-export const useProductsQuery = (query: string, categoryId: string | null) =>
+export const useProductsQuery = (query: string, categoryId: string | null, outletId: string | null) =>
   useGetQuery<IPagedResponse<IProduct>>(
     QueryKeys.PRODUCTS,
-    ApiRoutes.PRODUCTS_SEARCH(query, categoryId ?? undefined, 1, PAGE_LIMIT),
+    ApiRoutes.PRODUCTS_SEARCH(query, categoryId ?? undefined, 1, PAGE_LIMIT, undefined, outletId ?? undefined),
   )
 
 export const useCategoriesQuery = () =>

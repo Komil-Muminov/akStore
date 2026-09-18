@@ -47,6 +47,7 @@ export const parseReportParams = (query: Record<string, unknown>): IReportParams
   from: date(query.from),
   to: date(query.to),
   shiftId: uuid(query.shift),
+  outletId: uuid(query.outlet),
   cashierId: uuid(query.cashier),
   payment: payment(query.payment),
   query: search(query.q),

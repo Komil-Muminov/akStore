@@ -13,6 +13,8 @@ export interface IAuthUser {
 }
 
 export interface IUser extends IAuthUser {
+  outletId: string | null
+  outletName: string
   isActive: boolean
   createdAt: string
 }
@@ -20,6 +22,7 @@ export interface IUser extends IAuthUser {
 export interface IUserInput {
   login: string
   password: string
+  outletId: string | null
   role: UserRole
   fullName: string
 }

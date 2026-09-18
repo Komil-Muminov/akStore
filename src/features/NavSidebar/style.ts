@@ -115,3 +115,12 @@ export const itemBadgeText: StyleDesc = {
 }
 
 export const accountLine: StyleDesc = { whiteSpace: 'nowrap', textOverflow: 'ellipsis' }
+
+export const outletBox: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.xs,
+  paddingLeft: theme.spacing.md,
+  paddingRight: theme.spacing.md,
+  paddingBottom: theme.spacing.sm,
+}

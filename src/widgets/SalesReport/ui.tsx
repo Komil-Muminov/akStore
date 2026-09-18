@@ -9,7 +9,7 @@ import { TopProducts } from '@/features/TopProducts'
 import { ApiRoutes } from '@/shared/config'
 import { downloadFile, openPrintable } from '@/shared/lib'
 import { If, Text } from '@/shared/ui'
-import { useCashiersQuery, useDailyQuery, useSalesQuery, useSummaryQuery, useTopQuery } from './hooks'
+import { useCashiersQuery, useDailyQuery, useOutletsQuery, useSalesQuery, useSummaryQuery, useTopQuery } from './hooks'
 import { queryOf } from './lib'
 import {
   DESCRIPTION,
@@ -35,6 +35,7 @@ export const SalesReport = () => {
   const topQueryString = useMemo(() => queryOf(filters, topPage, TOP_LIMIT), [filters, topPage])
   const salesQueryString = useMemo(() => queryOf(filters, salesPage, SALES_LIMIT), [filters, salesPage])
 
+  const outlets = useOutletsQuery()
   const summary = useSummaryQuery(baseQuery)
   const cashiers = useCashiersQuery(baseQuery)
   const daily = useDailyQuery(baseQuery)
@@ -68,6 +69,11 @@ export const SalesReport = () => {
     void openPrintable(ApiRoutes.SALES_PRINT(sale.id), RECEIPT_FILE)
   }, [])
 
+  const outletOptions = useMemo(
+    () => (outlets.data ?? []).map((outlet) => ({ id: outlet.id, label: outlet.name })),
+    [outlets.data],
+  )
+
   const cashierOptions = useMemo(
     () => (cashiers.data ?? []).map((entry) => ({ id: entry.cashierId, label: entry.name })),
     [cashiers.data],
@@ -86,6 +92,7 @@ export const SalesReport = () => {
       </div>
       <ReportFilters
         filters={filters}
+        outlets={outletOptions}
         cashiers={cashierOptions}
         exporting={exporting}
         onChange={handleFilters}

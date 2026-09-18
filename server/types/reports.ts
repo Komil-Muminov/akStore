@@ -4,6 +4,7 @@ export interface IReportParams {
   from: string | null
   to: string | null
   shiftId: string | null
+  outletId: string | null
   cashierId: string | null
   payment: PaymentKind | null
   query: string

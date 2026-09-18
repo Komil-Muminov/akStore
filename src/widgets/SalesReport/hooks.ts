@@ -1,8 +1,11 @@
+import type { IOutlet } from '@/entities/outlet'
 import type { ICashierStat, IDailyPoint, IReportSummary, ITopProduct } from '@/entities/report'
 import type { ISale } from '@/entities/sale'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery } from '@/shared/hooks'
 import type { IPagedResponse } from '@/shared/model'
+
+export const useOutletsQuery = () => useGetQuery<IOutlet[]>(QueryKeys.OUTLETS, ApiRoutes.OUTLETS_LIST)
 
 export const useSummaryQuery = (filters: string) =>
   useGetQuery<IReportSummary>(QueryKeys.REPORT_SUMMARY, ApiRoutes.REPORTS_SUMMARY(filters))

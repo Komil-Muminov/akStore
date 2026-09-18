@@ -20,6 +20,8 @@ export interface IAuthUser {
 }
 
 export interface IUser extends IAuthUser {
+  outletId: string | null
+  outletName: string
   isActive: boolean
   createdAt: string
 }
@@ -30,6 +32,8 @@ export interface IUserRow {
   password_hash: string
   role: UserRole
   full_name: string
+  outlet_id: string | null
+  outlet_name: string | null
   is_active: boolean
   created_at: Date
 }
@@ -39,6 +43,7 @@ export interface IUserInput {
   password: string
   role: UserRole
   fullName: string
+  outletId: string | null
 }
 
 export interface ITokenPayload {

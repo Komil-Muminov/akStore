@@ -20,6 +20,10 @@ export const filterOf = (params: IReportParams, extra: string[] = []): IFilterSq
     values.push(params.shiftId)
     conditions.push(`s.shift_id = $${values.length}`)
   }
+  if (params.outletId) {
+    values.push(params.outletId)
+    conditions.push(`s.outlet_id = $${values.length}`)
+  }
   if (params.cashierId) {
     values.push(params.cashierId)
     conditions.push(`s.cashier_id = $${values.length}`)

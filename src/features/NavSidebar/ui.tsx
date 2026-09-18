@@ -1,7 +1,15 @@
 import { ROLE_LABELS } from '@/entities/user'
 import { AppRoutes, theme } from '@/shared/config'
-import { Icon, IconButton, Text, Tooltip } from '@/shared/ui'
-import { APP_NAME, APP_TAGLINE, CHANGE_PASSWORD_TOOLTIP, LOGOUT_TOOLTIP, NAV_SECTION, type IProps } from './model'
+import { Icon, IconButton, If, Select, Text, Tooltip } from '@/shared/ui'
+import {
+  APP_NAME,
+  APP_TAGLINE,
+  CHANGE_PASSWORD_TOOLTIP,
+  LOGOUT_TOOLTIP,
+  NAV_SECTION,
+  OUTLET_ALL,
+  type IProps,
+} from './model'
 import {
   account,
   accountLine,
@@ -11,6 +19,7 @@ import {
   brand,
   brandMark,
   brandText,
+  outletBox,
   root,
   section,
   spacer,
@@ -18,7 +27,18 @@ import {
 import { NavItem } from './ui/NavItem'
 import { initialsOf } from '@/shared/lib'
 
-export const NavSidebar = ({ active, items, unread, user, onNavigate, onChangePassword, onLogout }: IProps) => (
+export const NavSidebar = ({
+  active,
+  items,
+  unread,
+  user,
+  outlets,
+  outletId,
+  onOutletChange,
+  onNavigate,
+  onChangePassword,
+  onLogout,
+}: IProps) => (
   <div style={root} testId="nav">
     <div style={brand}>
       <div style={brandMark}>
@@ -42,6 +62,18 @@ export const NavSidebar = ({ active, items, unread, user, onNavigate, onChangePa
       />
     ))}
     <div style={spacer} />
+    <If condition={outlets.length > 1}>
+      <div style={outletBox}>
+        <Select
+          value={outletId}
+          options={outlets}
+          placeholder={OUTLET_ALL}
+          onChange={onOutletChange}
+          icon="building"
+          testId="nav__outlet"
+        />
+      </div>
+    </If>
     <div style={account} testId="nav__account">
       <div style={avatar}>
         <text style={avatarText}>{initialsOf(user.fullName || user.login)}</text>

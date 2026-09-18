@@ -3,10 +3,12 @@ import { PAYMENT_OPTIONS, PERIOD_OPTIONS, PeriodKind, type IReportFilters } from
 import { Button, Select, Text, TextInput, Tooltip } from '@/shared/ui'
 import {
   ALL_CASHIERS,
+  ALL_OUTLETS,
   ALL_PAYMENTS,
   CASHIER_LABEL,
   EXPORT_LABEL,
   EXPORT_TOOLTIP,
+  OUTLET_LABEL,
   PAYMENT_LABEL,
   PERIOD_LABEL,
   SEARCH_PLACEHOLDER,
@@ -14,13 +16,14 @@ import {
 } from './model'
 import { field, root, searchField, spacer } from './style'
 
-export const ReportFilters = ({ filters, cashiers, exporting, onChange, onExport }: IProps) => {
+export const ReportFilters = ({ filters, outlets, cashiers, exporting, onChange, onExport }: IProps) => {
   const patch = useCallback((part: Partial<IReportFilters>) => onChange({ ...filters, ...part }), [filters, onChange])
 
   const setPeriod = useCallback(
     (value: string | null) => patch({ period: (value ?? PeriodKind.TODAY) as PeriodKind }),
     [patch],
   )
+  const setOutlet = useCallback((outletId: string | null) => patch({ outletId }), [patch])
   const setCashier = useCallback((cashierId: string | null) => patch({ cashierId }), [patch])
   const setPayment = useCallback((payment: string | null) => patch({ payment }), [patch])
   const setQuery = useCallback((query: string) => patch({ query }), [patch])
@@ -30,6 +33,16 @@ export const ReportFilters = ({ filters, cashiers, exporting, onChange, onExport
       <div style={field}>
         <Text variant="label">{PERIOD_LABEL}</Text>
         <Select value={filters.period} options={PERIOD_OPTIONS} onChange={setPeriod} testId="report__period" />
+      </div>
+      <div style={field}>
+        <Text variant="label">{OUTLET_LABEL}</Text>
+        <Select
+          value={filters.outletId}
+          options={outlets}
+          placeholder={ALL_OUTLETS}
+          onChange={setOutlet}
+          testId="report__outlet"
+        />
       </div>
       <div style={field}>
         <Text variant="label">{CASHIER_LABEL}</Text>

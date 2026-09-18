@@ -6,19 +6,28 @@ const toUser = (row: IUserRow): IUser => ({
   login: row.login,
   role: row.role,
   fullName: row.full_name,
+  outletId: row.outlet_id,
+  outletName: row.outlet_name ?? '',
   isActive: row.is_active,
   createdAt: row.created_at.toISOString(),
 })
 
-const FIND_BY_LOGIN_SQL = 'SELECT * FROM users WHERE login = $1'
-const FIND_SQL = 'SELECT * FROM users WHERE id = $1'
+const BASE_SQL = `
+  SELECT u.*, o.name AS outlet_name
+  FROM users u
+  LEFT JOIN outlets o ON o.id = u.outlet_id`
+
+const FIND_BY_LOGIN_SQL = `${BASE_SQL} WHERE u.login = $1`
+const FIND_SQL = `${BASE_SQL} WHERE u.id = $1`
 const COUNT_ROLE_SQL = 'SELECT count(*)::text AS total FROM users WHERE role = $1 AND is_active = true'
-const CREATE_SQL = 'INSERT INTO users (login, password_hash, role, full_name) VALUES ($1, $2, $3, $4) RETURNING *'
-const UPDATE_SQL = 'UPDATE users SET full_name = $2, is_active = $3 WHERE id = $1 RETURNING *'
+const CREATE_SQL = `
+  INSERT INTO users (login, password_hash, role, full_name, outlet_id)
+  VALUES ($1, $2, $3, $4, $5) RETURNING id`
+const UPDATE_SQL = 'UPDATE users SET full_name = $2, is_active = $3, outlet_id = $4 WHERE id = $1 RETURNING id'
 const PASSWORD_SQL = 'UPDATE users SET password_hash = $2 WHERE id = $1'
 const DELETE_SQL = 'DELETE FROM users WHERE id = $1 RETURNING id'
 
-const LIST_SQL = 'SELECT * FROM users WHERE is_active = true ORDER BY role, full_name'
+const LIST_SQL = `${BASE_SQL} WHERE u.is_active = true ORDER BY u.role, u.full_name`
 
 const OUTLET_SQL = 'SELECT outlet_id FROM users WHERE id = $1'
 const SET_OUTLET_SQL = 'UPDATE users SET outlet_id = $2 WHERE id = $1 RETURNING id'
@@ -54,7 +63,7 @@ export const usersDb = {
     const offset = (page - 1) * limit
     const totalPages = Math.ceil(total / limit)
 
-    const listSql = `SELECT * FROM users ${whereClause} ORDER BY role, created_at LIMIT $${values.length + 1} OFFSET $${values.length + 2}`
+    const listSql = `${BASE_SQL} ${whereClause.replace(/full_name/g, 'u.full_name').replace(/login/g, 'u.login').replace(/role/g, 'u.role')} ORDER BY u.role, u.created_at LIMIT $${values.length + 1} OFFSET $${values.length + 2}`
     const result = await pool.query<IUserRow>(listSql, [...values, limit, offset])
 
     return {
@@ -74,10 +83,22 @@ export const usersDb = {
   },
   countActiveByRole: async (role: UserRole) =>
     Number((await pool.query<{ total: string }>(COUNT_ROLE_SQL, [role])).rows[0]?.total ?? 0),
-  create: async (login: string, passwordHash: string, role: UserRole, fullName: string) =>
-    toUser((await pool.query<IUserRow>(CREATE_SQL, [login, passwordHash, role, fullName])).rows[0]!),
-  update: async (id: string, fullName: string, isActive: boolean) => {
-    const row = (await pool.query<IUserRow>(UPDATE_SQL, [id, fullName, isActive])).rows[0]
+  create: async (
+    login: string,
+    passwordHash: string,
+    role: UserRole,
+    fullName: string,
+    outletId: string | null = null,
+  ) => {
+    const created = (
+      await pool.query<{ id: string }>(CREATE_SQL, [login, passwordHash, role, fullName, outletId])
+    ).rows[0]
+    const row = created ? (await pool.query<IUserRow>(FIND_SQL, [created.id])).rows[0] : undefined
+    return toUser(row!)
+  },
+  update: async (id: string, fullName: string, isActive: boolean, outletId: string | null = null) => {
+    await pool.query(UPDATE_SQL, [id, fullName, isActive, outletId])
+    const row = (await pool.query<IUserRow>(FIND_SQL, [id])).rows[0]
     return row ? toUser(row) : null
   },
   setPassword: async (id: string, passwordHash: string) => {

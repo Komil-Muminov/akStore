@@ -1,4 +1,5 @@
 import type { IUser, IUserInput } from '@/entities/user'
+import type { IOutlet } from '@/entities/outlet'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery, useMutationQuery } from '@/shared/hooks'
 
@@ -16,6 +17,8 @@ interface IResetVariables {
 }
 
 const USERS = [QueryKeys.USERS]
+
+export const useOutletsList = () => useGetQuery<IOutlet[]>(QueryKeys.OUTLETS, ApiRoutes.OUTLETS_LIST)
 
 export const useUsersQuery = (query?: string, page = 1) =>
   useGetQuery<IPagedResponse<IUser>>(QueryKeys.USERS, ApiRoutes.USERS_SEARCH(query, page))

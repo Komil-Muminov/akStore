@@ -5,7 +5,7 @@ import { UserList } from '@/features/UserList'
 import { UserRole, assignableRoles, toRole, type IUser, type IUserInput } from '@/entities/user'
 import { useSession } from '@/shared/lib'
 import { Button, ConfirmDialog, If, Pagination, Spinner, Text, TextInput } from '@/shared/ui'
-import { useUserMutations, useUsersQuery } from './hooks'
+import { useOutletsList, useUserMutations, useUsersQuery } from './hooks'
 import { ADD_LABEL, COUNT_SUFFIX, DELETE_DIALOG, DESCRIPTION_ADMIN, DESCRIPTION_SUPERADMIN, SEARCH_PLACEHOLDER, TITLE } from './model'
 import { header, headerActions, headerText, layout, searchWrap, sectionHead } from './style'
 import { ErrorState } from './ui/ErrorState'
@@ -22,6 +22,11 @@ export const Users = () => {
 
   const actorRole = toRole(current?.user.role ?? '')
   const roles = useMemo(() => assignableRoles(actorRole), [actorRole])
+  const outlets = useOutletsList()
+  const outletOptions = useMemo(
+    () => (outlets.data ?? []).map((outlet) => ({ id: outlet.id, label: outlet.name })),
+    [outlets.data],
+  )
   const users = useMemo(() => usersQuery.data?.items ?? [], [usersQuery.data?.items])
   const total = usersQuery.data?.total ?? 0
   const totalPages = usersQuery.data?.totalPages ?? 1
@@ -94,7 +99,7 @@ export const Users = () => {
       }>
         <Spinner />
       </If>
-      <UserForm open={formOpen} roles={roles} pending={create.isPending} error={create.error?.message} onSubmit={handleCreate} onClose={closeForm} />
+      <UserForm open={formOpen} roles={roles} outlets={outletOptions} pending={create.isPending} error={create.error?.message} onSubmit={handleCreate} onClose={closeForm} />
       <PasswordDialog mode={resetting ? 'reset' : null} subject={resetting?.fullName} pending={resetPassword.isPending} error={resetPassword.error?.message} onSubmit={handleReset} onClose={closeReset} />
       <ConfirmDialog open={deleting !== null} title={DELETE_DIALOG.title} text={DELETE_DIALOG.text} confirmLabel={DELETE_DIALOG.confirm} cancelLabel={DELETE_DIALOG.cancel} pending={pending} onConfirm={handleDelete} onCancel={cancelDelete} />
     </div>

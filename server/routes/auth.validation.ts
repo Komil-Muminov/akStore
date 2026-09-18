@@ -1,4 +1,4 @@
-import { HttpError, HttpStatus, requireString } from '../shared/utils'
+import { HttpError, HttpStatus, requireString, requireUuid } from '../shared/utils'
 import { UserRole, type IUserInput } from '../types'
 
 const LOGIN_MIN = 2
@@ -37,10 +37,15 @@ export const parseUserInput = (body: unknown): IUserInput => {
     password: parsePassword(raw.password),
     role,
     fullName: requireString(raw.fullName, 'fullName', LOGIN_MIN, NAME_MAX),
+    outletId: typeof raw.outletId === 'string' && raw.outletId.length > 0 ? requireUuid(raw.outletId, 'outletId') : null,
   }
 }
 
 export const parseUserUpdate = (body: unknown) => {
   const raw = (body ?? {}) as Record<string, unknown>
-  return { fullName: requireString(raw.fullName, 'fullName', LOGIN_MIN, NAME_MAX), isActive: raw.isActive !== false }
+  return {
+    fullName: requireString(raw.fullName, 'fullName', LOGIN_MIN, NAME_MAX),
+    isActive: raw.isActive !== false,
+    outletId: typeof raw.outletId === 'string' && raw.outletId.length > 0 ? requireUuid(raw.outletId, 'outletId') : null,
+  }
 }

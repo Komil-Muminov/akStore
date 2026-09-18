@@ -7,6 +7,7 @@ export interface ICashierOption {
 
 export interface IProps {
   filters: IReportFilters
+  outlets: ICashierOption[]
   cashiers: ICashierOption[]
   exporting: boolean
   onChange: (filters: IReportFilters) => void
@@ -14,6 +15,8 @@ export interface IProps {
 }
 
 export const PERIOD_LABEL = 'Период'
+export const OUTLET_LABEL = 'Точка'
+export const ALL_OUTLETS = 'Вся сеть'
 export const CASHIER_LABEL = 'Кассир'
 export const PAYMENT_LABEL = 'Оплата'
 export const SEARCH_PLACEHOLDER = 'Номер чека или кассир'

@@ -7,6 +7,7 @@ export enum PeriodKind {
 
 export interface IReportFilters {
   period: PeriodKind
+  outletId: string | null
   cashierId: string | null
   payment: string | null
   query: string
@@ -62,6 +63,7 @@ export const PAYMENT_OPTIONS = [
 
 export const EMPTY_FILTERS: IReportFilters = {
   period: PeriodKind.TODAY,
+  outletId: null,
   cashierId: null,
   payment: null,
   query: '',
