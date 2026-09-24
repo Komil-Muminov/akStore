@@ -28,6 +28,7 @@ const debtorOf = (body: unknown) => {
     name: requireString(raw.name, 'name', NAME_MIN, NAME_MAX),
     phone: optionalString(raw.phone, 'phone', PHONE_MAX),
     note: optionalString(raw.note, 'note', NAME_MAX),
+    creditLimit: Math.max(0, Number(raw.creditLimit ?? 0)),
   }
 }
 

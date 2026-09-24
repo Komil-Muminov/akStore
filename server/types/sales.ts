@@ -1,52 +1,10 @@
+export { type IShift, type IShiftRow, type IShiftTotals, type IShiftTotalsRow } from './shifts'
+
 export enum PaymentKind {
   CASH = 'cash',
   CARD = 'card',
   MIXED = 'mixed',
-}
-
-export interface IShift {
-  id: string
-  number: number
-  cashierId: string
-  cashierName: string
-  outletId: string | null
-  outletName: string
-  openedAt: string
-  closedAt: string | null
-  openingCash: number
-  closingCash: number | null
-  note: string
-}
-
-export interface IShiftRow {
-  id: string
-  number: number
-  cashier_id: string
-  cashier_name: string
-  outlet_id: string | null
-  outlet_name: string | null
-  opened_at: Date
-  closed_at: Date | null
-  opening_cash: string
-  closing_cash: string | null
-  note: string
-}
-
-export interface IShiftTotals {
-  salesCount: number
-  cashTotal: number
-  cardTotal: number
-  refundTotal: number
-  revenue: number
-  expectedCash: number
-  cashAdjustment?: number
-}
-
-export interface IShiftTotalsRow {
-  sales_count: string
-  cash_total: string
-  card_total: string
-  refund_total: string
+  DEBT = 'debt',
 }
 
 export interface ISaleItemInput {
@@ -69,6 +27,8 @@ export interface ISaleInput {
   discount: number
   cashPaid: number
   cardPaid: number
+  debtPaid?: number
+  debtorId?: string | null
 }
 
 export interface ISaleItem {
@@ -110,6 +70,8 @@ export interface ISaleRecord {
   paid: number
   cashAmount: number
   cardAmount: number
+  debtAmount: number
+  debtorId: string | null
   vatTotal: number
 }
 
@@ -144,6 +106,9 @@ export interface ISale {
   paid: number
   cashAmount: number
   cardAmount: number
+  debtAmount: number
+  debtorId: string | null
+  debtorName: string | null
   change: number
   vatTotal: number
   refundTotal: number
@@ -164,6 +129,9 @@ export interface ISaleRow {
   paid: string
   cash_amount: string
   card_amount: string
+  debt_amount: string
+  debtor_id: string | null
+  debtor_name: string | null
   vat_total: string
   refund_total: string
   refunded_at: Date | null
@@ -188,4 +156,3 @@ export interface ISaleItemRow {
   mark_code: string
   refunded: string
 }
-

@@ -6,6 +6,7 @@ const toDebtor = (row: IDebtorRow): IDebtor => ({
   name: row.name,
   phone: row.phone,
   note: row.note,
+  creditLimit: Number(row.credit_limit ?? 0),
   balance: Number(row.balance),
   lastMoveAt: row.last_move_at ? row.last_move_at.toISOString() : null,
 })
@@ -21,7 +22,7 @@ const toMove = (row: IDebtMoveRow): IDebtMove => ({
 })
 
 const BASE_SQL = `
-  SELECT d.id, d.name, d.phone, d.note,
+  SELECT d.id, d.name, d.phone, d.note, d.credit_limit,
     coalesce((SELECT sum(m.amount) FROM debt_moves m WHERE m.debtor_id = d.id), 0)::text AS balance,
     (SELECT max(m.created_at) FROM debt_moves m WHERE m.debtor_id = d.id) AS last_move_at
   FROM debtors d
@@ -30,8 +31,8 @@ const BASE_SQL = `
 const LIST_SQL = `${BASE_SQL} AND ($1::text IS NULL OR d.name ILIKE $1) ORDER BY d.name LIMIT $2`
 const FIND_SQL = `${BASE_SQL} AND d.id = $1`
 const BY_NAME_SQL = 'SELECT id FROM debtors WHERE lower(name) = lower($1) AND is_active'
-const CREATE_SQL = 'INSERT INTO debtors (name, phone, note) VALUES ($1, $2, $3) RETURNING id'
-const UPDATE_SQL = 'UPDATE debtors SET name = $2, phone = $3, note = $4 WHERE id = $1 RETURNING id'
+const CREATE_SQL = 'INSERT INTO debtors (name, phone, note, credit_limit) VALUES ($1, $2, $3, $4) RETURNING id'
+const UPDATE_SQL = 'UPDATE debtors SET name = $2, phone = $3, note = $4, credit_limit = $5 WHERE id = $1 RETURNING id'
 const ARCHIVE_SQL = 'UPDATE debtors SET is_active = false WHERE id = $1 RETURNING id'
 
 const MOVES_SQL = `
@@ -56,9 +57,10 @@ export const debtsDb = {
   },
   findByName: async (name: string) => (await pool.query<{ id: string }>(BY_NAME_SQL, [name])).rows[0]?.id ?? null,
   create: async (input: IDebtorInput) =>
-    (await pool.query<{ id: string }>(CREATE_SQL, [input.name, input.phone, input.note])).rows[0]?.id ?? '',
+    (await pool.query<{ id: string }>(CREATE_SQL, [input.name, input.phone, input.note, input.creditLimit])).rows[0]
+      ?.id ?? '',
   update: async (id: string, input: IDebtorInput) =>
-    ((await pool.query(UPDATE_SQL, [id, input.name, input.phone, input.note])).rowCount ?? 0) > 0,
+    ((await pool.query(UPDATE_SQL, [id, input.name, input.phone, input.note, input.creditLimit])).rowCount ?? 0) > 0,
   archive: async (id: string) => ((await pool.query(ARCHIVE_SQL, [id])).rowCount ?? 0) > 0,
   moves: async (debtorId: string, limit: number) =>
     (await pool.query<IDebtMoveRow>(MOVES_SQL, [debtorId, limit])).rows.map(toMove),

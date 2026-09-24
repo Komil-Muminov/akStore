@@ -19,6 +19,10 @@ export const MONEY_SCHEMA = `
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   );
   CREATE UNIQUE INDEX IF NOT EXISTS debtors_name_idx ON debtors (lower(name)) WHERE is_active;
+  ALTER TABLE debtors ADD COLUMN IF NOT EXISTS credit_limit NUMERIC(12, 2) NOT NULL DEFAULT 0;
+
+  ALTER TABLE sales ADD COLUMN IF NOT EXISTS debtor_id UUID REFERENCES debtors(id) ON DELETE SET NULL;
+  ALTER TABLE sales ADD COLUMN IF NOT EXISTS debt_amount NUMERIC(12, 2) NOT NULL DEFAULT 0;
 
   CREATE TABLE IF NOT EXISTS debt_moves (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -14,7 +14,6 @@ import type {
 } from '../types'
 
 const ROUND = 100
-
 const round = (value: number) => Math.round(value * ROUND) / ROUND
 
 const toItem = (row: ISaleItemRow): ISaleItem => ({
@@ -53,6 +52,9 @@ const toSale = (row: ISaleRow, items: ISaleItem[]): ISale => ({
   paid: Number(row.paid),
   cashAmount: Number(row.cash_amount),
   cardAmount: Number(row.card_amount),
+  debtAmount: Number(row.debt_amount ?? 0),
+  debtorId: row.debtor_id,
+  debtorName: row.debtor_name,
   change: Math.max(0, round(Number(row.paid) - Number(row.total))),
   vatTotal: Number(row.vat_total),
   refundTotal: Number(row.refund_total),
@@ -64,17 +66,17 @@ const toSale = (row: ISaleRow, items: ISaleItem[]): ISale => ({
 
 const BASE_SQL = `
   SELECT s.id, s.number, s.shift_id, u.full_name AS cashier_name, s.payment,
-         s.total, s.discount, s.paid, s.cash_amount, s.card_amount, s.vat_total, s.refund_total,
+         s.total, s.discount, s.paid, s.cash_amount, s.card_amount, s.debt_amount,
+         s.debtor_id, d.name AS debtor_name, s.vat_total, s.refund_total,
          s.refunded_at, s.created_at,
          s.fiscal_number, s.fiscal_sign, s.fiscal_device, s.fiscal_qr, s.fiscal_at
   FROM sales s
-  JOIN users u ON u.id = s.cashier_id`
+  JOIN users u ON u.id = s.cashier_id
+  LEFT JOIN debtors d ON d.id = s.debtor_id`
 
 const FIND_SQL = `${BASE_SQL} WHERE s.id = $1`
-
 const searchSql = (where: string, limitIndex: number) =>
   `${BASE_SQL} ${where} ORDER BY s.created_at DESC LIMIT $${limitIndex} OFFSET $${limitIndex + 1}`
-
 const countSql = (where: string) =>
   `SELECT count(*)::text AS total FROM sales s JOIN users u ON u.id = s.cashier_id ${where}`
 
@@ -83,24 +85,16 @@ const ITEMS_SQL = `
   FROM sale_items WHERE sale_id = ANY($1)`
 
 const CREATE_SALE_SQL = `
-  INSERT INTO sales
-    (shift_id, cashier_id, outlet_id, payment, total, discount, paid, cash_amount, card_amount, vat_total)
-  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`
+  INSERT INTO sales (shift_id, cashier_id, outlet_id, payment, total, discount, paid, cash_amount, card_amount, debt_amount, debtor_id, vat_total)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`
 
 const CREATE_ITEM_SQL = `
-  INSERT INTO sale_items
-    (sale_id, product_id, name, quantity, price, discount, cost_price, vat_rate, vat_amount, mark_code)
+  INSERT INTO sale_items (sale_id, product_id, name, quantity, price, discount, cost_price, vat_rate, vat_amount, mark_code)
   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 
-const FISCAL_SQL = `
-  UPDATE sales SET fiscal_number = $2, fiscal_sign = $3, fiscal_device = $4, fiscal_qr = $5, fiscal_at = now()
-  WHERE id = $1 RETURNING id`
-
+const FISCAL_SQL = `UPDATE sales SET fiscal_number = $2, fiscal_sign = $3, fiscal_device = $4, fiscal_qr = $5, fiscal_at = now() WHERE id = $1 RETURNING id`
 const REFUND_SQL = 'UPDATE sales SET refunded_at = now() WHERE id = $1 AND refunded_at IS NULL RETURNING id'
-
-const REFUND_ITEM_SQL = `
-  UPDATE sale_items SET refunded = refunded + $2
-  WHERE id = $1 AND refunded + $2 <= quantity RETURNING id`
+const REFUND_ITEM_SQL = 'UPDATE sale_items SET refunded = refunded + $2 WHERE id = $1 AND refunded + $2 <= quantity RETURNING id'
 
 const REFUND_TOTAL_SQL = `
   UPDATE sales SET refund_total = refund_total + $2,
@@ -135,6 +129,8 @@ export const salesDb = {
         record.paid,
         record.cashAmount,
         record.cardAmount,
+        record.debtAmount,
+        record.debtorId,
         record.vatTotal,
       ])
     ).rows[0]?.id ?? '',

@@ -26,6 +26,7 @@ export interface IDebtor {
   name: string
   phone: string
   note: string
+  creditLimit: number
   balance: number
   lastMoveAt: string | null
 }
@@ -35,6 +36,7 @@ export interface IDebtorRow {
   name: string
   phone: string
   note: string
+  credit_limit: string
   balance: string
   last_move_at: Date | null
 }
@@ -63,4 +65,5 @@ export interface IDebtorInput {
   name: string
   phone: string
   note: string
+  creditLimit: number
 }

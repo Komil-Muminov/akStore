@@ -1,8 +1,7 @@
-import { productsDb, salesDb, stockDb } from '../db'
+import { debtsDb, productsDb, salesDb, stockDb } from '../db'
 import { vatAmountOf } from '../fiscal'
 import { HttpError, HttpStatus } from '../shared/utils'
 import {
-  AuditAction,
   PaymentKind,
   StockMoveKind,
   type IPageParams,
@@ -12,9 +11,9 @@ import {
   type ISaleInput,
 } from '../types'
 import QRCode from 'qrcode'
-import { auditService } from './audit.service'
 import { fiscalService } from './fiscal.service'
 import { receiptHtml } from './receipt.print'
+import { refundSales } from './sales.refund'
 import { shiftsService } from './shifts.service'
 
 const SALES_LIMIT = 200
@@ -23,10 +22,7 @@ const PRODUCT_MISSING = 'Товар не найден'
 const NOT_ENOUGH = 'Недостаточно товара на остатке'
 const NOT_PAID = 'Внесённая сумма меньше итога'
 const SALE_MISSING = 'Чек не найден'
-const ALREADY_REFUNDED = 'Чек уже возвращён'
-const NOTHING_TO_REFUND = 'Нечего возвращать: позиции уже вернули'
-const ITEM_MISSING = 'Позиция не найдена в чеке'
-const REFUND_NOTE = 'Возврат по чеку'
+const DEBTOR_MISSING = 'Клиент не найден'
 const QR_WIDTH = 120
 
 const roundMoney = (value: number) => Math.round(value * 100) / 100
@@ -46,15 +42,30 @@ const itemRecordOf = (product: IProduct, quantity: number, discount: number) => 
   }
 }
 
-const paymentOf = (cashPaid: number, cardPaid: number) => {
-  if (cashPaid > 0 && cardPaid > 0) return PaymentKind.MIXED
-  return cardPaid > 0 ? PaymentKind.CARD : PaymentKind.CASH
+const paymentOf = (cash: number, card: number, debt: number) => {
+  const count = (cash > 0 ? 1 : 0) + (card > 0 ? 1 : 0) + (debt > 0 ? 1 : 0)
+  if (count > 1) return PaymentKind.MIXED
+  if (debt > 0) return PaymentKind.DEBT
+  return card > 0 ? PaymentKind.CARD : PaymentKind.CASH
 }
 
 export const salesService = {
   create: async (cashierId: string, input: ISaleInput) => {
     if (input.items.length === 0) throw new HttpError(HttpStatus.BAD_REQUEST, EMPTY_CART)
     const shift = await shiftsService.requireOpen(cashierId)
+    const debtPaid = roundMoney(input.debtPaid ?? 0)
+
+    if (debtPaid > 0) {
+      if (!input.debtorId) throw new HttpError(HttpStatus.BAD_REQUEST, 'Выберите клиента для продажи в долг')
+      const debtor = await debtsDb.find(input.debtorId)
+      if (!debtor) throw new HttpError(HttpStatus.NOT_FOUND, DEBTOR_MISSING)
+      if (debtor.creditLimit > 0 && debtor.balance + debtPaid > debtor.creditLimit) {
+        throw new HttpError(
+          HttpStatus.BAD_REQUEST,
+          `Превышен лимит долга (${debtor.creditLimit} ₽). Текущий долг: ${debtor.balance} ₽`,
+        )
+      }
+    }
 
     const prepared = []
     let subtotal = 0
@@ -71,7 +82,7 @@ export const salesService = {
 
     const discount = Math.min(roundMoney(input.discount), subtotal)
     const total = roundMoney(subtotal - discount)
-    const paid = roundMoney(input.cashPaid + input.cardPaid)
+    const paid = roundMoney(input.cashPaid + input.cardPaid + debtPaid)
     if (paid < total) throw new HttpError(HttpStatus.BAD_REQUEST, NOT_PAID)
 
     const records = prepared.map((line) => {
@@ -85,12 +96,14 @@ export const salesService = {
       shiftId: shift.id,
       cashierId,
       outletId: shift.outletId,
-      payment: paymentOf(input.cashPaid, input.cardPaid),
+      payment: paymentOf(input.cashPaid, input.cardPaid, debtPaid),
       total,
       discount,
       paid,
       cashAmount: input.cashPaid,
       cardAmount: input.cardPaid,
+      debtAmount: debtPaid,
+      debtorId: debtPaid > 0 ? (input.debtorId ?? null) : null,
       vatTotal,
     })
     for (const record of records) {
@@ -98,78 +111,19 @@ export const salesService = {
       await stockDb.register(record.productId, StockMoveKind.SALE, -record.quantity, 0, '', cashierId, shift.outletId)
     }
 
+    if (debtPaid > 0 && input.debtorId) {
+      await debtsDb.addMove(input.debtorId, saleId, cashierId, debtPaid, 'Продажа в долг')
+    }
+
     const sale = await salesDb.find(saleId)
     if (!sale) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
     return fiscalService.registerSale(sale)
   },
 
-  refundItems: async (cashierId: string, saleId: string, input: IRefundInput) => {
-    const sale = await salesDb.find(saleId)
-    if (!sale) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
-    if (sale.refundedAt !== null) throw new HttpError(HttpStatus.BAD_REQUEST, ALREADY_REFUNDED)
-    const shift = await shiftsService.requireOpen(cashierId)
+  refundItems: async (cashierId: string, saleId: string, input: IRefundInput) =>
+    refundSales.refundItems(cashierId, saleId, input),
 
-    let refundAmount = 0
-    for (const entry of input.items) {
-      const item = sale.items.find((line) => line.id === entry.itemId)
-      if (!item) throw new HttpError(HttpStatus.NOT_FOUND, ITEM_MISSING)
-      const available = item.quantity - item.refunded
-      if (available < entry.quantity) throw new HttpError(HttpStatus.BAD_REQUEST, NOTHING_TO_REFUND)
-      const share = item.quantity > 0 ? (item.total / item.quantity) * entry.quantity : 0
-      refundAmount += share
-      await salesDb.refundItem(item.id, entry.quantity)
-      await stockDb.register(
-        item.productId,
-        StockMoveKind.REFUND,
-        entry.quantity,
-        0,
-        REFUND_NOTE,
-        cashierId,
-        shift.outletId,
-      )
-    }
-
-    await salesDb.addRefundTotal(saleId, roundMoney(refundAmount))
-    const updated = await salesDb.find(saleId)
-    if (!updated) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
-    await auditService.record(
-      cashierId,
-      AuditAction.SALE_REFUND,
-      `Чек №${String(updated.number)}`,
-      saleId,
-      roundMoney(refundAmount).toFixed(2),
-    )
-    return updated.refundedAt === null ? updated : fiscalService.registerRefund(updated)
-  },
-
-  refund: async (cashierId: string, saleId: string) => {
-    const sale = await salesDb.find(saleId)
-    if (!sale) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
-    if (sale.refundedAt !== null) throw new HttpError(HttpStatus.BAD_REQUEST, ALREADY_REFUNDED)
-    const shift = await shiftsService.requireOpen(cashierId)
-    await salesDb.refund(saleId)
-    for (const item of sale.items) {
-      await stockDb.register(
-        item.productId,
-        StockMoveKind.REFUND,
-        item.quantity,
-        0,
-        REFUND_NOTE,
-        cashierId,
-        shift.outletId,
-      )
-    }
-    const refunded = await salesDb.find(saleId)
-    if (!refunded) throw new HttpError(HttpStatus.NOT_FOUND, SALE_MISSING)
-    await auditService.record(
-      cashierId,
-      AuditAction.SALE_REFUND,
-      `Чек №${String(refunded.number)}`,
-      saleId,
-      String(refunded.total),
-    )
-    return fiscalService.registerRefund(refunded)
-  },
+  refund: async (cashierId: string, saleId: string) => refundSales.refund(cashierId, saleId),
 
   printable: async (id: string) => {
     const sale = await salesDb.find(id)

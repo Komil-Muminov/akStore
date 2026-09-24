@@ -2,6 +2,7 @@ export enum PaymentKind {
   CASH = 'cash',
   CARD = 'card',
   MIXED = 'mixed',
+  DEBT = 'debt',
 }
 
 export enum DiscountKind {

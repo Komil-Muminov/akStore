@@ -103,7 +103,12 @@ export const parseSaleInput = (body: unknown): ISaleInput => {
   if (items.length === 0 || items.length > ITEMS_MAX) throw new HttpError(HttpStatus.BAD_REQUEST, ITEMS_ERROR)
   const cashPaid = money(raw.cashPaid, 'cashPaid')
   const cardPaid = money(raw.cardPaid, 'cardPaid')
-  if (cashPaid + cardPaid <= 0) throw new HttpError(HttpStatus.BAD_REQUEST, PAID_ERROR)
+  const debtPaid = raw.debtPaid ? money(raw.debtPaid, 'debtPaid') : 0
+  const debtorId = raw.debtorId ? requireUuid(raw.debtorId, 'debtorId') : null
+  if (debtPaid > 0 && !debtorId) {
+    throw new HttpError(HttpStatus.BAD_REQUEST, 'Для оформления в долг необходимо выбрать клиента')
+  }
+  if (cashPaid + cardPaid + debtPaid <= 0) throw new HttpError(HttpStatus.BAD_REQUEST, PAID_ERROR)
   return {
     items: (items as Record<string, unknown>[]).map((item) => ({
       productId: requireUuid(item.productId, 'productId'),
@@ -113,6 +118,8 @@ export const parseSaleInput = (body: unknown): ISaleInput => {
     discount: money(raw.discount, 'discount'),
     cashPaid,
     cardPaid,
+    debtPaid,
+    debtorId,
   }
 }
 

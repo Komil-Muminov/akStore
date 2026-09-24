@@ -17,6 +17,7 @@ export interface IDebtor {
   name: string
   phone: string
   note: string
+  creditLimit: number
   balance: number
   lastMoveAt: string | null
 }
@@ -40,6 +41,7 @@ export interface IDebtorInput {
   name: string
   phone: string
   note: string
+  creditLimit: number
 }
 
 export const CASH_MOVE_LABELS: Record<CashMoveKind, string> = {
@@ -47,4 +49,4 @@ export const CASH_MOVE_LABELS: Record<CashMoveKind, string> = {
   [CashMoveKind.OUT]: 'Изъятие',
 }
 
-export const EMPTY_DEBTOR: IDebtorInput = { name: '', phone: '', note: '' }
+export const EMPTY_DEBTOR: IDebtorInput = { name: '', phone: '', note: '', creditLimit: 0 }

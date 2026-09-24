@@ -6,6 +6,7 @@ const PAYMENT_TITLES: Record<PaymentKind, string> = {
   [PaymentKind.CASH]: 'Наличные',
   [PaymentKind.CARD]: 'Карта',
   [PaymentKind.MIXED]: 'Смешанная',
+  [PaymentKind.DEBT]: 'В долг',
 }
 
 const LABELS = {
@@ -72,6 +73,7 @@ export const receiptHtml = (sale: ISale, qr: string) => `<!doctype html>
   <div class="line total"><span>${LABELS.total}</span><span>${money(sale.total)}</span></div>
   ${sale.vatTotal > 0 ? `<div class="line muted"><span>${LABELS.vat}</span><span>${money(sale.vatTotal)}</span></div>` : ''}
   <div class="line"><span>${PAYMENT_TITLES[sale.payment]}</span><span>${money(sale.paid)}</span></div>
+  ${sale.debtAmount > 0 ? `<div class="line muted"><span>В долг (${sale.debtorName || 'Клиент'}):</span><span>${money(sale.debtAmount)}</span></div>` : ''}
   ${sale.change > 0 ? `<div class="line"><span>${LABELS.change}</span><span>${money(sale.change)}</span></div>` : ''}
   ${sale.refundedAt === null ? '' : `<div class="rule"></div><div class="refund">${LABELS.refund}</div>`}
   ${fiscalHtml(sale, qr)}
