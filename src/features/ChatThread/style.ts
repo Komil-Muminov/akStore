@@ -10,14 +10,13 @@ export const root: StyleDesc = {
   flexDirection: 'column',
   backgroundColor: theme.colors.canvas,
 }
-
 export const list: StyleDesc = {
   flexGrow: 1,
   minHeight: 0,
   paddingTop: theme.spacing.lg,
   paddingBottom: theme.spacing.lg,
 }
-
+// тест коммит
 export const rowOf = (own: boolean): StyleDesc => ({
   width: '100%',
   alignSelf: 'stretch',
@@ -50,13 +49,13 @@ export const bubbleOf = (own: boolean, wide: boolean, maxWidth: number): StyleDe
   backgroundColor: own ? undefined : theme.colors.raised,
   background: own
     ? {
-        type: 'linear-gradient',
-        angle: 135,
-        stops: [
-          { color: theme.colors.accent, position: 0 },
-          { color: theme.colors.accentHover, position: 1 },
-        ],
-      }
+      type: 'linear-gradient',
+      angle: 135,
+      stops: [
+        { color: theme.colors.accent, position: 0 },
+        { color: theme.colors.accentHover, position: 1 },
+      ],
+    }
     : undefined,
 })
 
