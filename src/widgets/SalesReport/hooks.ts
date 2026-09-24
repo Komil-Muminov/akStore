@@ -1,5 +1,5 @@
 import type { IOutlet } from '@/entities/outlet'
-import type { ICashierStat, IDailyPoint, IReportSummary, ITopProduct } from '@/entities/report'
+import type { ICashierStat, IDailyPoint, IHourlyPoint, IReportSummary, ITopProduct } from '@/entities/report'
 import type { ISale } from '@/entities/sale'
 import { ApiRoutes, QueryKeys } from '@/shared/config'
 import { useGetQuery } from '@/shared/hooks'
@@ -15,6 +15,9 @@ export const useCashiersQuery = (filters: string) =>
 
 export const useDailyQuery = (filters: string) =>
   useGetQuery<IDailyPoint[]>(QueryKeys.REPORT_DAILY, ApiRoutes.REPORTS_DAILY(filters))
+
+export const useHourlyQuery = (filters: string) =>
+  useGetQuery<IHourlyPoint[]>(QueryKeys.REPORT_HOURLY, ApiRoutes.REPORTS_HOURLY(filters))
 
 export const useTopQuery = (filters: string) =>
   useGetQuery<IPagedResponse<ITopProduct>>(QueryKeys.REPORT_TOP, ApiRoutes.REPORTS_TOP(filters))

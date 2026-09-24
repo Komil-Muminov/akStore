@@ -27,3 +27,4 @@ export const ESTIMATED_LINE_HEIGHT = 72
 export const QUANTITY_HINT = 'Кол-во'
 export const LINE_DISCOUNT_HINT = 'Скидка'
 export const QUANTITY_STEP = 1
+export const QUICK_DISCOUNTS = [0, 5, 10, 15, 20]

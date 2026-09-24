@@ -9,6 +9,8 @@ export interface IProps {
   onOpen: (openingCash: number) => void
   onClose: (closingCash: number, note: string) => void
   onPay: (cashPaid: number, cardPaid: number) => void
+  onExactCash?: () => void
+  onExactCard?: () => void
   lastSaleId: string | null
   onPrintReceipt: () => void
   parkedCount: number
@@ -22,6 +24,10 @@ export const CASH_FIELD_LABEL = 'Наличные'
 export const CARD_FIELD_LABEL = 'Карта'
 export const PAY_LABEL = 'Оплатить'
 export const EXACT_TOOLTIP = 'Без сдачи'
+export const EXACT_CASH_LABEL = 'F8 Нал'
+export const EXACT_CARD_LABEL = 'F9 Карта'
+export const EXACT_CASH_TOOLTIP = 'Быстрая оплата наличными ровно под расчёт (F8)'
+export const EXACT_CARD_TOOLTIP = 'Быстрая оплата картой на всю сумму (F9)'
 export const CASH_TOOLTIP = 'Внесение и изъятие наличных'
 export const PARK_LABEL = 'Отложить'
 export const PARK_TOOLTIP = 'Отложить чек и обслужить следующего'

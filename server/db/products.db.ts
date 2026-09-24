@@ -75,18 +75,26 @@ export const productsDb = {
       conditions.push(`p.category_id = $${values.length}`)
     }
     if (params.favorite) conditions.push('p.is_favorite = true')
-    if (params.lowStock) conditions.push('p.stock <= p.min_stock AND p.min_stock > 0')
-    const where = `WHERE ${conditions.join(' AND ')}`
-    const total = Number(
-      (await pool.query<{ total: string }>(`SELECT count(*)::text AS total FROM products p ${where}`, values))
-        .rows[0]?.total ?? 0,
-    )
     const listValues = [...values]
     let listSql = BASE_SQL
+    let countFrom = 'products p'
     if (params.outletId) {
       listValues.push(params.outletId)
       listSql = baseSql(params.outletId).replace('$OUTLET$', `$${listValues.length}`)
+      countFrom = `products p LEFT JOIN product_stocks os ON os.product_id = p.id AND os.outlet_id = $${listValues.length}`
     }
+    if (params.lowStock) {
+      conditions.push(
+        params.outletId
+          ? 'coalesce(os.quantity, 0) <= p.min_stock AND p.min_stock > 0'
+          : 'p.stock <= p.min_stock AND p.min_stock > 0',
+      )
+    }
+    const where = `WHERE ${conditions.join(' AND ')}`
+    const total = Number(
+      (await pool.query<{ total: string }>(`SELECT count(*)::text AS total FROM ${countFrom} ${where}`, listValues))
+        .rows[0]?.total ?? 0,
+    )
     const page = Math.max(params.page ?? DEFAULT_PAGE, DEFAULT_PAGE)
     const limit = Math.max(params.limit ?? DEFAULT_LIMIT, 1)
     const rows = (

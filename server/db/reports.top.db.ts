@@ -1,6 +1,6 @@
 import { pool } from './pool'
 import { filterOf } from './reports.filters'
-import type { IPageParams, IReportParams, ITopProduct, ITopProductRow } from '../types'
+import type { IPageParams, IReportParams, ITopProduct, ITopProductRow, TAbcGroup } from '../types'
 
 const ROUND = 100
 
@@ -12,13 +12,33 @@ const FROM_SQL = `
   JOIN users u ON u.id = s.cashier_id`
 
 const listSql = (where: string, limitIndex: number) => `
-  SELECT i.product_id, i.name,
-    sum(i.quantity)::text AS quantity,
-    sum(i.price * i.quantity)::text AS revenue,
-    sum((i.price - i.cost_price) * i.quantity)::text AS profit
-  ${FROM_SQL} ${where}
-  GROUP BY i.product_id, i.name
-  ORDER BY sum(i.price * i.quantity) DESC
+  WITH grouped AS (
+    SELECT i.product_id, i.name,
+      sum(i.quantity) AS quantity,
+      sum(i.price * i.quantity) AS revenue,
+      sum((i.price - i.cost_price) * i.quantity) AS profit
+    ${FROM_SQL} ${where}
+    GROUP BY i.product_id, i.name
+  ),
+  with_totals AS (
+    SELECT *,
+      coalesce(sum(revenue) OVER (), 0) AS total_revenue,
+      coalesce(sum(revenue) OVER (ORDER BY revenue DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 0) AS cum_revenue
+    FROM grouped
+  )
+  SELECT product_id, name,
+    quantity::text,
+    revenue::text,
+    profit::text,
+    CASE WHEN total_revenue > 0 THEN round((revenue / total_revenue) * 100, 1)::text ELSE '0' END AS share_percent,
+    CASE
+      WHEN total_revenue = 0 THEN 'C'
+      WHEN (cum_revenue - revenue) / total_revenue < 0.8 THEN 'A'
+      WHEN (cum_revenue - revenue) / total_revenue < 0.95 THEN 'B'
+      ELSE 'C'
+    END AS abc_group
+  FROM with_totals
+  ORDER BY revenue DESC
   LIMIT $${limitIndex} OFFSET $${limitIndex + 1}`
 
 const countSql = (where: string) => `
@@ -30,6 +50,8 @@ const toProduct = (row: ITopProductRow): ITopProduct => ({
   quantity: round(Number(row.quantity)),
   revenue: round(Number(row.revenue)),
   profit: round(Number(row.profit)),
+  sharePercent: round(Number(row.share_percent ?? 0)),
+  abcGroup: (row.abc_group as TAbcGroup) || 'C',
 })
 
 export const topProductsDb = {

@@ -110,6 +110,25 @@ export const discountBox: StyleDesc = {
   gap: theme.spacing.sm,
 }
 
+export const chipsRow: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.xs,
+  marginTop: theme.spacing.xs,
+}
+
+export const discountChipOf = (active: boolean): StyleDesc => ({
+  paddingLeft: theme.spacing.sm,
+  paddingRight: theme.spacing.sm,
+  paddingTop: theme.spacing.xxs,
+  paddingBottom: theme.spacing.xxs,
+  borderRadius: theme.radius.sm,
+  backgroundColor: active ? theme.colors.accent : theme.colors.surface,
+  borderWidth: 1,
+  borderColor: active ? theme.colors.accent : theme.colors.border,
+})
+
 export const discountKindBox: StyleDesc = { width: theme.size.cartQuantity + theme.spacing.xl }
 
 export const empty: StyleDesc = {

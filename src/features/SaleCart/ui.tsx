@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { moneyOf } from '@/entities/product'
-import { cartSubtotalOf, cartTotalOf, cartVatOf, DISCOUNT_OPTIONS } from '@/entities/sale'
+import { cartSubtotalOf, cartTotalOf, cartVatOf, DISCOUNT_OPTIONS, DiscountKind } from '@/entities/sale'
 import { theme } from '@/shared/config'
 import { Icon, IconButton, If, Select, Text, TextInput, Tooltip } from '@/shared/ui'
 import {
@@ -10,13 +10,16 @@ import {
   EMPTY_HINT,
   EMPTY_TITLE,
   ESTIMATED_LINE_HEIGHT,
+  QUICK_DISCOUNTS,
   SUBTOTAL_LABEL,
   TOTAL_LABEL,
   VAT_ROW_LABEL,
   type IProps,
 } from './model'
 import {
+  chipsRow,
   discountBox,
+  discountChipOf,
   discountField,
   discountKindBox,
   empty,
@@ -99,6 +102,21 @@ export const SaleCart = ({
               />
             </div>
           </div>
+        </div>
+        <div style={chipsRow}>
+          {QUICK_DISCOUNTS.map((pct) => (
+            <div
+              key={pct}
+              style={discountChipOf(discount === pct && discountKind === DiscountKind.PERCENT)}
+              onClick={() => {
+                onDiscountChange(pct)
+                onDiscountKindChange(DiscountKind.PERCENT)
+              }}
+              testId={`cart__discount-chip-${pct}`}
+            >
+              <Text variant="caption">{pct === 0 ? 'Сброс' : `${pct}%`}</Text>
+            </div>
+          ))}
         </div>
         <If condition={cartVatOf(lines, discount) > 0}>
           <div style={totalRow}>

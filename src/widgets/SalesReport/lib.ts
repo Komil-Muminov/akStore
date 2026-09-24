@@ -1,9 +1,10 @@
-import { periodStartOf, type IReportFilters } from '@/entities/report'
+import { periodRangeOf, type IReportFilters } from '@/entities/report'
 
 export const queryOf = (filters: IReportFilters, page?: number, limit?: number) => {
   const params = new URLSearchParams()
-  const from = periodStartOf(filters.period)
-  if (from.length > 0) params.set('from', from)
+  const { from, to } = periodRangeOf(filters.period)
+  if (from) params.set('from', from)
+  if (to) params.set('to', to)
   if (filters.outletId) params.set('outlet', filters.outletId)
   if (filters.cashierId) params.set('cashier', filters.cashierId)
   if (filters.payment) params.set('payment', filters.payment)

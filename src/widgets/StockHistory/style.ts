@@ -19,6 +19,13 @@ export const head: StyleDesc = {
 
 export const headText: StyleDesc = { display: 'flex', flexDirection: 'column', flexGrow: 1 }
 
+export const actions: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+}
+
 export const list: StyleDesc = { flexGrow: 1 }
 
 export const row: StyleDesc = {

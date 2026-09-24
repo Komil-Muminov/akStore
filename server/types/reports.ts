@@ -25,6 +25,8 @@ export interface IReportSummary {
   vatTotal: number
   refundTotal: number
   refundCount: number
+  cashTotal: number
+  cardTotal: number
 }
 
 export interface IReportSummaryRow {
@@ -34,7 +36,11 @@ export interface IReportSummaryRow {
   vat_total: string
   refund_total: string
   refund_count: string
+  cash_total: string
+  card_total: string
 }
+
+export type TAbcGroup = 'A' | 'B' | 'C'
 
 export interface ITopProduct {
   productId: string
@@ -42,6 +48,8 @@ export interface ITopProduct {
   quantity: number
   revenue: number
   profit: number
+  sharePercent: number
+  abcGroup: TAbcGroup
 }
 
 export interface ITopProductRow {
@@ -50,6 +58,8 @@ export interface ITopProductRow {
   quantity: string
   revenue: string
   profit: string
+  share_percent: string
+  abc_group: string
 }
 
 export interface ICashierStat {
@@ -79,6 +89,20 @@ export interface IDailyPoint {
 
 export interface IDailyPointRow {
   day: Date
+  sales_count: string
+  revenue: string
+  cost: string
+}
+
+export interface IHourlyPoint {
+  hour: number
+  salesCount: number
+  revenue: number
+  profit: number
+}
+
+export interface IHourlyPointRow {
+  hour: number
   sales_count: string
   revenue: string
   cost: string

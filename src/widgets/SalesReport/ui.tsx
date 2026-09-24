@@ -10,7 +10,15 @@ import { TopProducts } from '@/features/TopProducts'
 import { ApiRoutes } from '@/shared/config'
 import { downloadFile, openPrintable } from '@/shared/lib'
 import { If, Text } from '@/shared/ui'
-import { useCashiersQuery, useDailyQuery, useOutletsQuery, useSalesQuery, useSummaryQuery, useTopQuery } from './hooks'
+import {
+  useCashiersQuery,
+  useDailyQuery,
+  useHourlyQuery,
+  useOutletsQuery,
+  useSalesQuery,
+  useSummaryQuery,
+  useTopQuery,
+} from './hooks'
 import { queryOf } from './lib'
 import { useRefund } from './refund'
 import {
@@ -42,6 +50,7 @@ export const SalesReport = () => {
   const summary = useSummaryQuery(baseQuery)
   const cashiers = useCashiersQuery(baseQuery)
   const daily = useDailyQuery(baseQuery)
+  const hourly = useHourlyQuery(baseQuery)
   const top = useTopQuery(topQueryString)
   const sales = useSalesQuery(salesQueryString)
 
@@ -102,7 +111,7 @@ export const SalesReport = () => {
         onExport={handleExport}
       />
       <ReportSummary summary={summary.data ?? null} />
-      <DailyChart points={daily.data ?? []} />
+      <DailyChart points={daily.data ?? []} hourlyPoints={hourly.data ?? []} />
       <div style={columns}>
         <TopProducts
           products={top.data?.items ?? []}

@@ -4,8 +4,10 @@ import type { TIconName } from '@/shared/ui'
 
 export const COUNT_LABEL = 'Инвентаризация'
 export const COUNT_TOOLTIP = 'Пересчёт остатков ведомостью'
+export const TRANSFER_LABEL = 'Перемещение'
+export const TRANSFER_TOOLTIP = 'Перемещение товара между точками'
 export const TITLE = 'Склад'
-export const DESCRIPTION = 'Приход, списания и продажи'
+export const DESCRIPTION = 'Приход, списания, перемещения и продажи'
 export const EMPTY_TITLE = 'Движений пока нет'
 export const EMPTY_HINT = 'Оформите приход товара в разделе «Товары»'
 export const ESTIMATED_ROW_HEIGHT = 64

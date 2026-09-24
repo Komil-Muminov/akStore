@@ -100,6 +100,7 @@ export const ApiRoutes = {
   REPORTS_SUMMARY: (filters: string) => `/reports/summary?${filters}`,
   REPORTS_CASHIERS: (filters: string) => `/reports/cashiers?${filters}`,
   REPORTS_DAILY: (filters: string) => `/reports/daily?${filters}`,
+  REPORTS_HOURLY: (filters: string) => `/reports/hourly?${filters}`,
   REPORTS_TOP: (filters: string) => `/reports/top-search?${filters}`,
   REPORTS_SALES: (filters: string) => `/reports/sales-search?${filters}`,
   REPORTS_EXPORT: (filters: string) => `/reports/export?${filters}`,

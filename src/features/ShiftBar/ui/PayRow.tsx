@@ -7,6 +7,10 @@ import {
   CASH_TOOLTIP,
   CHANGE_LABEL,
   CLOSE_LABEL,
+  EXACT_CARD_LABEL,
+  EXACT_CARD_TOOLTIP,
+  EXACT_CASH_LABEL,
+  EXACT_CASH_TOOLTIP,
   EXACT_TOOLTIP,
   PARK_LABEL,
   PARK_TOOLTIP,
@@ -29,6 +33,8 @@ interface IProps {
   onCashChange: (value: string) => void
   onCardChange: (value: string) => void
   onExact: () => void
+  onExactCash?: () => void
+  onExactCard?: () => void
   onPay: () => void
   onOpenCash: () => void
   onPark: () => void
@@ -49,6 +55,8 @@ export const PayRow = ({
   onCashChange,
   onCardChange,
   onExact,
+  onExactCash,
+  onExactCard,
   onPay,
   onOpenCash,
   onPark,
@@ -76,6 +84,28 @@ export const PayRow = ({
       <Tooltip title={EXACT_TOOLTIP}>
         <IconButton icon="check" onClick={onExact} testId="shift__exact" />
       </Tooltip>
+      <If condition={onExactCash !== undefined}>
+        <Tooltip title={EXACT_CASH_TOOLTIP}>
+          <Button
+            label={EXACT_CASH_LABEL}
+            variant="secondary"
+            onClick={onExactCash}
+            disabled={pending || cartTotal <= 0}
+            testId="shift__exact-cash"
+          />
+        </Tooltip>
+      </If>
+      <If condition={onExactCard !== undefined}>
+        <Tooltip title={EXACT_CARD_TOOLTIP}>
+          <Button
+            label={EXACT_CARD_LABEL}
+            variant="secondary"
+            onClick={onExactCard}
+            disabled={pending || cartTotal <= 0}
+            testId="shift__exact-card"
+          />
+        </Tooltip>
+      </If>
       <Text variant="secondary">{CHANGE_LABEL}</Text>
       <text style={changeText}>{moneyOf(changeOf(cartTotal, received))}</text>
       <Button

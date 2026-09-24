@@ -14,13 +14,23 @@ const startOfDay = () => {
 
 const shiftDays = (days: number) => new Date(startOfDay().getTime() - days * DAY_MS)
 
-export const periodStartOf = (period: PeriodKind) => {
-  if (period === PeriodKind.TODAY) return startOfDay().toISOString()
-  if (period === PeriodKind.WEEK) return shiftDays(WEEK_DAYS).toISOString()
-  if (period === PeriodKind.MONTH) return shiftDays(MONTH_DAYS).toISOString()
-  return ''
+export const periodRangeOf = (period: PeriodKind): { from?: string; to?: string } => {
+  if (period === PeriodKind.TODAY) return { from: startOfDay().toISOString() }
+  if (period === PeriodKind.YESTERDAY) {
+    return {
+      from: shiftDays(1).toISOString(),
+      to: startOfDay().toISOString(),
+    }
+  }
+  if (period === PeriodKind.WEEK) return { from: shiftDays(WEEK_DAYS).toISOString() }
+  if (period === PeriodKind.MONTH) return { from: shiftDays(MONTH_DAYS).toISOString() }
+  return {}
 }
 
+export const periodStartOf = (period: PeriodKind) => periodRangeOf(period).from ?? ''
+
 export const dayLabelOf = (iso: string) => new Date(iso).toLocaleDateString(LOCALE, DAY_OPTIONS)
+
+export const hourLabelOf = (hour: number) => `${String(hour).padStart(2, '0')}:00`
 
 export const percentOf = (value: number) => `${value.toFixed(1)}%`

@@ -2,6 +2,8 @@ import { moneyOf } from '@/entities/product'
 import { percentOf, type IReportSummary } from '@/entities/report'
 import {
   AVERAGE_LABEL,
+  CARD_LABEL,
+  CASH_LABEL,
   COST_LABEL,
   MARGIN_LABEL,
   PROFIT_LABEL,
@@ -23,6 +25,8 @@ export const cardsOf = (summary: IReportSummary | null): ICard[] => [
   { label: MARGIN_LABEL, value: percentOf(summary?.margin ?? 0), tone: 'plain' },
   { label: RECEIPTS_LABEL, value: String(summary?.salesCount ?? 0), tone: 'plain' },
   { label: AVERAGE_LABEL, value: moneyOf(summary?.average ?? 0), tone: 'plain' },
+  { label: CASH_LABEL, value: moneyOf(summary?.cashTotal ?? 0), tone: 'plain' },
+  { label: CARD_LABEL, value: moneyOf(summary?.cardTotal ?? 0), tone: 'plain' },
   { label: COST_LABEL, value: moneyOf(summary?.cost ?? 0), tone: 'muted' },
   { label: VAT_LABEL, value: moneyOf(summary?.vatTotal ?? 0), tone: 'muted' },
   { label: REFUNDS_LABEL, value: moneyOf(summary?.refundTotal ?? 0), tone: 'muted' },

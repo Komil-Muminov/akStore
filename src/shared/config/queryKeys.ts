@@ -21,6 +21,7 @@ export enum QueryKeys {
   REPORT_SUMMARY = 'report-summary',
   REPORT_CASHIERS = 'report-cashiers',
   REPORT_DAILY = 'report-daily',
+  REPORT_HOURLY = 'report-hourly',
   REPORT_TOP = 'report-top',
   REPORT_SALES = 'report-sales',
   POSITIONS = 'positions',

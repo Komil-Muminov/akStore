@@ -31,9 +31,11 @@ export const ProductRow = ({ product, onEdit, onStock, onArchive, onLabel }: IPr
         <text style={price}>{moneyOf(product.salePrice)}</text>
         <Text variant="caption">{moneyOf(product.costPrice)}</Text>
       </div>
-      <div style={column}>
-        <text style={stock(isLowStock(product))}>{stockLabelOf(product)}</text>
-      </div>
+      <Tooltip title={isLowStock(product) ? `Остаток ниже нормы (мин: ${product.minStock})` : 'Остаток в норме'}>
+        <div style={column}>
+          <text style={stock(isLowStock(product))}>{stockLabelOf(product)}</text>
+        </div>
+      </Tooltip>
       <div style={actions}>
         <Tooltip title={STOCK_TOOLTIP}>
           <IconButton icon="download" onClick={stockMove} testId={`product__stock-${product.id}`} />

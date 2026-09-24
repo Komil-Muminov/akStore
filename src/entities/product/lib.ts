@@ -14,7 +14,8 @@ export const stockLabelOf = (product: IProduct) =>
 
 export const unitLabelOf = (unit: ProductUnit) => UNIT_LABELS[unit]
 
-export const isLowStock = (product: IProduct) => product.stock <= LOW_STOCK_LIMIT
+export const isLowStock = (product: IProduct) =>
+  product.minStock > 0 ? product.stock <= product.minStock : product.stock <= LOW_STOCK_LIMIT
 
 export const marginOf = (product: IProduct) =>
   product.salePrice > 0 ? Math.round(((product.salePrice - product.costPrice) / product.salePrice) * PERCENT) : 0

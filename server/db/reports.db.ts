@@ -5,6 +5,8 @@ import type {
   ICashierStatRow,
   IDailyPoint,
   IDailyPointRow,
+  IHourlyPoint,
+  IHourlyPointRow,
   IReportParams,
   IReportSummary,
   IReportSummaryRow,
@@ -17,7 +19,7 @@ const round = (value: number) => Math.round(value * ROUND) / ROUND
 
 const summarySql = (where: string) => `
   WITH filtered AS (
-    SELECT s.total, s.vat_total, s.refunded_at, ${COST_SQL} AS cost
+    SELECT s.total, s.vat_total, s.refunded_at, s.payment, ${COST_SQL} AS cost
     FROM sales s JOIN users u ON u.id = s.cashier_id ${where}
   )
   SELECT
@@ -26,7 +28,9 @@ const summarySql = (where: string) => `
     coalesce(sum(cost) FILTER (WHERE refunded_at IS NULL), 0)::text AS cost,
     coalesce(sum(vat_total) FILTER (WHERE refunded_at IS NULL), 0)::text AS vat_total,
     coalesce(sum(total) FILTER (WHERE refunded_at IS NOT NULL), 0)::text AS refund_total,
-    count(*) FILTER (WHERE refunded_at IS NOT NULL)::text AS refund_count
+    count(*) FILTER (WHERE refunded_at IS NOT NULL)::text AS refund_count,
+    coalesce(sum(total) FILTER (WHERE refunded_at IS NULL AND payment = 'cash'), 0)::text AS cash_total,
+    coalesce(sum(total) FILTER (WHERE refunded_at IS NULL AND payment = 'card'), 0)::text AS card_total
   FROM filtered`
 
 const cashiersSql = (where: string) => `
@@ -47,6 +51,14 @@ const dailySql = (where: string) => `
   FROM sales s JOIN users u ON u.id = s.cashier_id ${where}
   GROUP BY day ORDER BY day`
 
+const hourlySql = (where: string) => `
+  SELECT extract(hour from s.created_at)::int AS hour,
+    count(*)::text AS sales_count,
+    coalesce(sum(s.total), 0)::text AS revenue,
+    coalesce(sum(${COST_SQL}), 0)::text AS cost
+  FROM sales s JOIN users u ON u.id = s.cashier_id ${where}
+  GROUP BY hour ORDER BY hour`
+
 const toSummary = (row: IReportSummaryRow | undefined): IReportSummary => {
   const salesCount = Number(row?.sales_count ?? 0)
   const revenue = round(Number(row?.revenue ?? 0))
@@ -62,6 +74,8 @@ const toSummary = (row: IReportSummaryRow | undefined): IReportSummary => {
     vatTotal: round(Number(row?.vat_total ?? 0)),
     refundTotal: round(Number(row?.refund_total ?? 0)),
     refundCount: Number(row?.refund_count ?? 0),
+    cashTotal: round(Number(row?.cash_total ?? 0)),
+    cardTotal: round(Number(row?.card_total ?? 0)),
   }
 }
 
@@ -81,6 +95,13 @@ const toDaily = (row: IDailyPointRow): IDailyPoint => ({
   profit: round(Number(row.revenue) - Number(row.cost)),
 })
 
+const toHourly = (row: IHourlyPointRow): IHourlyPoint => ({
+  hour: Number(row.hour),
+  salesCount: Number(row.sales_count),
+  revenue: round(Number(row.revenue)),
+  profit: round(Number(row.revenue) - Number(row.cost)),
+})
+
 export const reportsDb = {
   summary: async (params: IReportParams) => {
     const { where, values } = filterOf(params)
@@ -93,5 +114,9 @@ export const reportsDb = {
   daily: async (params: IReportParams) => {
     const { where, values } = filterOf(params, ['s.refunded_at IS NULL'])
     return (await pool.query<IDailyPointRow>(dailySql(where), values)).rows.map(toDaily)
+  },
+  hourly: async (params: IReportParams) => {
+    const { where, values } = filterOf(params, ['s.refunded_at IS NULL'])
+    return (await pool.query<IHourlyPointRow>(hourlySql(where), values)).rows.map(toHourly)
   },
 }

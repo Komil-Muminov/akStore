@@ -13,6 +13,41 @@ export const root: StyleDesc = {
   flexShrink: 0,
 }
 
+export const header: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+}
+
+export const headerLeft: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.md,
+}
+
+export const tabs: StyleDesc = {
+  display: 'flex',
+  flexDirection: 'row',
+  gap: theme.spacing.xs,
+  backgroundColor: theme.colors.surface,
+  padding: 3,
+  borderRadius: theme.radius.md,
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+}
+
+export const tabOf = (active: boolean): StyleDesc => ({
+  paddingTop: theme.spacing.xs,
+  paddingBottom: theme.spacing.xs,
+  paddingLeft: theme.spacing.md,
+  paddingRight: theme.spacing.md,
+  borderRadius: theme.radius.sm,
+  backgroundColor: active ? theme.colors.raised : 'transparent',
+})
+
 export const plot: StyleDesc = {
   display: 'flex',
   flexDirection: 'row',
@@ -30,11 +65,11 @@ export const column: StyleDesc = {
   width: theme.size.chartBar,
 }
 
-export const barOf = (ratio: number): StyleDesc => ({
+export const barOf = (ratio: number, isPeak = false): StyleDesc => ({
   width: theme.size.chartBar,
   height: Math.round(theme.size.chartHeight * ratio),
   borderRadius: theme.radius.sm,
-  backgroundColor: theme.colors.accent,
+  backgroundColor: isPeak ? theme.colors.warning : theme.colors.accent,
 })
 
 export const empty: StyleDesc = {

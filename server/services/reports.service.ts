@@ -9,6 +9,7 @@ export const reportsService = {
   summary: async (params: IReportParams) => reportsDb.summary(params),
   cashiers: async (params: IReportParams) => reportsDb.cashiers(params),
   daily: async (params: IReportParams) => reportsDb.daily(params),
+  hourly: async (params: IReportParams) => reportsDb.hourly(params),
   topProducts: async (params: IReportParams, page: IPageParams) => topProductsDb.search(params, page),
   sales: async (params: IReportParams, page: IPageParams) => salesDb.search(params, page),
   export: async (params: IReportParams) => {

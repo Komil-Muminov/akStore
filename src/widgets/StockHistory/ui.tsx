@@ -3,8 +3,10 @@ import { saleStampOf } from '@/entities/sale'
 import { ApiRoutes, QueryKeys, theme } from '@/shared/config'
 import { useGetQuery } from '@/shared/hooks'
 import { StocktakeDialog } from '@/features/StocktakeDialog'
+import { TransferDialog } from '@/features/TransferDialog'
 import { Button, Icon, If, Spinner, Text, Tooltip } from '@/shared/ui'
 import { useStocktake } from './stocktake'
+import { useStockTransfer } from './transfer'
 import {
   COUNT_LABEL,
   COUNT_TOOLTIP,
@@ -13,15 +15,18 @@ import {
   EMPTY_TITLE,
   ESTIMATED_ROW_HEIGHT,
   TITLE,
+  TRANSFER_LABEL,
+  TRANSFER_TOOLTIP,
   iconOf,
   toneOf,
 } from './model'
-import { empty, head, headText, list, mark, root, row, rowText, quantity } from './style'
+import { actions, empty, head, headText, list, mark, root, row, rowText, quantity } from './style'
 
 export const StockHistory = () => {
   const moves = useGetQuery<IStockMove[]>(QueryKeys.STOCK_HISTORY, ApiRoutes.PRODUCTS_HISTORY())
   const items = moves.data ?? []
   const stocktake = useStocktake()
+  const transfer = useStockTransfer()
 
   return (
     <div style={root} testId="stock__layout">
@@ -30,10 +35,33 @@ export const StockHistory = () => {
           <Text variant="heading">{TITLE}</Text>
           <Text variant="secondary">{DESCRIPTION}</Text>
         </div>
-        <Tooltip title={COUNT_TOOLTIP}>
-          <Button label={COUNT_LABEL} icon="listChecks" onClick={stocktake.openDialog} testId="stock__count" />
-        </Tooltip>
+        <div style={actions}>
+          <Tooltip title={TRANSFER_TOOLTIP}>
+            <Button
+              label={TRANSFER_LABEL}
+              icon="car"
+              variant="secondary"
+              onClick={transfer.openDialog}
+              testId="stock__transfer"
+            />
+          </Tooltip>
+          <Tooltip title={COUNT_TOOLTIP}>
+            <Button label={COUNT_LABEL} icon="listChecks" onClick={stocktake.openDialog} testId="stock__count" />
+          </Tooltip>
+        </div>
       </div>
+      <TransferDialog
+        open={transfer.open}
+        outlets={transfer.outlets}
+        products={transfer.products}
+        stocks={transfer.stocks}
+        productId={transfer.productId}
+        pending={transfer.pending}
+        error={transfer.error}
+        onProductChange={transfer.setProductId}
+        onSubmit={transfer.submit}
+        onClose={transfer.closeDialog}
+      />
       <StocktakeDialog
         open={stocktake.open}
         lines={stocktake.lines}

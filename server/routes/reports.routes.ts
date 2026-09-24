@@ -12,6 +12,7 @@ export const reportsRouter = Router()
 reportsRouter.get('/summary', manager, respond((req) => reportsService.summary(parseReportParams(req.query))))
 reportsRouter.get('/cashiers', manager, respond((req) => reportsService.cashiers(parseReportParams(req.query))))
 reportsRouter.get('/daily', manager, respond((req) => reportsService.daily(parseReportParams(req.query))))
+reportsRouter.get('/hourly', manager, respond((req) => reportsService.hourly(parseReportParams(req.query))))
 reportsRouter.get('/top-search', manager, respond((req) =>
   reportsService.topProducts(parseReportParams(req.query), parsePageParams(req.query)),
 ))

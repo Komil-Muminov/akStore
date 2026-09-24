@@ -37,6 +37,8 @@ export const ShiftBar = ({
   onOpen,
   onClose,
   onPay,
+  onExactCash,
+  onExactCard,
   lastSaleId,
   onPrintReceipt,
   parkedCount,
@@ -123,6 +125,8 @@ export const ShiftBar = ({
               onCashChange={setCash}
               onCardChange={setCard}
               onExact={handleExact}
+              onExactCash={onExactCash}
+              onExactCard={onExactCard}
               onPay={handlePay}
               onOpenCash={onOpenCash}
               onPark={onPark}
